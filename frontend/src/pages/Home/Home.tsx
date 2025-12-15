@@ -58,7 +58,7 @@ const Home = () => {
 
 	const [userData, setUserData] = useState<User[] | null>([]);
 
-	const [loading, setLoading] = useState(false);
+	// const [loading, setLoading] = useState(true);
 
 	const [inputData, setInputData] = useState<InputData>({
 		date: new Date(),
@@ -67,7 +67,6 @@ const Home = () => {
 
 	useEffect(() => {
 		const getUsersData = async () => {
-			setLoading(true);
 			try {
 				const response = await axios.get(
 					"https://weekly-planner-backend.onrender.com/api"
@@ -75,8 +74,6 @@ const Home = () => {
 				setUserData(response.data);
 			} catch (error) {
 				console.log(error);
-			} finally {
-				setLoading(false);
 			}
 		};
 
@@ -129,8 +126,6 @@ const Home = () => {
 			people: updatedPeople,
 		});
 	};
-
-	if (loading) return;
 
 	return (
 		<main className="home">
