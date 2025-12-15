@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import usersData from "./../../assets/data/users-data.json";
 import axios from "axios";
 import "./Home.scss";
@@ -34,6 +34,7 @@ const dayNow = weekData[correctDate];
 const month = dateNow.getMonth();
 const date = dateNow.getDate();
 const monthNow = monthData[month];
+const yearNow = dateNow.getFullYear();
 
 const Home = () => {
 	interface User {
@@ -42,7 +43,7 @@ const Home = () => {
 			name: string;
 			notes: string;
 		}[];
-		updatedAt: string;
+		updatedAt: Date;
 	}
 
 	interface Person {
@@ -57,12 +58,26 @@ const Home = () => {
 
 	const [userData, setUserData] = useState<User[]>([]);
 
-	// const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 
 	const [inputData, setInputData] = useState<InputData>({
-		date: new Date(),
+		date: dateNow,
 		people: [],
 	});
+
+	const [dropdownVisible, setDropdownVisible] = useState(() =>
+		new Array(usersData.length).fill(false)
+	);
+
+	const handleDropdonwVisible = (index: number) => {
+		setDropdownVisible((prev) => {
+			const updated = [...prev];
+			updated[index] = !updated[index];
+			return updated;
+		});
+	};
+
+	const popUp = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const getUsersData = async () => {
@@ -79,21 +94,34 @@ const Home = () => {
 		getUsersData();
 	}, []);
 
-	const updateUsersData = async (e: any) => {
-		e.preventDefault();
+	const updateUsersData = async () => {
+		setLoading(true);
 		try {
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 			await axios.put("https://weekly-planner-backend.onrender.com/api", {
 				...inputData,
 				date: inputData.date.toISOString(),
 			});
 		} catch (error) {
 			console.log(error);
+		} finally {
+			setLoading(false);
+
+			popUp.current && popUp.current.classList.add("pop-up--visible");
+
+			setTimeout(() => {
+				popUp.current && popUp.current.classList.remove("pop-up--visible");
+			}, 3000);
 		}
 	};
 
 	const todayKey = new Date().toISOString().slice(0, 10);
 
 	const usersDayNow = userData.find((u) => u.date.slice(0, 10) === todayKey);
+
+	// const usersDayNow = userData;
+
+	const usertt = userData.slice(-6);
 
 	useEffect(() => {
 		if (!usersData?.length) return;
@@ -134,58 +162,106 @@ const Home = () => {
 		}));
 	};
 
+	const weekDataModified = [
+		weekData[correctDate === 0 ? 1 : correctDate - 6],
+		weekData[correctDate === 0 ? 2 : correctDate - 5],
+		weekData[correctDate === 0 ? 3 : correctDate - 4],
+		weekData[correctDate === 0 ? 4 : correctDate - 3],
+		weekData[correctDate === 0 ? 5 : correctDate - 2],
+		weekData[correctDate === 0 ? 6 : correctDate - 1],
+		weekData[correctDate],
+	];
+
 	return (
-		<main className="home">
-			<p style={{ marginBottom: 50 }}>Home</p>
-			<p style={{ fontSize: "2rem", marginBottom: 20 }}>
-				{dayNow}, {monthNow} {date}
-			</p>
-			<div className="home-users-container">
-				{inputData.people.map((person, i) => (
-					<div className="home-user-container" key={person.name}>
-						<div style={{ display: "flex", justifyContent: "space-between" }}>
-							<p>{person.name}</p>
-						</div>
-
-						<form onSubmit={updateUsersData}>
-							<textarea
-								value={person.notes}
-								onChange={(e) => handlePersonChange(i, "notes", e.target.value)}
-								className="textarea"
-								rows={5}
-							/>
-
+		<>
+			<div ref={popUp} className="pop-up">
+				Informace aktualizovány!
+			</div>
+			<main className="home">
+				{/* <p style={{ marginBottom: 50 }}>Home</p> */}
+				<div style={{ marginBottom: 20 }}>
+					<p style={{ fontSize: "2rem" }}>
+						{dayNow}, {monthNow} {date}
+					</p>
+					<p>
+						{yearNow}-{month + 1}-{date}
+					</p>
+				</div>
+				<div className="home-users-container">
+					{inputData.people.map((person, i) => (
+						<div className="home-user-container" key={person.name}>
 							<div style={{ display: "flex", justifyContent: "space-between" }}>
 								<button
+									onClick={() => handleDropdonwVisible(i)}
 									style={{
-										padding: 10,
-										background: "red",
-										color: "white",
-										marginTop: 5,
-										borderRadius: 5,
+										display: "flex",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: 5,
 									}}
-									onClick={() => clearNotes(i)}
 								>
-									Clear
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										fill="currentColor"
+										className="bi bi-arrow-right-square-fill"
+										viewBox="0 0 16 16"
+									>
+										<path d="M0 14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2zm4.5-6.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5a.5.5 0 0 1 0-1" />
+									</svg>
+									<p style={{ fontSize: "1.2rem" }}>{person.name}</p>
 								</button>
-								<button
-									style={{
-										padding: 10,
-										background: "green",
-										color: "white",
-										marginTop: 5,
-										borderRadius: 5,
-									}}
-									type="submit"
-								>
-									Submit
-								</button>
+								<p>
+									{userData.length > 0
+										? userData[0].updatedAt.toString().slice(11, 16)
+										: ""}
+								</p>
 							</div>
-						</form>
-					</div>
-				))}
-			</div>
-		</main>
+							<div
+								className={`dd-container ${
+									dropdownVisible[i] ? "dd-container--visible" : ""
+								}`}
+							>
+								<div style={{ overflow: "hidden" }}>
+									{weekDataModified.map((day, i) => {
+										return <p key={i}>{day}</p>;
+									})}
+									<textarea
+										value={person.notes}
+										onChange={(e) =>
+											handlePersonChange(i, "notes", e.target.value)
+										}
+										className="textarea"
+										rows={5}
+									/>
+									<div
+										style={{
+											display: "flex",
+											justifyContent: "flex-end",
+											gap: 10,
+										}}
+									>
+										<button className="reset-btn" onClick={() => clearNotes(i)}>
+											Smazat
+										</button>
+										<button onClick={updateUsersData} className="submit-btn">
+											{loading ? (
+												<span className="circle-loading">
+													<span></span>
+												</span>
+											) : (
+												"Uložit"
+											)}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					))}
+				</div>
+			</main>
+		</>
 	);
 };
 

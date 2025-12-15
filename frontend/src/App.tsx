@@ -14,7 +14,7 @@ function App() {
 	return (
 		<Router>
 			<div className="wrapper">
-				<div className="sidebar">
+				<div style={{ display: "none" }} className="sidebar">
 					<NavLink to="/">Planner</NavLink>
 					<ul>
 						{usersData.map((user) => {
