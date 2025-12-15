@@ -1,7 +1,11 @@
 [
-	{ "id": 1, "name": "Serhii" },
-	{ "id": 2, "name": "Kristian" },
-	{ "id": 3, "name": "Matej" },
-	{ "id": 4, "name": "Denisa" },
-	{ "id": 5, "name": "Alex" }
+	{ "id": 1, "name": "Matěj Kurty" },
+	{ "id": 2, "name": "Jirka Faltin" },
+	{ "id": 3, "name": "Oleksandr Padalka" },
+	{ "id": 4, "name": "Jiří Faltin" },
+	{ "id": 5, "name": "Alex Padelka" },
+	{ "id": 6, "name": "Viktor Tomyšynec" },
+	{ "id": 7, "name": "Serhiy Tanchynets" },
+	{ "id": 8, "name": "Kristián Janko" },
+	{ "id": 8, "name": "Denisa Vojtíšková" }
 ]
