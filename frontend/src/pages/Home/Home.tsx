@@ -4,28 +4,28 @@ import axios from "axios";
 import "./Home.scss";
 
 const weekData = [
-	"Monday",
-	"Tuesday",
-	"Wednesday",
-	"Thursday",
-	"Friday",
-	"Saturday",
-	"Sunday",
+	"Pondělí",
+	"Úterý",
+	"Středa",
+	"Čtvrtek",
+	"Pátek",
+	"Sobota",
+	"Neděle",
 ];
 
 const monthData = [
-	"January",
-	"February",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"August",
-	"September",
-	"October",
-	"November",
-	"December",
+	"leden",
+	"únor",
+	"březen",
+	"duben",
+	"květen",
+	"červen",
+	"červenec",
+	"srpen",
+	"září",
+	"říjen",
+	"listopad",
+	"prosinec",
 ];
 
 const dateNow = new Date();
@@ -128,11 +128,21 @@ const Home = () => {
 		});
 	};
 
+	// TODO: LEARN THIS
+	const clearNotes = (index: number) => {
+		setInputData((prev) => ({
+			...prev,
+			people: prev.people.map((p, i) =>
+				i === index ? { ...p, notes: "" } : p
+			),
+		}));
+	};
+
 	return (
 		<main className="home">
 			<p style={{ marginBottom: 50 }}>Home</p>
-			<p style={{ fontSize: "2rem" }}>
-				{dayNow} {monthNow} {date}
+			<p style={{ fontSize: "2rem", marginBottom: 20 }}>
+				{dayNow}, {monthNow} {date}
 			</p>
 			<div className="home-users-container">
 				{inputData.people.map((person, i) => (
@@ -150,8 +160,30 @@ const Home = () => {
 							/>
 
 							<div style={{ display: "flex", justifyContent: "space-between" }}>
-								<input type="reset" value="Reset" />
-								<button type="submit">Submit</button>
+								<button
+									style={{
+										padding: 10,
+										background: "red",
+										color: "white",
+										marginTop: 5,
+										borderRadius: 5,
+									}}
+									onClick={() => clearNotes(i)}
+								>
+									Clear
+								</button>
+								<button
+									style={{
+										padding: 10,
+										background: "green",
+										color: "white",
+										marginTop: 5,
+										borderRadius: 5,
+									}}
+									type="submit"
+								>
+									Submit
+								</button>
 							</div>
 						</form>
 					</div>
