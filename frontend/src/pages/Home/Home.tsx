@@ -119,9 +119,7 @@ const Home = () => {
 
 	const usersDayNow = userData.find((u) => u.date.slice(0, 10) === todayKey);
 
-	// const usersDayNow = userData;
-
-	// const usertt = userData.slice(-6);
+	const lastWeek = userData.slice(-6);
 
 	useEffect(() => {
 		if (!usersData?.length) return;
@@ -162,23 +160,12 @@ const Home = () => {
 		}));
 	};
 
-	const weekDataModified = [
-		weekData[correctDate === 0 ? 1 : correctDate - 6],
-		weekData[correctDate === 0 ? 2 : correctDate - 5],
-		weekData[correctDate === 0 ? 3 : correctDate - 4],
-		weekData[correctDate === 0 ? 4 : correctDate - 3],
-		weekData[correctDate === 0 ? 5 : correctDate - 2],
-		weekData[correctDate === 0 ? 6 : correctDate - 1],
-		weekData[correctDate],
-	];
-
 	return (
 		<>
 			<div ref={popUp} className="pop-up">
 				Informace aktualizovány!
 			</div>
 			<main className="home">
-				{/* <p style={{ marginBottom: 50 }}>Home</p> */}
 				<div style={{ marginBottom: 20 }}>
 					<p style={{ fontSize: "2rem" }}>
 						{dayNow}, {monthNow} {date}
@@ -214,20 +201,72 @@ const Home = () => {
 									</svg>
 									<p style={{ fontSize: "1.2rem" }}>{person.name}</p>
 								</div>
-								<p>
+								{/* <p>
 									{userData.length > 0
 										? userData[0].updatedAt.toString().slice(11, 16)
 										: ""}
-								</p>
+								</p> */}
 							</button>
 							<div
 								className={`dd-container ${
 									dropdownVisible[i] ? "dd-container--visible" : ""
 								}`}
 							>
-								<div style={{ overflow: "hidden", padding: "0 20px" }}>
-									{weekDataModified.map((day, i) => {
-										return <p key={i}>{day}</p>;
+								<div
+									style={{
+										overflow: "hidden",
+										padding: "0 20px",
+										display: "flex",
+										flexDirection: "column",
+									}}
+								>
+									{lastWeek.map((day, index) => {
+										const correctHours = new Date(day.updatedAt).getHours();
+										const correctMinutes = new Date(day.updatedAt).getMinutes();
+										const correctDay = new Date(day.updatedAt).getDay();
+
+										return day.people.map((user) => {
+											return (
+												user.name === person.name && (
+													<div
+														style={{
+															display: "flex",
+															flexDirection: "column",
+															justifyContent: "center",
+															alignItems: "flex-start",
+														}}
+													>
+														<div
+															style={{
+																display: "flex",
+																justifyContent: "space-between",
+																width: "100%",
+																margin: "5px 0",
+															}}
+														>
+															<span style={{ fontWeight: 600 }}>
+																{weekData[correctDay - 1]}
+															</span>{" "}
+															<span>
+																{person.name === user.name &&
+																	day.date.slice(0, 10)}
+															</span>{" "}
+															<span>
+																{correctHours}:
+																{correctMinutes.toString().padStart(2, "0")}
+															</span>
+														</div>
+														{index !== lastWeek.length - 1 && (
+															<p className="week-notes">
+																{index !== lastWeek.length - 1 &&
+																	person.name === user.name &&
+																	user.notes}
+															</p>
+														)}
+													</div>
+												)
+											);
+										});
 									})}
 									<textarea
 										value={person.notes}

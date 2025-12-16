@@ -95,6 +95,7 @@
 .dd-container {
 	display: grid;
 	grid-template-rows: 0fr;
+	// gap: 10px;
 	overflow: hidden;
 	transition: grid-template-rows 0.3s, padding 0.3s;
 }
@@ -102,4 +103,12 @@
 .dd-container--visible {
 	grid-template-rows: 1fr;
 	padding: 10px 0;
+}
+
+.week-notes {
+	background-color: #fff;
+	padding: 5px;
+	width: 100%;
+	border-radius: 10px;
+	background: rgb(255, 219, 219);
 }
