@@ -1,16 +1,18 @@
-import logo from "/logo/logo-black.png";
 import { NavLink } from "react-router-dom";
-import "./Header.scss";
 import { useNavigate } from "react-router-dom";
+import logo from "/logo/logo-black.png";
+import "./Header.scss";
 
-const Header = ({ setUser }) => {
+const Header = ({ user, setUser }) => {
 	const navigate = useNavigate();
 
+	// TODO: learn this
 	const handleLogout = () => {
 		localStorage.removeItem("token");
 		setUser(null);
 		navigate("/");
 	};
+
 	return (
 		<header className="header">
 			<NavLink className="header__logo" to="/">
@@ -20,9 +22,22 @@ const Header = ({ setUser }) => {
 					<span>Říyení práce a plánovač úkolů</span>
 				</span>
 			</NavLink>
-			<button onClick={handleLogout} style={{ color: "#000" }}>
-				Prihlasit se
-			</button>
+			<div>
+				{user ? (
+					<button onClick={handleLogout} className="header__btn">
+						Odhlásit se
+					</button>
+				) : (
+					<div style={{ display: "flex", gap: 10 }}>
+						<NavLink className="header__link" to="/login">
+							Prihlasit se
+						</NavLink>
+						<NavLink className="header__link" to="/register">
+							Registrace
+						</NavLink>
+					</div>
+				)}
+			</div>
 		</header>
 	);
 };

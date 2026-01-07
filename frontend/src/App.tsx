@@ -47,7 +47,7 @@ function App() {
 	return (
 		<Router>
 			<div className="wrapper">
-				<Header setUser={setUser} />
+				<Header user={user} setUser={setUser} />
 				<div className="wrapper-inner">
 					<Sidebar />
 					{/* <div style={{ display: "none" }} className="sidebar">

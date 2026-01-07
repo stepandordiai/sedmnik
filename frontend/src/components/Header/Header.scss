@@ -16,3 +16,11 @@
 		width: 80px;
 	}
 }
+
+.header__link,
+.header__btn {
+	background: var(--accent-clr);
+	color: #fff;
+	padding: 5px;
+	border-radius: 10px;
+}
