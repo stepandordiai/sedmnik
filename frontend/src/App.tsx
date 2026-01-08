@@ -9,9 +9,10 @@ import axios from "axios";
 import { Navigate } from "react-router-dom";
 import UserPage from "./pages/UserPage/UserPage";
 import "./scss/App.scss";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
-	const [user, setUser] = useState(null);
+	const { user, setUser } = useAuth();
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
 
@@ -39,13 +40,13 @@ function App() {
 		fetchUser();
 	}, []);
 
-	if (isLoading) {
+	if (isLoading && !user) {
 		return <div>Loading...</div>;
 	}
 	return (
 		<Router>
 			<div className="wrapper">
-				<Header user={user} setUser={setUser} />
+				<Header />
 				<div className="wrapper-inner">
 					<Sidebar user={user} />
 					{/* <div style={{ display: "none" }} className="sidebar">
@@ -71,15 +72,10 @@ function App() {
 				</div> */}
 					<Routes>
 						<Route path="/" element={<Home user={user} error={error} />} />
-						<Route
-							path="/login"
-							element={user ? <Navigate to="/" /> : <Login setUser={setUser} />}
-						/>
+						<Route path="/login" element={<Login />} />
 						<Route
 							path="/register"
-							element={
-								user ? <Navigate to="/" /> : <Register setUser={setUser} />
-							}
+							element={user ? <Navigate to="/" /> : <Register />}
 						/>
 						<Route path="/users/:id" element={<UserPage />} />
 						{/* <Route path="*" element={<NotFound />} /> */}

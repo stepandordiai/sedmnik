@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
+import workRoutes from "./routes/work.js";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 dotenv.config();
@@ -32,6 +33,8 @@ app.use(
 );
 
 app.use("/api/users", authRoutes);
+
+app.use("/api/work", workRoutes);
 
 app.get("/health", (req, res) => {
 	res.status(200).write("ok");

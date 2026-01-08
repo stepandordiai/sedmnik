@@ -1,13 +1,57 @@
 import ClockIcon from "../../icons/ClockIcon";
 import { useEffect, useState } from "react";
 import timeToMinutes from "../../utils/timeToMinutes";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import "./Visit.scss";
 
-const Visit = () => {
+// const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+
+const Visit = ({ userId, currentUser }) => {
+	const { user } = useAuth();
+
+	const [data, setData] = useState(null);
 	const [startTime, setStartTime] = useState("");
 	const [endTime, setEndTime] = useState("");
 	const [pauseTime, setPauseTime] = useState("");
 	const [total, setTotal] = useState("00:00");
+	const [error, setError] = useState(null);
+
+	const today = new Date();
+	const [shiftDate, setShiftDate] = useState(today.toISOString().split("T")[0]);
+
+	useEffect(() => {
+		const fetchWorkShift = async () => {
+			try {
+				const token = localStorage.getItem("token");
+				const response = await axios.get(
+					`https://weekly-planner-backend.onrender.com/api/work/${shiftDate}?userId=${userId}`,
+					{
+						headers: {
+							Authorization: `Bearer ${token}`,
+						},
+					}
+				);
+
+				setData(response.data);
+			} catch (err: any) {
+				const message = err.response?.data?.message || "Something went wrong";
+				setError(message);
+				console.error("Full Error Object:", err.response);
+			}
+		};
+
+		fetchWorkShift();
+	}, [userId, shiftDate]);
+
+	useEffect(() => {
+		if (data) {
+			setStartTime(data.startTime ?? "");
+			setEndTime(data.endTime ?? "");
+			setPauseTime(data.pauseTime ?? "");
+			setTotal("00:00");
+		}
+	}, [data]);
 
 	useEffect(() => {
 		if (!startTime || !endTime) return;
@@ -22,9 +66,36 @@ const Visit = () => {
 		setTotal(hours + ":" + minutes.toString().padStart(2, "0"));
 	}, [startTime, endTime, pauseTime]);
 
-	const today = new Date();
+	const upsertWorkShift = async () => {
+		try {
+			const token = localStorage.getItem("token");
 
-	const dateString = today.toISOString().split("T")[0];
+			const response = await axios.post(
+				"https://weekly-planner-backend.onrender.com/api/work",
+				{
+					date: shiftDate,
+					startTime,
+					endTime,
+					pauseTime,
+				},
+				{
+					headers: {
+						Authorization: `Bearer ${token}`, // <--- this is correct
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			console.log(response.data);
+		} catch (err: any) {
+			const message = err.response?.data?.message || "Something went wrong";
+			setError(message);
+			console.error("Full Error Object:", err.response);
+		}
+	};
+
+	if (!user) return <p>Loading...</p>; // wait for context to hydrate
+	const canEdit = currentUser.id === userId;
 
 	return (
 		<div className="visit">
@@ -50,7 +121,8 @@ const Visit = () => {
 								borderRadius: 10,
 								padding: 5,
 							}}
-							defaultValue={dateString}
+							value={shiftDate}
+							onChange={(e) => setShiftDate(e.target.value)}
 							type="date"
 						/>
 					</div>
@@ -66,6 +138,7 @@ const Visit = () => {
 								textAlign: "center",
 								minWidth: 80,
 							}}
+							disabled={!canEdit}
 							type="time"
 						/>
 					</div>
@@ -81,6 +154,7 @@ const Visit = () => {
 								textAlign: "center",
 								minWidth: 80,
 							}}
+							disabled={!canEdit}
 							type="time"
 						/>
 					</div>
@@ -98,6 +172,7 @@ const Visit = () => {
 								textAlign: "center",
 								minWidth: 80,
 							}}
+							disabled={!canEdit}
 							type="time"
 						/>
 					</div>
@@ -116,6 +191,9 @@ const Visit = () => {
 							{total}
 						</p>
 					</div>
+					<button onClick={upsertWorkShift} disabled={!canEdit}>
+						Save
+					</button>
 				</div>
 			</div>
 		</div>

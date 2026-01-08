@@ -31,9 +31,10 @@ const Weekbar = () => {
 	return (
 		<div className="weekbar">
 			<div className="weekbar-container">
-				{schedule.map((day) => {
+				{schedule.map((day, i) => {
 					return (
 						<div
+							key={i}
 							className={classNames("weekbar__day", {
 								"weekbar__day--active": day.date === new Date().toDateString(),
 							})}

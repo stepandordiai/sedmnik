@@ -76,6 +76,18 @@ router.get("/all", protect, async (req, res) => {
 	}
 });
 
+// const workEntry = await WorkEntry.findOneAndUpdate(
+//   { user: req.user._id, date },
+//   {
+//     startTime,
+//     endTime,
+//     pauseMinutes: pauseMinutes || 0,
+//   },
+//   { new: true, upsert: true } // create if not exists
+// );
+
+// res.status(200).json(workEntry);
+
 // Generate JWT token
 const generateToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d" });

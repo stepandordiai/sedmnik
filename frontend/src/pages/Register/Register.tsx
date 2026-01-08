@@ -3,18 +3,10 @@ import { useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import "./Register.scss";
+import { useAuth } from "../../context/AuthContext";
 
-type User = {
-	id: string;
-	name: string;
-	username: string;
-};
-
-type Props = {
-	setUser: React.Dispatch<React.SetStateAction<User | null>>;
-};
-
-const Register = ({ setUser }: Props) => {
+const Register = () => {
+	const { setUser } = useAuth();
 	const navigate = useNavigate();
 
 	const [formData, setFormData] = useState({
@@ -38,6 +30,8 @@ const Register = ({ setUser }: Props) => {
 				formData
 			);
 			localStorage.setItem("token", res.data.token);
+			// Save user object
+			localStorage.setItem("user", JSON.stringify(res.data));
 			setUser(res.data);
 			navigate("/");
 			// TODO: LEARN THIS

@@ -2,15 +2,19 @@ import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import logo from "/logo/logo-black.png";
 import "./Header.scss";
+import { useAuth } from "../../context/AuthContext";
 
-const Header = ({ user, setUser }) => {
+const Header = () => {
+	const { user, setUser } = useAuth();
+
 	const navigate = useNavigate();
 
 	// TODO: learn this
 	const handleLogout = () => {
 		localStorage.removeItem("token");
+		localStorage.removeItem("user");
 		setUser(null);
-		navigate("/");
+		navigate("/login", { replace: true });
 	};
 
 	return (

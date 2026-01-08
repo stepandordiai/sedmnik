@@ -3,23 +3,25 @@ import { useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 import "./Login.scss";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect } from "react";
 
 type User = {
 	id: string;
+	name: string;
 	username: string;
 };
 
-type Loginrops = {
-	setUser: React.Dispatch<React.SetStateAction<User | null>>;
-};
+const Login = () => {
+	const { setUser } = useAuth();
 
-const Login = ({ setUser }: Loginrops) => {
 	const navigate = useNavigate();
 
 	const [formData, setFormData] = useState({
 		username: "",
 		password: "",
 	});
+	const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -35,17 +37,29 @@ const Login = ({ setUser }: Loginrops) => {
 				formData
 			);
 			localStorage.setItem("token", res.data.token);
-			setUser(res.data);
 
-			setTimeout(() => {
-				navigate(`/users/${res.data.id}`);
-			}, 100);
+			setLoggedInUser(res.data);
+
 			// FIXME:
 		} catch (err) {
 			setError(err.response?.data.message);
 			console.error("Full Error Object:", err.response?.data.message);
 		}
 	};
+
+	// Navigate **after context updates**
+	useEffect(() => {
+		if (loggedInUser) {
+			setUser(loggedInUser);
+
+			// Save user object
+			localStorage.setItem("user", JSON.stringify(loggedInUser));
+
+			navigate(`/users/${loggedInUser.id}`);
+		}
+	}, [loggedInUser, navigate, setUser]);
+
+	console.log(loggedInUser);
 
 	return (
 		<main className="login">
