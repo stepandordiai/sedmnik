@@ -2,15 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
-import "./Login.scss";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect } from "react";
-
-type User = {
-	id: string;
-	name: string;
-	username: string;
-};
+import "./Login.scss";
 
 const Login = () => {
 	const { setUser } = useAuth();
@@ -21,7 +15,7 @@ const Login = () => {
 		username: "",
 		password: "",
 	});
-	const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+	const [loggedInUser, setLoggedInUser] = useState(null);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -47,7 +41,6 @@ const Login = () => {
 		}
 	};
 
-	// Navigate **after context updates**
 	useEffect(() => {
 		if (loggedInUser) {
 			setUser(loggedInUser);
@@ -55,11 +48,9 @@ const Login = () => {
 			// Save user object
 			localStorage.setItem("user", JSON.stringify(loggedInUser));
 
-			navigate(`/users/${loggedInUser.id}`);
+			navigate(`/users/${loggedInUser._id}`);
 		}
 	}, [loggedInUser, navigate, setUser]);
-
-	console.log(loggedInUser);
 
 	return (
 		<main className="login">

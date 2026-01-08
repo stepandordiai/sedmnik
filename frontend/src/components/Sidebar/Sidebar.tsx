@@ -63,10 +63,6 @@ const Sidebar = ({ user }) => {
 					);
 				})}
 			</div>
-			<div className="sidebar-container">
-				<a href="">Stavby</a>
-				<a href="">Harmonogram</a>
-			</div>
 		</div>
 	);
 };

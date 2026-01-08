@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 type User = {
-	id: string;
+	// FIXME:
+	_id: string;
 	name: string;
 	username: string;
 };

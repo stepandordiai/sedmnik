@@ -18,7 +18,7 @@ const Home = ({ user, error }) => {
 						<p style={{ fontSize: "2rem", marginBottom: 25 }}>
 							Vítej, {user.username}!
 						</p>
-						<NavLink className="home__link" to={`/users/${user.id}`}>
+						<NavLink className="home__link" to={`/users/${user._id}`}>
 							Přejít na můj profil
 						</NavLink>
 					</div>

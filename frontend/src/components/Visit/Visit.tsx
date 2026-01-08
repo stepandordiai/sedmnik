@@ -2,13 +2,13 @@ import ClockIcon from "../../icons/ClockIcon";
 import { useEffect, useState } from "react";
 import timeToMinutes from "../../utils/timeToMinutes";
 import axios from "axios";
-import { useAuth } from "../../context/AuthContext";
 import "./Visit.scss";
+import { useParams } from "react-router-dom";
 
 // const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
 const Visit = ({ userId, currentUser }) => {
-	const { user } = useAuth();
+	const { id } = useParams();
 
 	const [data, setData] = useState(null);
 	const [startTime, setStartTime] = useState("");
@@ -16,11 +16,19 @@ const Visit = ({ userId, currentUser }) => {
 	const [pauseTime, setPauseTime] = useState("");
 	const [total, setTotal] = useState("00:00");
 	const [error, setError] = useState(null);
-
 	const today = new Date();
+
 	const [shiftDate, setShiftDate] = useState(today.toISOString().split("T")[0]);
 
+	// FIXME:
+	console.log(error);
+
 	useEffect(() => {
+		setStartTime("");
+		setEndTime("");
+		setPauseTime("");
+		setTotal("00:00");
+
 		const fetchWorkShift = async () => {
 			try {
 				const token = localStorage.getItem("token");
@@ -35,9 +43,12 @@ const Visit = ({ userId, currentUser }) => {
 
 				setData(response.data);
 			} catch (err: any) {
-				const message = err.response?.data?.message || "Something went wrong";
-				setError(message);
-				console.error("Full Error Object:", err.response);
+				// If 404, treat as empty shift
+				if (err.response?.status === 404) {
+					setData({ startTime: "", endTime: "", pauseTime: "" });
+				} else {
+					setError(err.response?.data?.message || "Something went wrong");
+				}
 			}
 		};
 
@@ -45,57 +56,64 @@ const Visit = ({ userId, currentUser }) => {
 	}, [userId, shiftDate]);
 
 	useEffect(() => {
-		if (data) {
-			setStartTime(data.startTime ?? "");
-			setEndTime(data.endTime ?? "");
-			setPauseTime(data.pauseTime ?? "");
-			setTotal("00:00");
-		}
+		if (!data) return;
+		setStartTime(data.startTime ?? "");
+		setEndTime(data.endTime ?? "");
+		setPauseTime(data.pauseTime ?? "");
+		setTotal("00:00");
 	}, [data]);
 
 	useEffect(() => {
-		if (!startTime || !endTime) return;
+		if (startTime && endTime) {
+			const start = timeToMinutes(startTime);
+			const end = timeToMinutes(endTime);
+			const pause = timeToMinutes(pauseTime);
 
-		const start = timeToMinutes(startTime);
-		const end = timeToMinutes(endTime);
-		const pause = timeToMinutes(pauseTime);
+			const hours = Math.floor((end - start - pause) / 60);
+			const minutes = (end - start - pause) % 60;
 
-		const hours = Math.floor((end - start - pause) / 60);
-		const minutes = (end - start - pause) % 60;
+			setTotal(hours + ":" + minutes.toString().padStart(2, "0"));
+		} else {
+			setTotal("00:00");
+		}
+	}, [startTime, endTime, pauseTime, shiftDate]);
 
-		setTotal(hours + ":" + minutes.toString().padStart(2, "0"));
+	useEffect(() => {
+		// Only auto-save if at least one input has a value
+		if (!startTime && !endTime && !pauseTime) return;
+		const upsertWorkShift = async () => {
+			try {
+				const token = localStorage.getItem("token");
+
+				const response = await axios.post(
+					"https://weekly-planner-backend.onrender.com/api/work",
+					{
+						date: shiftDate,
+						startTime,
+						endTime,
+						pauseTime,
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${token}`, // <--- this is correct
+							"Content-Type": "application/json",
+						},
+					}
+				);
+
+				console.log(response.data);
+			} catch (err: any) {
+				const message = err.response?.data?.message || "Something went wrong";
+				setError(message);
+				console.error("Full Error Object:", err.response);
+			}
+		};
+
+		upsertWorkShift();
 	}, [startTime, endTime, pauseTime]);
 
-	const upsertWorkShift = async () => {
-		try {
-			const token = localStorage.getItem("token");
-
-			const response = await axios.post(
-				"https://weekly-planner-backend.onrender.com/api/work",
-				{
-					date: shiftDate,
-					startTime,
-					endTime,
-					pauseTime,
-				},
-				{
-					headers: {
-						Authorization: `Bearer ${token}`, // <--- this is correct
-						"Content-Type": "application/json",
-					},
-				}
-			);
-
-			console.log(response.data);
-		} catch (err: any) {
-			const message = err.response?.data?.message || "Something went wrong";
-			setError(message);
-			console.error("Full Error Object:", err.response);
-		}
-	};
-
-	if (!user) return <p>Loading...</p>; // wait for context to hydrate
-	const canEdit = currentUser.id === userId;
+	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
+	const canEdit = currentUser._id === id;
 
 	return (
 		<div className="visit">
@@ -191,9 +209,6 @@ const Visit = ({ userId, currentUser }) => {
 							{total}
 						</p>
 					</div>
-					<button onClick={upsertWorkShift} disabled={!canEdit}>
-						Save
-					</button>
 				</div>
 			</div>
 		</div>
