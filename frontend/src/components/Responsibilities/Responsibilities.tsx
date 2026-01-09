@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import "./Responsibilities.scss";
 import axios from "axios";
+import "./Responsibilities.scss";
+import ResponsibilityIcon from "../../icons/ResponsibilityIcon";
 
 const emptyInput = () => ({
 	// TODO: LEARN THIS
@@ -12,13 +13,20 @@ const emptyInput = () => ({
 const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 	// TODO: LEARN THIS
 	const [list, setList] = useState([emptyInput()]);
+	const [error, setError] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
+		setList([emptyInput(), emptyInput()]);
+
 		const fetchResponsibilities = async (date: string) => {
+			setLoading(true);
 			const token = localStorage.getItem("token");
 			try {
 				const res = await axios.get(
-					`https://weekly-planner-backend.onrender.com/api/work/responsibilities/${date}?userId=${userId}`,
+					`${
+						import.meta.env.VITE_API_URL
+					}/api/work/responsibilities/${date}?userId=${userId}`,
 					{
 						headers: { Authorization: `Bearer ${token}` },
 					}
@@ -29,9 +37,17 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 					time: item.time,
 				}));
 
-				setList(hydrated.length ? hydrated : [emptyInput()]);
+				setList(
+					hydrated.length > 1
+						? hydrated
+						: hydrated.length === 1
+						? [...hydrated, emptyInput()]
+						: [emptyInput(), emptyInput()]
+				);
 			} catch (error) {
-				console.log(error);
+				setError(error);
+			} finally {
+				setLoading(false);
 			}
 		};
 
@@ -54,6 +70,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 	};
 
 	const saveData = async (date: string) => {
+		setLoading(true);
 		const token = localStorage.getItem("token");
 		const payload = {
 			responsibilities: list
@@ -64,13 +81,25 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 				.filter((item) => item.task),
 		};
 
-		await axios.put(
-			`https://weekly-planner-backend.onrender.com/api/work/responsibilities/${date}`,
-			payload,
-			{
-				headers: { Authorization: `Bearer ${token}` },
-			}
-		);
+		try {
+			await axios.put(
+				`${import.meta.env.VITE_API_URL}/api/work/responsibilities/${date}`,
+				payload,
+				{
+					headers: { Authorization: `Bearer ${token}` },
+				}
+			);
+		} catch (error) {
+			setError(error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const status = (): string => {
+		if (error) return error;
+		if (loading) return "Aktualizace...";
+		else return "Aktualizováno";
 	};
 
 	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
@@ -85,7 +114,18 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 					marginBottom: 10,
 				}}
 			>
-				<p>Strucny popis prace</p>
+				<p
+					style={{
+						fontWeight: 600,
+						display: "flex",
+						alignItems: "center",
+						gap: 5,
+						marginBottom: 10,
+					}}
+				>
+					<ResponsibilityIcon size={16} />
+					Strucny popis prace
+				</p>
 				<button onClick={handleAddInput} className="responsibilities__btn">
 					Pridat
 				</button>
@@ -108,7 +148,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 									type="text"
 									name="task"
 									value={item.task}
-									placeholder="Write down your task"
+									placeholder="Napište si své pracovní povinnosti"
 									onBlur={() => saveData(shiftDate)}
 									disabled={!canEdit}
 								/>
@@ -136,6 +176,22 @@ const Responsibilities = ({ shiftDate, userId, currentUser }) => {
 					);
 				})}
 			</div>
+			<p
+				style={{
+					display: "flex",
+					justifyContent: "flex-start",
+					alignItems: "center",
+					gap: 5,
+					marginTop: 10,
+				}}
+			>
+				<span
+					className={`visit__status-indicator ${
+						loading ? "status--loading" : error ? "status--error" : "status--ok"
+					}`}
+				></span>
+				<span style={{ fontSize: "0.8rem" }}>{status()}</span>
+			</p>
 		</div>
 	);
 };
