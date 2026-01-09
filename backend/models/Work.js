@@ -23,6 +23,12 @@ const workShiftSchema = new mongoose.Schema(
 			type: String,
 			required: false,
 		},
+		responsibilities: [
+			{
+				task: String,
+				time: String,
+			},
+		],
 	},
 	{ timestamps: true }
 );

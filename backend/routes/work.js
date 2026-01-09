@@ -68,4 +68,59 @@ router.get("/:date", protect, async (req, res) => {
 	}
 });
 
+// GET responsibilities
+router.get("/responsibilities/:date", protect, async (req, res) => {
+	try {
+		const date = req.params.date;
+		const userId = req.query.userId || req.user._id; // use query if provided
+		const shift = await WorkShift.findOne({ user: userId, date });
+		const responsibilities = shift?.responsibilities || [];
+
+		res.status(200).json({ responsibilities });
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
+// PUT responsibilities
+router.put("/responsibilities/:date", protect, async (req, res) => {
+	try {
+		const { responsibilities } = req.body;
+		const userId = req.user._id;
+		const date = req.params.date;
+
+		if (!Array.isArray(responsibilities)) {
+			return res
+				.status(400)
+				.json({ message: "Invalid responsibilities format" });
+		}
+
+		const sanitized = responsibilities
+			.map((item) => ({
+				task: item.task.trim(),
+				time: item.time,
+			}))
+			.filter((item) => item.task);
+
+		let shift = await WorkShift.findOne({ user: userId, date });
+
+		if (!shift) {
+			shift = await WorkShift.create({
+				user: userId,
+				date,
+				responsibilities: sanitized,
+			});
+		} else {
+			shift.responsibilities = sanitized;
+			await shift.save();
+		}
+
+		res.status(200).json({ responsibilities: shift.responsibilities });
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
 export default router;

@@ -16,5 +16,14 @@
 	border: var(--secondary-border);
 	padding: 5px;
 	border-radius: 5px;
-	width: 100%;
+}
+
+.responsibilities-input-container {
+	display: flex;
+	flex-direction: column;
+
+	&:nth-child(1) {
+		// width: 100%;
+		flex-grow: 1;
+	}
 }

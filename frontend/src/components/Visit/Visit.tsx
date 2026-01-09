@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 
 // const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 
-const Visit = ({ userId, currentUser }) => {
+const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 	const { id } = useParams();
 
 	const [data, setData] = useState(null);
@@ -16,9 +16,6 @@ const Visit = ({ userId, currentUser }) => {
 	const [pauseTime, setPauseTime] = useState("");
 	const [total, setTotal] = useState("00:00");
 	const [error, setError] = useState(null);
-	const today = new Date();
-
-	const [shiftDate, setShiftDate] = useState(today.toISOString().split("T")[0]);
 
 	// FIXME:
 	console.log(error);
