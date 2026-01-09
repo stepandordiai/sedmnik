@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import "./Weekbar.scss";
 
-const Weekbar = () => {
+const Weekbar = ({ shiftDate, setShiftDate }) => {
 	const weekData = [
 		"Pondělí",
 		"Úterý",
@@ -11,6 +11,7 @@ const Weekbar = () => {
 		"Sobota",
 		"Neděle",
 	];
+
 	const today = new Date();
 	const dayOfWeek = today.getDay();
 	const diffToMonday = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
@@ -24,29 +25,39 @@ const Weekbar = () => {
 
 		schedule.push({
 			day: weekData[i],
-			date: currentDate.toDateString(),
+			date: currentDate.toISOString().split("T")[0],
 		});
 	}
 
 	return (
 		<div className="weekbar">
-			<div className="weekbar-container">
-				{schedule.map((day, i) => {
-					return (
-						<div
-							key={i}
-							className={classNames("weekbar__day", {
-								"weekbar__day--active": day.date === new Date().toDateString(),
-							})}
-						>
-							{day.day}
-						</div>
-					);
-				})}
-			</div>
 			<a className="weekbar__pdf" href="">
 				Export PDF
 			</a>
+			<div className="weekbar-container">
+				{schedule.map((day, i) => {
+					return (
+						<button
+							key={i}
+							onClick={() => setShiftDate(day.date)}
+							className={classNames("weekbar__day", {
+								"weekbar__day--active":
+									day.date === new Date().toISOString().split("T")[0],
+							})}
+							style={
+								shiftDate === day.date
+									? {
+											outline: "2px solid var(--accent-clr)",
+											outlineOffset: "-2px",
+									  }
+									: { outline: "none" }
+							}
+						>
+							{day.day}
+						</button>
+					);
+				})}
+			</div>
 		</div>
 	);
 };

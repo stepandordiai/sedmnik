@@ -17,7 +17,7 @@ const UserPage = () => {
 
 	return (
 		<main className="user-page">
-			<Weekbar />
+			<Weekbar shiftDate={shiftDate} setShiftDate={setShiftDate} />
 			<Visit
 				key={user?._id}
 				userId={id}
