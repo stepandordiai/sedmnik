@@ -2,6 +2,7 @@ import Weekbar from "../../components/Weekbar/Weekbar";
 import { useParams } from "react-router-dom";
 import Visit from "../../components/Visit/Visit";
 import { useAuth } from "../../context/AuthContext";
+import Responsibilities from "../../components/Responsibilities/Responsibilities";
 import "./UserPage.scss";
 
 const UserPage = () => {
@@ -14,6 +15,7 @@ const UserPage = () => {
 		<main className="user-page">
 			<Weekbar />
 			<Visit key={user?._id} userId={id} currentUser={user} />
+			<Responsibilities />
 		</main>
 	);
 };
