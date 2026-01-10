@@ -35,23 +35,25 @@ const Preload = ({ loading }) => {
 	return (
 		<div className="preload">
 			<img src={logo} width={128} height={128} alt="NERESEN a.s. logo" />
-			<span className="preload__indicator">
+			<div className="preload__indicator">
 				<div
 					style={{
 						display: "flex",
 						justifyContent: "space-between",
-						mixBlendMode: "difference",
-						color: "white",
 					}}
 				>
-					<span>Načítání...</span>
-					<span>{progress + "%"}</span>
+					<span style={{ mixBlendMode: "difference", color: "#fff" }}>
+						Načítání...
+					</span>
+					<span style={{ mixBlendMode: "difference", color: "#fff" }}>
+						{progress + "%"}
+					</span>
 				</div>
 				<span
 					style={{ width: `${progress}%` }}
 					className="preload__indicator-progress"
 				></span>
-			</span>
+			</div>
 		</div>
 	);
 };

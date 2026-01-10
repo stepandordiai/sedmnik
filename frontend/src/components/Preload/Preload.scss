@@ -12,10 +12,10 @@
 	right: 10px;
 	bottom: 10px;
 	background: var(--bg-clr);
-	width: min(100%, 200px);
+	width: min(calc(100% - 20px), 200px);
 	padding: 5px;
 	border-radius: 5px;
-	border: 2px solid black;
+	background: rgba(0, 0, 0, 0.05);
 	overflow: hidden;
 }
 
