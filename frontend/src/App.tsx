@@ -8,15 +8,42 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 // import { Navigate } from "react-router-dom";
 import UserPage from "./pages/UserPage/UserPage";
-// import { useAuth } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import Preload from "./components/Preload/Preload";
 import "./scss/App.scss";
 
 function App() {
-	// const { user, setUser } = useAuth();
+	const { user } = useAuth();
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [preloader, setPreloader] = useState(true);
+	const [allUsers, setAllUsers] = useState<any[]>([]);
+
+	useEffect(() => {
+		const fetchAllUsers = async () => {
+			if (!user) {
+				setAllUsers([]);
+				return;
+			}
+
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			try {
+				const res = await axios.get(
+					"https://weekly-planner-backend.onrender.com/api/users/all",
+					{
+						headers: { Authorization: `Bearer ${token}` },
+					}
+				);
+				setAllUsers(res.data);
+			} catch (err) {
+				console.error("Error fetching sidebar users", err);
+			}
+		};
+
+		fetchAllUsers();
+	}, [user]);
 
 	// useEffect(() => {
 	// 	const fetchUser = async () => {
@@ -70,12 +97,15 @@ function App() {
 			<div className="wrapper">
 				<Header />
 				<div className="wrapper-inner">
-					<Sidebar />
+					<Sidebar allUsers={allUsers} />
 					<Routes>
 						<Route path="/" element={<Home error={error} />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
-						<Route path="/users/:id" element={<UserPage />} />
+						<Route
+							path="/users/:id"
+							element={<UserPage allUsers={allUsers} />}
+						/>
 					</Routes>
 				</div>
 			</div>

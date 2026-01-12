@@ -27,3 +27,40 @@
 		flex-grow: 1;
 	}
 }
+
+//
+
+.week-section {
+	background: #fff;
+	border: var(--primary-border);
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.week-section__title {
+	// TODO: learn this
+	writing-mode: sideways-lr;
+	text-align: center;
+	border: var(--secondary-border);
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.week-section__title--active {
+	background: var(--accent-semi-tp-clr) !important;
+}
+
+.week-section__input {
+	border: var(--secondary-border);
+	padding: 5px;
+	border-radius: 5px;
+
+	&:nth-child(1) {
+		flex-grow: 1;
+	}
+}
+
+.week-section-input-container {
+	display: flex;
+	gap: 5px;
+}

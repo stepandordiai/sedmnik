@@ -1,0 +1,16 @@
+.plan {
+	background: #fff;
+	border: var(--primary-border);
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.plan__input {
+	border: var(--secondary-border);
+	padding: 5px;
+	border-radius: 5px;
+
+	&:nth-child(1) {
+		flex-grow: 1;
+	}
+}

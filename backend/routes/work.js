@@ -1,8 +1,25 @@
 import WorkShift from "../models/Work.js";
 import { protect } from "../middleware/auth.js";
 import express from "express";
+import Plan from "../models/Plan.js";
 
 const router = express.Router();
+
+router.post("/responsibilities/plan", protect, async (req, res) => {
+	try {
+		const { task, executor, priority } = req.body;
+
+		const plan = await Plan.findOne([], task, executor, priority, {
+			new: true,
+			upsert: true,
+		});
+
+		if (plan) {
+		}
+
+		res.status(200).json(plan);
+	} catch (error) {}
+});
 
 router.post("/", protect, async (req, res) => {
 	try {
@@ -37,6 +54,96 @@ router.post("/", protect, async (req, res) => {
 		res.status(201).json(newWorkShift);
 	} catch (error) {
 		console.error(error);
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
+router.get("/responsibilities/week", protect, async (req, res) => {
+	try {
+		const userId = req.query.userId || req.user._id;
+		let { dates } = req.query;
+
+		// 🔹 Normalize dates to array
+		if (!dates) {
+			return res.status(400).json({ message: "dates are required" });
+		}
+
+		// Normalize to array (Express might return a string if only 1 date is sent)
+		const dateArray = Array.isArray(dates) ? dates : [dates];
+
+		// 1. Prepare the structure for all requested dates
+		let daysMap = dateArray.map((date) => ({ date, responsibilities: [] }));
+
+		// 2. Fetch only the shifts that exist in DB
+		const existingShifts = await WorkShift.find({
+			user: userId,
+			date: { $in: dateArray },
+		});
+
+		// 3. Merge DB data into our daysMap
+		existingShifts.forEach((shift) => {
+			const dayEntry = daysMap.find((d) => d.date === shift.date);
+			if (dayEntry) {
+				dayEntry.responsibilities = shift.responsibilities || [];
+			}
+		});
+
+		// 🔹 FIX: Return 'daysMap', not '[workShift]'
+		res.status(200).json(daysMap);
+	} catch (err) {
+		console.error("Error in /responsibilities/week:", err);
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
+router.put("/responsibilities/week", protect, async (req, res) => {
+	try {
+		const { weekList } = req.body; // frontend sends [{ date, responsibilities: [...] }]
+		const userId = req.user._id;
+
+		if (!Array.isArray(weekList)) {
+			return res.status(400).json({ message: "Invalid weekList format" });
+		}
+
+		const updatedShifts = [];
+
+		for (const day of weekList) {
+			const date = day.date;
+			if (!date) continue; // skip invalid entries
+
+			// sanitize responsibilities: remove empty tasks
+			const sanitized = (day.responsibilities || [])
+				.map((r) => ({
+					task: (r.task || "").trim(),
+					time: r.time || "",
+				}))
+				.filter((r) => r.task); // keep only non-empty tasks
+
+			// check if shift exists
+			let shift = await WorkShift.findOne({ user: userId, date });
+
+			if (shift) {
+				// update existing
+				shift.responsibilities = sanitized;
+				await shift.save();
+			} else {
+				// create new
+				shift = await WorkShift.create({
+					user: userId,
+					date,
+					responsibilities: sanitized,
+				});
+			}
+
+			updatedShifts.push({
+				date,
+				responsibilities: shift.responsibilities,
+			});
+		}
+
+		res.status(200).json({ week: updatedShifts });
+	} catch (err) {
+		console.error("Error updating week responsibilities:", err);
 		res.status(500).json({ message: "Server error" });
 	}
 });
@@ -122,5 +229,7 @@ router.put("/responsibilities/:date", protect, async (req, res) => {
 		res.status(500).json({ message: "Server error" });
 	}
 });
+
+//
 
 export default router;

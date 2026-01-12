@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import "./Weekbar.scss";
 
-const Weekbar = ({ shiftDate, setShiftDate }) => {
+const Weekbar = ({ shiftDate, setShiftDate, isWeek, setIsWeek }) => {
 	const weekData = [
 		"Pondělí",
 		"Úterý",
@@ -29,23 +29,42 @@ const Weekbar = ({ shiftDate, setShiftDate }) => {
 		});
 	}
 
+	const handleWeekDay = (date, bool) => {
+		setShiftDate(date);
+		setIsWeek(bool);
+	};
+
 	return (
 		<div className="weekbar">
 			<a className="weekbar__pdf" href="">
 				Export PDF
 			</a>
 			<div className="weekbar-container">
+				<button
+					onClick={() => setIsWeek(true)}
+					className="weekbar__day"
+					style={
+						isWeek
+							? {
+									outline: "2px solid var(--accent-clr)",
+									outlineOffset: "-2px",
+							  }
+							: { outline: "none" }
+					}
+				>
+					Week
+				</button>
 				{schedule.map((day, i) => {
 					return (
 						<button
 							key={i}
-							onClick={() => setShiftDate(day.date)}
+							onClick={() => handleWeekDay(day.date, false)}
 							className={classNames("weekbar__day", {
 								"weekbar__day--active":
 									day.date === new Date().toISOString().split("T")[0],
 							})}
 							style={
-								shiftDate === day.date
+								shiftDate === day.date && !isWeek
 									? {
 											outline: "2px solid var(--accent-clr)",
 											outlineOffset: "-2px",
