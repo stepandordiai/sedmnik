@@ -16,13 +16,14 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		setStartTime("");
-		setEndTime("");
-		setPauseTime("");
-		setTotal("00:00");
-
+		let isCurrentRequest = true;
 		const fetchWorkShift = async () => {
+			setError(null);
 			setLoading(true);
+			setStartTime("");
+			setEndTime("");
+			setPauseTime("");
+			setTotal("00:00");
 			try {
 				const token = localStorage.getItem("token");
 				const response = await axios.get(
@@ -36,20 +37,28 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 					}
 				);
 
-				setData(response.data);
+				if (isCurrentRequest) {
+					setData(response.data);
+				}
 			} catch (error) {
 				// If 404, treat as empty shift
-				if (error.response?.status === 404) {
-					setData({ startTime: "", endTime: "", pauseTime: "" });
-				} else {
-					setError(error.response?.data?.message || "Něco se pokazilo");
+				if (isCurrentRequest) {
+					if (error.response?.status === 404) {
+						setData({ startTime: "", endTime: "", pauseTime: "" });
+					} else {
+						setError(error.response?.data?.message || "Něco se pokazilo");
+					}
 				}
 			} finally {
-				setLoading(false);
+				if (isCurrentRequest) setLoading(false);
 			}
 		};
 
 		fetchWorkShift();
+
+		return () => {
+			isCurrentRequest = false;
+		};
 	}, [userId, shiftDate]);
 
 	useEffect(() => {
