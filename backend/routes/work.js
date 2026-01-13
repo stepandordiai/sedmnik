@@ -42,9 +42,38 @@ router.put("/responsibilities/plan", protect, async (req, res) => {
 	}
 });
 
+router.get("/", protect, async (req, res) => {
+	try {
+		const date = req.query.date;
+		const userId = req.query.userId || req.user._id; // use query if provided
+
+		const workShift = await WorkShift.findOne({
+			user: userId,
+			date,
+		});
+
+		if (workShift) {
+			return res.status(200).json(workShift);
+		}
+
+		// Return default object with empty times
+		return res.status(200).json({
+			user: userId,
+			date,
+			startTime: "",
+			endTime: "",
+			pauseTime: "",
+		});
+	} catch (err) {
+		console.error(err);
+		res.status(500).json({ message: "Server error" });
+	}
+});
+
 router.post("/", protect, async (req, res) => {
 	try {
 		const { date, startTime, endTime, pauseTime } = req.body;
+
 		if (!date) {
 			return res.status(400).json({ message: "Missing required fields" });
 		}
@@ -165,33 +194,6 @@ router.put("/responsibilities/week", protect, async (req, res) => {
 		res.status(200).json({ week: updatedShifts });
 	} catch (err) {
 		console.error("Error updating week responsibilities:", err);
-		res.status(500).json({ message: "Server error" });
-	}
-});
-
-router.get("/:date", protect, async (req, res) => {
-	try {
-		const date = req.params.date;
-		const userId = req.query.userId || req.user._id; // use query if provided
-		let workShift = await WorkShift.findOne({
-			user: userId,
-			date,
-		});
-
-		if (!workShift) {
-			// Return default object with empty times
-			workShift = {
-				user: userId,
-				date,
-				startTime: "",
-				endTime: "",
-				pauseTime: "",
-			};
-		}
-
-		res.status(200).json(workShift);
-	} catch (err) {
-		console.error(err);
 		res.status(500).json({ message: "Server error" });
 	}
 });

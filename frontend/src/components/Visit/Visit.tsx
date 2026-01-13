@@ -6,74 +6,75 @@ import "./Visit.scss";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 
 const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
-	const [data, setData] = useState(null);
+	const [data, setData] = useState({
+		startTime: "",
+		endTime: "",
+		pauseTime: "",
+	});
 
-	const [startTime, setStartTime] = useState("");
-	const [endTime, setEndTime] = useState("");
-	const [pauseTime, setPauseTime] = useState("");
 	const [total, setTotal] = useState("00:00");
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		let isCurrentRequest = true;
 		const fetchWorkShift = async () => {
 			setError(null);
 			setLoading(true);
-			setStartTime("");
-			setEndTime("");
-			setPauseTime("");
+			setData({
+				startTime: "",
+				endTime: "",
+				pauseTime: "",
+			});
 			setTotal("00:00");
+
 			try {
 				const token = localStorage.getItem("token");
-				const response = await axios.get(
-					`${
-						import.meta.env.VITE_API_URL
-					}/api/work/${shiftDate}?userId=${userId}`,
+				const res = await axios.get(
+					`${import.meta.env.VITE_API_URL}/api/work`,
+					// }/api/work/${shiftDate}?userId=${userId}`,
 					{
+						params: { date: shiftDate, userId },
 						headers: {
 							Authorization: `Bearer ${token}`,
 						},
 					}
 				);
 
-				if (isCurrentRequest) {
-					setData(response.data);
-				}
+				setData({
+					startTime: res.data.startTime || "",
+					endTime: res.data.endTime || "",
+					pauseTime: res.data.pauseTime || "",
+				});
 			} catch (error) {
 				// If 404, treat as empty shift
-				if (isCurrentRequest) {
-					if (error.response?.status === 404) {
-						setData({ startTime: "", endTime: "", pauseTime: "" });
-					} else {
-						setError(error.response?.data?.message || "Něco se pokazilo");
-					}
+				if (error.response?.status === 404) {
+					setData({ startTime: "", endTime: "", pauseTime: "" });
+				} else {
+					setError(error.response?.data?.message || "Něco se pokazilo");
 				}
 			} finally {
-				if (isCurrentRequest) setLoading(false);
+				setLoading(false);
 			}
 		};
 
 		fetchWorkShift();
-
-		return () => {
-			isCurrentRequest = false;
-		};
 	}, [userId, shiftDate]);
 
-	useEffect(() => {
-		if (!data) return;
-		setStartTime(data.startTime ?? "");
-		setEndTime(data.endTime ?? "");
-		setPauseTime(data.pauseTime ?? "");
-		setTotal("00:00");
-	}, [data]);
+	console.log("DATA", data);
+
+	// useEffect(() => {
+	// 	if (!data) return;
+	// 	setStartTime(data.startTime || "");
+	// 	setEndTime(data.endTime || "");
+	// 	setPauseTime(data.pauseTime || "");
+	// 	setTotal("00:00");
+	// }, [data]);
 
 	useEffect(() => {
-		if (startTime && endTime) {
-			const start = timeToMinutes(startTime);
-			const end = timeToMinutes(endTime);
-			const pause = timeToMinutes(pauseTime);
+		if (data.startTime && data.endTime) {
+			const start = timeToMinutes(data.startTime);
+			const end = timeToMinutes(data.endTime);
+			const pause = timeToMinutes(data.pauseTime);
 
 			const hours = Math.floor((end - start - pause) / 60);
 			const minutes = (end - start - pause) % 60;
@@ -82,20 +83,19 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 		} else {
 			setTotal("00:00");
 		}
-	}, [startTime, endTime, pauseTime, shiftDate]);
+	}, [data, shiftDate]);
 
 	const upsertWorkShift = async () => {
 		setLoading(true);
+		const token = localStorage.getItem("token");
 		try {
-			const token = localStorage.getItem("token");
-
-			const response = await axios.post(
+			await axios.post(
 				`${import.meta.env.VITE_API_URL}/api/work`,
 				{
 					date: shiftDate,
-					startTime,
-					endTime,
-					pauseTime,
+					startTime: data.startTime,
+					endTime: data.endTime,
+					pauseTime: data.pauseTime,
 				},
 				{
 					headers: {
@@ -104,27 +104,31 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 					},
 				}
 			);
-
-			console.log(response.data);
-		} catch (err: any) {
+		} catch (err) {
 			const message = err.response?.data?.message || "Something went wrong";
 			setError(message);
-			console.error("Full Error Object:", err.response);
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	useEffect(() => {
-		// Only auto-save if at least one input has a value
-		if (!startTime && !endTime && !pauseTime) return;
+	// useEffect(() => {
+	// 	// Only auto-save if at least one input has a value
+	// 	if (!data.startTime && !data.endTime && !data.pauseTime) return;
 
-		const timeout = setTimeout(() => {
-			upsertWorkShift();
-		}, 1000);
+	// 	const timeout = setTimeout(() => {
+	// 		upsertWorkShift();
+	// 	}, 1000);
 
-		return () => clearTimeout(timeout);
-	}, [startTime, endTime, pauseTime]);
+	// 	return () => clearTimeout(timeout);
+	// }, [data]);
+
+	const handleDataInput = (name, value) => {
+		setData((prev) => ({
+			...prev,
+			[name]: value,
+		}));
+	};
 
 	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
 	const canEdit = currentUser._id === userId;
@@ -157,9 +161,10 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 					<div className="visit-input-container">
 						<span>Prichod</span>
 						<input
-							onChange={(e) => setStartTime(e.target.value)}
+							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
+							name="startTime"
 							onBlur={upsertWorkShift}
-							value={startTime}
+							value={data.startTime}
 							className="visit__input"
 							style={
 								!canEdit
@@ -173,7 +178,8 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 					<div className="visit-input-container">
 						<span>Odchod</span>
 						<input
-							onChange={(e) => setEndTime(e.target.value)}
+							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
+							name="endTime"
 							onBlur={upsertWorkShift}
 							className="visit__input"
 							style={
@@ -181,7 +187,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 									? { background: "var(--bg-clr)" }
 									: { background: "#fff" }
 							}
-							value={endTime}
+							value={data.endTime}
 							disabled={!canEdit}
 							type="time"
 						/>
@@ -191,7 +197,8 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 					<div className="visit-input-container">
 						<span>Pause</span>
 						<input
-							onChange={(e) => setPauseTime(e.target.value)}
+							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
+							name="pauseTime"
 							onBlur={upsertWorkShift}
 							className="visit__input"
 							style={
@@ -199,7 +206,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 									? { background: "var(--bg-clr)" }
 									: { background: "#fff" }
 							}
-							value={pauseTime}
+							value={data.pauseTime}
 							disabled={!canEdit}
 							type="time"
 						/>
