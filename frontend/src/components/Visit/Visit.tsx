@@ -5,7 +5,7 @@ import axios from "axios";
 import "./Visit.scss";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 
-const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
+const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 	const [data, setData] = useState({
 		startTime: "",
 		endTime: "",
@@ -15,6 +15,12 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 	const [total, setTotal] = useState("00:00");
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
+
+	const [monthInput, setMonthInput] = useState(shiftDate.slice(0, 7));
+
+	const [month, setMonth] = useState("00:00");
+
+	console.log(monthInput);
 
 	useEffect(() => {
 		const fetchWorkShift = async () => {
@@ -59,8 +65,6 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 
 		fetchWorkShift();
 	}, [userId, shiftDate]);
-
-	console.log("DATA", data);
 
 	// useEffect(() => {
 	// 	if (!data) return;
@@ -123,6 +127,37 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 	// 	return () => clearTimeout(timeout);
 	// }, [data]);
 
+	useEffect(() => {
+		const fetchMonthData = async () => {
+			setLoading(true);
+			setError(null);
+
+			try {
+				const token = localStorage.getItem("token");
+
+				const res = await axios.get(
+					`${import.meta.env.VITE_API_URL}/api/work/monthly`,
+					{
+						params: { month: monthInput },
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json",
+						},
+						// This matches the <input type="month" /> value
+					}
+				);
+
+				setMonth(res.data);
+			} catch (error) {
+				setError(error.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchMonthData();
+	}, [monthInput]);
+
 	const handleDataInput = (name, value) => {
 		setData((prev) => ({
 			...prev,
@@ -133,8 +168,60 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
 	const canEdit = currentUser._id === userId;
 
+	if (isWeek) {
+		return (
+			<section className="section">
+				<p
+					style={{
+						fontWeight: 600,
+						display: "flex",
+						alignItems: "center",
+						gap: 5,
+						marginBottom: 10,
+					}}
+				>
+					Docházka
+				</p>
+				<div
+					style={{
+						display: "flex",
+						gap: 5,
+						width: "max-content",
+						marginLeft: "auto",
+					}}
+				>
+					<div style={{ display: "flex", flexDirection: "column" }}>
+						<label htmlFor="fudfugf">Datum</label>
+						<input
+							id="fudfugf"
+							className="input"
+							type="month"
+							onChange={(e) => setMonthInput(e.target.value)}
+							value={monthInput}
+						/>
+					</div>
+
+					<div>
+						<p>Odpracováno</p>
+						<p
+							style={{
+								padding: 5,
+								border: "var(--secondary-border)",
+								borderRadius: 5,
+								background: "var(--bg-clr)",
+								textAlign: "center",
+							}}
+						>
+							{month}
+						</p>
+					</div>
+				</div>
+			</section>
+		);
+	}
+
 	return (
-		<div className="visit">
+		<section className="section">
 			<p
 				style={{
 					fontWeight: 600,
@@ -228,7 +315,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate }) => {
 				</div>
 			</div>
 			<StatusIndicator loading={loading} error={error} />
-		</div>
+		</section>
 	);
 };
 

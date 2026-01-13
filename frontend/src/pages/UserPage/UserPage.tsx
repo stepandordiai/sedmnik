@@ -31,6 +31,7 @@ const UserPage = ({ allUsers }) => {
 				currentUser={user}
 				shiftDate={shiftDate}
 				setShiftDate={setShiftDate}
+				isWeek={isWeek}
 			/>
 
 			<Responsibilities

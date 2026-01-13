@@ -243,7 +243,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 
 	if (isWeek)
 		return (
-			<section className="week-section">
+			<section className="section">
 				<p style={{ marginBottom: 10, fontWeight: 600 }}>Tydenni report</p>
 				<div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 					{weekList.map((day, index) => {
@@ -334,7 +334,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 		);
 
 	return (
-		<div className="responsibilities">
+		<section className="section">
 			<div
 				style={{
 					display: "flex",
@@ -405,7 +405,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 				})}
 			</div>
 			<StatusIndicator error={error} loading={loading} />
-		</div>
+		</section>
 	);
 };
 

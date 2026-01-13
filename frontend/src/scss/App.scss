@@ -20,6 +20,19 @@ html {
 	height: 100svh;
 }
 
+.section {
+	background: #fff;
+	border: var(--primary-border);
+	border-radius: 10px;
+	padding: 10px;
+}
+
+.input {
+	border: var(--secondary-border);
+	border-radius: 5px;
+	padding: 5px;
+}
+
 // .sidebar {
 // 	// position: fixed;
 // 	// top: 0;
