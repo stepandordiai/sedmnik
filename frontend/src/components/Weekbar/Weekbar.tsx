@@ -52,7 +52,7 @@ const Weekbar = ({ shiftDate, setShiftDate, isWeek, setIsWeek }) => {
 							: { outline: "none" }
 					}
 				>
-					Week
+					Týdenní
 				</button>
 				{schedule.map((day, i) => {
 					return (
