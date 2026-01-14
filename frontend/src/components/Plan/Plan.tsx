@@ -30,8 +30,8 @@ const Plan = ({ allUsers }) => {
 
 	useEffect(() => {
 		const fetchPlanData = async () => {
-			setError(null);
 			setLoading(true);
+			setError(null);
 
 			try {
 				const res = await api.get("/api/work/responsibilities/plan");
@@ -58,32 +58,27 @@ const Plan = ({ allUsers }) => {
 		fetchPlanData();
 	}, []);
 
-	const savePlanData = async () => {
+	const savePlanData = async (data) => {
 		setError(null);
+
+		// TODO: LEARN THIS
+		for (const item of data) {
+			if ((item.task && !item.executor) || (!item.task && item.executor)) {
+				setError("Pokud vyplníte úkol, musíte uvést i řešitele (a naopak).");
+				return;
+			}
+		}
+
 		setLoading(true);
 
 		try {
-			// TODO: LEARN THIS
-			for (const item of plan) {
-				if ((item.task && !item.executor) || (!item.task && item.executor)) {
-					throw new Error(
-						"Pokud vyplníte úkol, musíte uvést i řešitele (a naopak)."
-					);
-				}
-			}
-
 			// TODO: api won't run if custom error
-			await api.put("/api/work/responsibilities/plan", plan);
+			await api.put("/api/work/responsibilities/plan", data);
 		} catch (err) {
-			// TODO: Catch throw new Error
 			setError(err.message);
 		} finally {
 			setLoading(false);
 		}
-	};
-
-	const removeItem = (id) => {
-		setPlan((prev) => prev.filter((item) => item.id !== id));
 	};
 
 	useEffect(() => {
@@ -100,9 +95,14 @@ const Plan = ({ allUsers }) => {
 		});
 	}, [plan.length]);
 
-	useEffect(() => {
-		savePlanData();
-	}, [plan]);
+	// TODO: learn this
+	const removeItem = (id: string) => {
+		setPlan((prev) => {
+			const updated = prev.filter((item) => item.id !== id);
+			savePlanData(updated);
+			return updated;
+		});
+	};
 
 	return (
 		<section className="section">
@@ -134,7 +134,7 @@ const Plan = ({ allUsers }) => {
 								}
 								value={item.task}
 								placeholder="Vypracujte plán práce a vyberte zhotovitele."
-								onBlur={savePlanData}
+								onBlur={() => savePlanData(plan)}
 							/>
 							<select
 								className="plan__input"
@@ -144,7 +144,7 @@ const Plan = ({ allUsers }) => {
 									handlePlanInput(item.id, e.target.name, e.target.value)
 								}
 								value={item.executor}
-								onBlur={savePlanData}
+								onBlur={() => savePlanData(plan)}
 							>
 								<option value="">Not selected</option>
 								{allUsers.map((user) => {
@@ -167,7 +167,7 @@ const Plan = ({ allUsers }) => {
 									handlePlanInput(item.id, e.target.name, e.target.value)
 								}
 								value={item.priority}
-								onBlur={savePlanData}
+								onBlur={() => savePlanData(plan)}
 							>
 								<option style={{ background: "green" }} value="Nizká">
 									Nizká
