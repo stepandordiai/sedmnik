@@ -59,8 +59,8 @@ function App() {
 		const fetchUser = async () => {
 			const token = localStorage.getItem("token");
 			if (token) {
-				// setLoading(true);
-				// setError(null);
+				setLoading(true);
+				setError(null);
 				try {
 					const res = await api.get("/api/users/me");
 					setUser(res.data);

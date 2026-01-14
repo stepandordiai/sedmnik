@@ -2,16 +2,9 @@ import "./StatusIndicator.scss";
 
 const StatusIndicator = ({ loading, error }) => {
 	return (
-		<div
-			style={{
-				display: "flex",
-				justifyContent: "flex-start",
-				alignItems: "center",
-				gap: 5,
-			}}
-		>
+		<div className="status-indicator">
 			<span
-				className={`visit__status-indicator ${
+				className={`status-indicator__status ${
 					loading ? "status--loading" : error ? "status--error" : "status--ok"
 				}`}
 			></span>

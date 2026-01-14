@@ -1,0 +1,24 @@
+.status-indicator {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	gap: 5px;
+}
+
+.status-indicator__status {
+	width: 16px;
+	aspect-ratio: 1/1;
+	border-radius: 50%;
+}
+
+.status--error {
+	background: var(--red-clr);
+}
+
+.status--loading {
+	background: var(--orange-clr);
+}
+
+.status--ok {
+	background: var(--green-clr);
+}
