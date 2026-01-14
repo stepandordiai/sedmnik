@@ -52,42 +52,10 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 	}, []);
 
 	useEffect(() => {
-		if (!Array.isArray(schedule) || schedule.length === 0) return;
-		setWeekList([]);
-
-		const fetchWeekResponsibilities = async () => {
-			setLoading(true);
-
-			try {
-				const dates = schedule.map((d) => d.date);
-				const res = await api.get("/api/work/responsibilities/week", {
-					params: {
-						userId,
-						dates,
-					},
-					paramsSerializer: {
-						indexes: null,
-					},
-				});
-
-				console.log("Received data:", res.data); // Debug log
-				setWeekList(res.data);
-			} catch (error) {
-				console.error("Fetch error:", error);
-				setError(error);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchWeekResponsibilities();
-	}, [schedule, userId, list]);
-
-	useEffect(() => {
-		setList([emptyInput(), emptyInput()]);
-
 		const fetchResponsibilities = async (date: string) => {
 			setLoading(true);
+			setError(null);
+			setList([emptyInput(), emptyInput()]);
 
 			try {
 				const res = await api.get(
@@ -119,12 +87,35 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 	}, [shiftDate, userId, isWeek]);
 
 	useEffect(() => {
-		if (list.length === 0) setList([emptyInput()]);
-	}, [list]);
+		if (!Array.isArray(schedule) || schedule.length === 0) return;
 
-	const handleAddInput = () => {
-		setList((prev) => [...prev, emptyInput()]);
-	};
+		const fetchWeekResponsibilities = async () => {
+			setLoading(true);
+			setError(null);
+			setWeekList([]);
+
+			try {
+				const dates = schedule.map((d) => d.date);
+				const res = await api.get("/api/work/responsibilities/week", {
+					params: {
+						userId,
+						dates,
+					},
+					paramsSerializer: {
+						indexes: null,
+					},
+				});
+
+				setWeekList(res.data);
+			} catch (err) {
+				setError(err.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchWeekResponsibilities();
+	}, [schedule, userId]);
 
 	const handleChangeInput = (id, name, value) => {
 		setList((prev) =>
@@ -152,6 +143,26 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 		);
 	};
 
+	const saveData = async () => {
+		setLoading(true);
+		const payload = {
+			responsibilities: list
+				.map((item) => ({
+					task: item.task.trim(),
+					time: item.time,
+				}))
+				.filter((item) => item.task),
+		};
+
+		try {
+			await api.put(`/api/work/responsibilities/${shiftDate}`, payload);
+		} catch (err) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	const saveWeekData = async () => {
 		setLoading(true);
 		// ✅ Prepare payload for backend
@@ -177,24 +188,8 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 		}
 	};
 
-	const saveData = async (date: string) => {
-		setLoading(true);
-		const payload = {
-			responsibilities: list
-				.map((item) => ({
-					task: item.task.trim(),
-					time: item.time,
-				}))
-				.filter((item) => item.task),
-		};
-
-		try {
-			await api.put(`/api/work/responsibilities/${date}`, payload);
-		} catch (err) {
-			setError(err.message);
-		} finally {
-			setLoading(false);
-		}
+	const handleAddInput = () => {
+		setList((prev) => [...prev, emptyInput()]);
 	};
 
 	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
@@ -330,7 +325,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 									type="text"
 									name="task"
 									placeholder="Napište si své pracovní povinnosti"
-									onBlur={() => saveData(shiftDate)}
+									onBlur={saveData}
 									disabled={!canEdit}
 								/>
 							</div>
@@ -349,7 +344,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 									type="time"
 									name="time"
 									id="djfufu"
-									onBlur={() => saveData(shiftDate)}
+									onBlur={saveData}
 									disabled={!canEdit}
 								/>
 							</div>
