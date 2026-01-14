@@ -5,19 +5,32 @@ import Sidebar from "./components/Sidebar/Sidebar";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
 // import { Navigate } from "react-router-dom";
+import api from "./axios";
 import UserPage from "./pages/UserPage/UserPage";
 import { useAuth } from "./context/AuthContext";
 import Preload from "./components/Preload/Preload";
 import "./scss/App.scss";
 
 function App() {
-	const { user } = useAuth();
-	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
+	const { user, setUser } = useAuth();
 	const [preloader, setPreloader] = useState(true);
 	const [allUsers, setAllUsers] = useState<any[]>([]);
+
+	// TODO: LEARN THIS
+	useEffect(() => {
+		api
+			.get("/health")
+			.then(() => {
+				console.log("API awake");
+			})
+			.catch(() => {
+				console.warn("API still sleeping");
+			});
+	}, []);
 
 	useEffect(() => {
 		const fetchAllUsers = async () => {
@@ -26,58 +39,12 @@ function App() {
 				return;
 			}
 
-			const token = localStorage.getItem("token");
-			if (!token) return;
-
 			try {
-				const res = await axios.get(
-					"https://weekly-planner-backend.onrender.com/api/users/all",
-					{
-						headers: { Authorization: `Bearer ${token}` },
-					}
-				);
+				const res = await api.get("/api/users/all");
 				setAllUsers(res.data);
 			} catch (err) {
 				console.error("Error fetching sidebar users", err);
-			}
-		};
-
-		fetchAllUsers();
-	}, [user]);
-
-	// useEffect(() => {
-	// 	const fetchUser = async () => {
-	// 		const token = localStorage.getItem("token");
-	// 		if (token) {
-	// 			try {
-	// 				const response = await axios.get(
-	// 					`${import.meta.env.VITE_API_URL}/api/users/me`,
-	// 					{
-	// 						headers: { Authorization: `Bearer ${token}` },
-	// 					}
-	// 				);
-	// 				setUser(response.data);
-	// 			} catch (err) {
-	// 				// TODO:
-	// 				setError(err instanceof Error ? err.message : "An error occurred");
-	// 				localStorage.removeItem("token");
-	// 			} finally {
-	// 				// setIsLoading(false);
-	// 			}
-	// 		}
-	// 	};
-
-	// 	fetchUser();
-	// }, []);
-
-	useEffect(() => {
-		const wakeUpApi = async () => {
-			setLoading(true);
-			try {
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-				await axios.get(`${import.meta.env.VITE_API_URL}/health`);
-			} catch (error) {
-				setError(error);
+				setError(err.message);
 			} finally {
 				setLoading(false);
 				await new Promise((resolve) => setTimeout(resolve, 500));
@@ -85,10 +52,31 @@ function App() {
 			}
 		};
 
-		wakeUpApi();
+		fetchAllUsers();
+	}, [user]);
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			const token = localStorage.getItem("token");
+			if (token) {
+				// setLoading(true);
+				// setError(null);
+				try {
+					const res = await api.get("/api/users/me");
+					setUser(res.data);
+				} catch (err) {
+					setError(err instanceof Error ? err.message : "An error occurred");
+					localStorage.removeItem("token");
+				} finally {
+					setLoading(false);
+				}
+			}
+		};
+
+		fetchUser();
 	}, []);
 
-	if (preloader) {
+	if (preloader && user) {
 		return <Preload loading={loading} />;
 	}
 

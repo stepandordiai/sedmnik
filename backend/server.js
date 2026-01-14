@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import workRoutes from "./routes/work.js";
+import usersRoutes from "./routes/users.js";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 dotenv.config();
@@ -31,8 +32,9 @@ app.use(
 		// credentials: true,
 	})
 );
+app.use("/api", authRoutes);
 
-app.use("/api/users", authRoutes);
+app.use("/api/users", usersRoutes);
 
 app.use("/api/work", workRoutes);
 

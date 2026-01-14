@@ -26,7 +26,7 @@ const Register = () => {
 		e.preventDefault();
 		try {
 			const res = await axios.post(
-				"https://weekly-planner-backend.onrender.com/api/users/register",
+				`${import.meta.env.VITE_API_URL}/api/register`,
 				formData
 			);
 			localStorage.setItem("token", res.data.token);
