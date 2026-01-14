@@ -8,7 +8,6 @@ const StatusIndicator = ({ loading, error }) => {
 				justifyContent: "flex-start",
 				alignItems: "center",
 				gap: 5,
-				marginTop: 10,
 			}}
 		>
 			<span

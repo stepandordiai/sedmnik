@@ -1,8 +1,8 @@
-import ClockIcon from "../../icons/ClockIcon";
 import { useEffect, useState } from "react";
-import timeToMinutes from "../../utils/timeToMinutes";
 import api from "../../axios";
+import timeToMinutes from "../../utils/timeToMinutes";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import ClockIcon from "../../icons/ClockIcon";
 import "./Visit.scss";
 
 const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
@@ -125,17 +125,10 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 	if (isWeek) {
 		return (
 			<section className="section">
-				<p
-					style={{
-						fontWeight: 600,
-						display: "flex",
-						alignItems: "center",
-						gap: 5,
-						marginBottom: 10,
-					}}
-				>
-					Docházka
-				</p>
+				<div className="container-title">
+					<ClockIcon size={20} />
+					<h2>Dochazka</h2>
+				</div>
 				<div
 					style={{
 						display: "flex",
@@ -177,18 +170,10 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 
 	return (
 		<section className="section">
-			<p
-				style={{
-					fontWeight: 600,
-					display: "flex",
-					alignItems: "center",
-					gap: 5,
-					marginBottom: 10,
-				}}
-			>
-				<ClockIcon size={16} />
-				<span>Dochazka</span>
-			</p>
+			<div className="container-title">
+				<ClockIcon size={20} />
+				<h2>Dochazka</h2>
+			</div>
 			<div className="visit-container">
 				<div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
 					<div className="visit-input-container">
