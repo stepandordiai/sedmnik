@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../axios";
 import classNames from "classnames";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import ListTaskIcon from "../../icons/ListTaskIcon";
 import "./Plan.scss";
 
 const emptyInput = () => ({
@@ -13,9 +14,9 @@ const emptyInput = () => ({
 });
 
 const Plan = ({ allUsers }) => {
-	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
-	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
+	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
 
 	const handleAddInput = () => {
 		setPlan((prev) => [...prev, emptyInput()]);
@@ -31,15 +32,9 @@ const Plan = ({ allUsers }) => {
 		const fetchPlanData = async () => {
 			setError(null);
 			setLoading(true);
-			const token = localStorage.getItem("token");
 
 			try {
-				const res = await axios.get(
-					`${import.meta.env.VITE_API_URL}/api/work/responsibilities/plan`,
-					{
-						headers: { Authorization: `Bearer ${token}` },
-					}
-				);
+				const res = await api.get("/api/work/responsibilities/plan");
 
 				const updated = res.data.map((item) => ({
 					id: crypto.randomUUID(),
@@ -63,12 +58,9 @@ const Plan = ({ allUsers }) => {
 		fetchPlanData();
 	}, []);
 
-	console.log(plan);
-
 	const savePlanData = async () => {
 		setError(null);
 		setLoading(true);
-		const token = localStorage.getItem("token");
 
 		try {
 			// TODO: LEARN THIS
@@ -80,16 +72,11 @@ const Plan = ({ allUsers }) => {
 				}
 			}
 
-			await axios.put(
-				`${import.meta.env.VITE_API_URL}/api/work/responsibilities/plan`,
-				plan,
-				{
-					headers: { Authorization: `Bearer ${token}` },
-				}
-			);
-		} catch (error) {
+			// TODO: api won't run if custom error
+			await api.put("/api/work/responsibilities/plan", plan);
+		} catch (err) {
 			// TODO: Catch throw new Error
-			setError(error.message);
+			setError(err.message);
 		} finally {
 			setLoading(false);
 		}
@@ -118,24 +105,17 @@ const Plan = ({ allUsers }) => {
 	}, [plan]);
 
 	return (
-		<section className="plan">
+		<section className="section">
 			<div
 				style={{
 					display: "flex",
 					justifyContent: "space-between",
-					marginBottom: 10,
 				}}
 			>
-				<p
-					style={{
-						fontWeight: 600,
-						display: "flex",
-						alignItems: "center",
-						gap: 5,
-					}}
-				>
-					Seznam úkolů / Plán na další dny
-				</p>
+				<div className="container-title">
+					<ListTaskIcon size={20} />
+					<h2>Seznam úkolů / Plán na další dny</h2>
+				</div>
 				<button onClick={handleAddInput} className="responsibilities__btn">
 					Pridat
 				</button>
