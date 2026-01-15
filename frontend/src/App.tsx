@@ -83,7 +83,7 @@ function App() {
 	return (
 		<Router>
 			<div className="wrapper">
-				<Header />
+				<Header allUsers={allUsers} />
 				<div className="wrapper-inner">
 					<Sidebar allUsers={allUsers} />
 					<Routes>
