@@ -6,6 +6,7 @@ import TeamIcon from "../../icons/TeamIcon";
 import BuildingIcon from "../../icons/BuildingIcon";
 import api from "../../axios";
 import "./Sidebar.scss";
+import StatusIndicator from "../StatusIndicator/StatusIndicator";
 
 const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 	const { user } = useAuth();
@@ -154,6 +155,7 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 						);
 					})}
 				</div>
+				<StatusIndicator error={error} loading={loading} />
 			</aside>
 		</>
 	);
