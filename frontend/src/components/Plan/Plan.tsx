@@ -25,7 +25,7 @@ const Plan = ({ allUsers }) => {
 
 	const handlePlanInput = (id, name, value) => {
 		setPlan((prev) =>
-			prev.map((item) => (item.id === id ? { ...item, [name]: value } : item))
+			prev.map((item) => (item.id === id ? { ...item, [name]: value } : item)),
 		);
 	};
 
@@ -47,7 +47,7 @@ const Plan = ({ allUsers }) => {
 				setPlan(
 					updated.length > 0
 						? updated
-						: [emptyInput(), emptyInput(), emptyInput()]
+						: [emptyInput(), emptyInput(), emptyInput()],
 				);
 			} catch (error) {
 				setError(error);
@@ -145,7 +145,7 @@ const Plan = ({ allUsers }) => {
 								value={item.executor}
 								onBlur={() => savePlanData(plan)}
 							>
-								<option value="">Not selected</option>
+								<option value="">Nezvoleno</option>
 								{allUsers.map((user) => {
 									return (
 										<option key={user._id} value={user.name}>
@@ -156,9 +156,9 @@ const Plan = ({ allUsers }) => {
 							</select>
 							<select
 								className={classNames("plan__input", {
-									"priority--low": item.priority === "Nizká",
-									"priority--medium": item.priority === "Střední",
-									"priority--high": item.priority === "Vysoká",
+									"input--green": item.priority === "Nizká",
+									"input--orange": item.priority === "Střední",
+									"input--red": item.priority === "Vysoká",
 								})}
 								name="priority"
 								id=""
@@ -168,11 +168,16 @@ const Plan = ({ allUsers }) => {
 								value={item.priority}
 								onBlur={() => savePlanData(plan)}
 							>
-								<option style={{ background: "green" }} value="Nizká">
+								<option value="">Nezvoleno</option>
+								<option className="input--green" value="Nizká">
 									Nizká
 								</option>
-								<option value="Střední">Střední</option>
-								<option value="Vysoká">Vysoká</option>
+								<option className="input--orange" value="Střední">
+									Střední
+								</option>
+								<option className="input--red" value="Vysoká">
+									Vysoká
+								</option>
 							</select>
 							<button
 								onClick={() => removeItem(item.id)}

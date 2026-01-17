@@ -20,6 +20,7 @@ function App() {
 	const { user, setUser } = useAuth();
 	const [preloader, setPreloader] = useState(true);
 	const [allUsers, setAllUsers] = useState<any[]>([]);
+	const [buildings, setBuildings] = useState([]);
 
 	// TODO: LEARN THIS
 	useEffect(() => {
@@ -86,7 +87,11 @@ function App() {
 			<div className="wrapper">
 				<Header allUsers={allUsers} />
 				<div className="wrapper-inner">
-					<Sidebar allUsers={allUsers} />
+					<Sidebar
+						allUsers={allUsers}
+						buildings={buildings}
+						setBuildings={setBuildings}
+					/>
 					<Routes>
 						<Route path="/" element={<Home error={error} />} />
 						<Route path="/login" element={<Login />} />
@@ -95,7 +100,10 @@ function App() {
 							path="/users/:id"
 							element={<UserPage allUsers={allUsers} />}
 						/>
-						<Route path="/buildings/:id" element={<BuildingPage />} />
+						<Route
+							path="/buildings/:id"
+							element={<BuildingPage buildings={buildings} />}
+						/>
 					</Routes>
 				</div>
 			</div>

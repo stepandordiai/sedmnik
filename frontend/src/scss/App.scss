@@ -38,6 +38,24 @@ html {
 	padding: 5px;
 }
 
+.input--green {
+	background: var(--green-tp-clr) !important;
+	border: 2px solid var(--green-clr) !important;
+	color: var(--green-clr) !important;
+}
+
+.input--orange {
+	background: var(--orange-tp-clr) !important;
+	border: 2px solid var(--orange-clr) !important;
+	color: var(--orange-clr) !important;
+}
+
+.input--red {
+	background: var(--red-tp-clr) !important;
+	border: 2px solid var(--red-clr) !important;
+	color: var(--red-clr) !important;
+}
+
 .container-title {
 	display: flex;
 	justify-content: flex-start;
@@ -47,6 +65,13 @@ html {
 	h2 {
 		font-weight: 600;
 	}
+}
+
+.btn {
+	background: var(--accent-clr);
+	color: #fff;
+	padding: 5px;
+	border-radius: 5px;
 }
 
 // .sidebar {

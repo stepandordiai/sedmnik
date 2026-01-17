@@ -15,24 +15,6 @@
 	}
 }
 
-.priority--low {
-	background: var(--green-tp-clr);
-	border: 2px solid var(--green-clr);
-	color: var(--green-clr);
-}
-
-.priority--medium {
-	background: var(--orange-tp-clr);
-	border: 2px solid var(--orange-clr);
-	color: var(--orange-clr);
-}
-
-.priority--high {
-	background: var(--red-tp-clr);
-	border: 2px solid var(--red-clr);
-	color: var(--red-clr);
-}
-
 .plan__remove-btn {
 	background: var(--red-tp-clr);
 	color: var(--red-clr);

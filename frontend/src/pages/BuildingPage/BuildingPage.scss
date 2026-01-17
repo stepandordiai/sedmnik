@@ -7,3 +7,43 @@
 	flex-direction: column;
 	gap: 10px;
 }
+
+.building-page__btn {
+	padding: 5px;
+	border-radius: 5px;
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.building-page__btn--active {
+	color: #fff;
+	background: var(--accent-clr);
+}
+
+.section-table {
+	background: #fff;
+	border: var(--primary-border);
+	border-radius: 10px;
+	padding: 5px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+table {
+	border-collapse: separate;
+	border-spacing: 5px;
+	width: 100%;
+}
+
+th {
+	white-space: nowrap;
+	width: 100%;
+	text-align: left;
+	font-weight: initial;
+}
+
+td {
+	&:first-child {
+		width: 100%;
+	}
+}

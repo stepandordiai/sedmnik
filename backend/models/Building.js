@@ -7,8 +7,15 @@ const buildingSchema = new mongoose.Schema(
 			unique: true,
 			required: true,
 		},
+		orderedItems: [
+			{
+				desc: { type: String, required: true },
+				orderOption: String,
+				orderDate: String,
+			},
+		],
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 const Building = mongoose.model("Building", buildingSchema);

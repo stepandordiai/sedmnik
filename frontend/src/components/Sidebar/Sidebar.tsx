@@ -7,9 +7,8 @@ import BuildingIcon from "../../icons/BuildingIcon";
 import api from "../../axios";
 import "./Sidebar.scss";
 
-const Sidebar = ({ allUsers }) => {
+const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 	const { user } = useAuth();
-	const [buildings, setBuildings] = useState([]);
 	const [modalFormVisible, setModalFormVisible] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -43,6 +42,7 @@ const Sidebar = ({ allUsers }) => {
 
 			setBuildings((prev) => [...prev, res.data]);
 			setModalFormVisible(false);
+			setModalFormData("");
 		} catch (error) {
 			// TODO: LEARN THIS
 			setError(error.response.data.message);
