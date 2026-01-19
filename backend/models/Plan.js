@@ -2,11 +2,21 @@ import mongoose from "mongoose";
 
 const planSchema = new mongoose.Schema(
 	{
-		task: String,
-		executor: String,
-		priority: String,
+		user: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+		plan: [
+			{
+				task: {
+					type: String,
+				},
+				priority: String,
+			},
+		],
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 const Plan = mongoose.model("Plan", planSchema);

@@ -3,18 +3,17 @@ import api from "../../axios";
 import classNames from "classnames";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import ListTaskIcon from "../../icons/ListTaskIcon";
-import "./Plan.scss";
 import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
+import "./Plan.scss";
 
 const emptyInput = () => ({
 	// TODO: LEARN THIS
 	id: crypto.randomUUID(),
 	task: "",
-	executor: "",
 	priority: "",
 });
 
-const Plan = ({ allUsers }) => {
+const Plan = ({ userId }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
@@ -35,12 +34,13 @@ const Plan = ({ allUsers }) => {
 			setError(null);
 
 			try {
-				const res = await api.get("/api/work/responsibilities/plan");
+				const res = await api.get("/api/work/responsibilities/plan", {
+					params: { userId },
+				});
 
-				const updated = res.data.map((item) => ({
+				const updated = (res.data || []).map((item) => ({
 					id: crypto.randomUUID(),
 					task: item.task || "",
-					executor: item.executor || "",
 					priority: item.priority || "",
 				}));
 
@@ -57,24 +57,17 @@ const Plan = ({ allUsers }) => {
 		};
 
 		fetchPlanData();
-	}, []);
+	}, [userId]);
 
 	const savePlanData = async (data) => {
 		setError(null);
-
-		// TODO: LEARN THIS
-		for (const item of data) {
-			if ((item.task && !item.executor) || (!item.task && item.executor)) {
-				setError("Pokud vyplníte úkol, musíte uvést i řešitele (a naopak).");
-				return;
-			}
-		}
-
 		setLoading(true);
 
 		try {
 			// TODO: api won't run if custom error
-			await api.put("/api/work/responsibilities/plan", data);
+			await api.put("/api/work/responsibilities/plan", data, {
+				params: { userId },
+			});
 		} catch (err) {
 			setError(err.message);
 		} finally {
@@ -135,7 +128,7 @@ const Plan = ({ allUsers }) => {
 								holder={"Vypracujte plán práce a vyberte zhotovitele"}
 								blur={() => savePlanData(plan)}
 							/>
-							<select
+							{/* <select
 								className="plan__input"
 								name="executor"
 								id=""
@@ -153,7 +146,7 @@ const Plan = ({ allUsers }) => {
 										</option>
 									);
 								})}
-							</select>
+							</select> */}
 							<select
 								className={classNames("plan__input", {
 									"input--green": item.priority === "Nizká",

@@ -7,7 +7,7 @@ import { useState } from "react";
 import "./UserPage.scss";
 import Plan from "../../components/Plan/Plan";
 
-const UserPage = ({ allUsers }) => {
+const UserPage = () => {
 	const { user } = useAuth();
 	const { id } = useParams<string>();
 	const today = new Date();
@@ -40,7 +40,7 @@ const UserPage = ({ allUsers }) => {
 				currentUser={user}
 				isWeek={isWeek}
 			/>
-			<Plan allUsers={allUsers} />
+			<Plan userId={id} />
 		</main>
 	);
 };

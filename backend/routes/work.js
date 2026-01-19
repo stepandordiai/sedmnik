@@ -42,13 +42,13 @@ router.get("/monthly", protect, async (req, res) => {
 		const totalHours = Math.floor(stats / 60);
 		const totalMins = stats % 60;
 		const formattedTotal = `${String(totalHours).padStart(2, "0")}:${String(
-			totalMins
+			totalMins,
 		).padStart(2, "0")}`;
 
 		res.status(200).json(
 			// month,
 			// totalMinutes: stats,
-			formattedTotal
+			formattedTotal,
 			// shiftCount: workShifts.length,
 			// shifts: workShifts, // optionally return the raw data too
 		);
@@ -60,10 +60,11 @@ router.get("/monthly", protect, async (req, res) => {
 
 router.get("/responsibilities/plan", protect, async (req, res) => {
 	try {
+		const userId = req.query.userId || req.user._id; // use query if provided
 		// This returns [ {task: '...'}, {task: '...'} ]
-		const plan = await Plan.find({});
+		const existingPlan = await Plan.findOne({ user: userId });
 
-		res.status(200).json(plan);
+		res.status(200).json(existingPlan?.plan || []);
 	} catch (error) {
 		res.status(500).json({ message: "Server error" });
 	}
@@ -71,25 +72,20 @@ router.get("/responsibilities/plan", protect, async (req, res) => {
 
 router.put("/responsibilities/plan", protect, async (req, res) => {
 	try {
+		const userId = req.query.userId || req.user._id; // use query if provided
 		const planArray = req.body; // Your array from frontend
 
 		const validData = planArray.filter(
-			(item) =>
-				(item.task && item.task.trim() !== "") ||
-				(item.executor && item.executor.trim() !== "")
+			(item) => item.task && item.task.trim() !== "",
 		);
 
-		await Plan.deleteMany({});
+		const updatedPlan = await Plan.findOneAndUpdate(
+			{ user: userId },
+			{ user: userId, plan: validData },
+			{ new: true, upsert: true },
+		);
 
-		// 2. Decide what to do if no valid data exists
-		if (validData.length === 0) {
-			return res.status(200).json([]);
-		}
-
-		// 3. Replace old data with new valid data
-		const savedPlan = await Plan.insertMany(validData);
-
-		res.status(200).json(savedPlan);
+		res.status(200).json(updatedPlan.plan);
 	} catch (error) {
 		res.status(500).json({ message: "Chyba při ukládání plánu" });
 	}
