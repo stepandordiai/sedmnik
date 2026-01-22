@@ -46,3 +46,33 @@
 	border-radius: 10px;
 	color: red;
 }
+
+.switch-btn {
+	position: relative;
+	background: rgba(0, 0, 0, 0.05);
+	min-width: 60px;
+	height: 30px;
+	border-radius: 5px;
+
+	&::before {
+		content: "";
+		position: absolute;
+		left: 2px;
+		top: 2px;
+		bottom: 2px;
+		height: calc(100% - 4px);
+		aspect-ratio: 1/1;
+		background: #fff;
+		border-radius: 5px;
+		transition:
+			transform 0.3s,
+			background-color 0.3s;
+	}
+}
+
+.switch-btn--active {
+	&::before {
+		background: var(--accent-clr);
+		transform: translateX(calc(100% + 4px));
+	}
+}

@@ -7,6 +7,7 @@ import { useState } from "react";
 import Plan from "../../components/Plan/Plan";
 import Period from "../../components/Period/Period";
 import "./UserPage.scss";
+import classNames from "classnames";
 
 const UserPage = ({ allUsers }) => {
 	const { user } = useAuth();
@@ -21,13 +22,23 @@ const UserPage = ({ allUsers }) => {
 
 	return (
 		<main className="user-page">
-			<button
-				style={{ justifyContent: "flex-end", width: "max-content" }}
-				className="btn"
-				onClick={() => setPeriodActive((prev) => !prev)}
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "flex-start",
+					alignItems: "center",
+					gap: 5,
+				}}
 			>
-				Obdobi
-			</button>
+				<button
+					style={{ justifyContent: "flex-end", width: "max-content" }}
+					className={classNames("switch-btn", {
+						"switch-btn--active": periodActive,
+					})}
+					onClick={() => setPeriodActive((prev) => !prev)}
+				></button>
+				<span style={{ fontWeight: 600 }}>Obdobi</span>
+			</div>
 
 			{periodActive ? (
 				<Period allUsers={allUsers} userId={id} />
