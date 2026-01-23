@@ -20,6 +20,7 @@ function App() {
 	const [preloader, setPreloader] = useState(true);
 	const [allUsers, setAllUsers] = useState<any[]>([]);
 	const [buildings, setBuildings] = useState([]);
+	const [modalFormVisible, setModalFormVisible] = useState(false);
 
 	// TODO: learn this
 	useEffect(() => {
@@ -84,12 +85,18 @@ function App() {
 	return (
 		<Router>
 			<div className="wrapper">
-				<Header allUsers={allUsers} />
+				<Header
+					allUsers={allUsers}
+					buildings={buildings}
+					setModalFormVisible={setModalFormVisible}
+				/>
 				<div className="wrapper-inner">
 					<Sidebar
 						allUsers={allUsers}
 						buildings={buildings}
 						setBuildings={setBuildings}
+						modalFormVisible={modalFormVisible}
+						setModalFormVisible={setModalFormVisible}
 					/>
 					<Routes>
 						<Route path="/" element={<Home error={error} />} />

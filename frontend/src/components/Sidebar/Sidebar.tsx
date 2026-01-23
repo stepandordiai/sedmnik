@@ -11,12 +11,17 @@ import PlusIconSmall from "../../icons/PlusIconSmall";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import "./Sidebar.scss";
 
-const Sidebar = ({ allUsers, buildings, setBuildings }) => {
+const Sidebar = ({
+	allUsers,
+	buildings,
+	setBuildings,
+	modalFormVisible,
+	setModalFormVisible,
+}) => {
 	const { user } = useAuth();
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
-	const [modalFormVisible, setModalFormVisible] = useState(false);
 	const [modalFormData, setModalFormData] = useState("");
 	const [sidebarTeam, setSidebarTeam] = useState(true);
 	const [sidebarBuildings, setSidebarBuildings] = useState(false);
@@ -134,6 +139,8 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 					>
 						<div className="sidebar-container">
 							{allUsers.map((user) => {
+								const [firstName, lastName] = user.name.split(" ");
+
 								return (
 									<NavLink
 										className={({ isActive }) =>
@@ -145,7 +152,7 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 										to={`/users/${user._id}`}
 									>
 										<span className="avatar">
-											{user.name.split(" ")[0][0] + user.name.split(" ")[1][0]}
+											{firstName.charAt(0) + lastName.charAt(0)}
 										</span>
 										<span>{user.name}</span>
 									</NavLink>
