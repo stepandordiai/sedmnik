@@ -1,3 +1,3 @@
 export interface Icon {
-	size: number;
+	size?: number;
 }

@@ -9,7 +9,7 @@ router.post("/", protect, async (req, res) => {
 		const { name } = req.body;
 
 		if (!name) {
-			return res.status(400).json({ message: "Missing required fields" });
+			return res.status(400).json({ message: "Zadejte název stavby" });
 		}
 
 		const buildingExists = await Building.findOne({

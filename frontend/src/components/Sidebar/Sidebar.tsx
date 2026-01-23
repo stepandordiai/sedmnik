@@ -5,15 +5,21 @@ import classNames from "classnames";
 import TeamIcon from "../../icons/TeamIcon";
 import BuildingIcon from "../../icons/BuildingIcon";
 import api from "../../axios";
-import "./Sidebar.scss";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
+import PlusIcon from "../../icons/PlusIcon";
+import PlusIconSmall from "../../icons/PlusIconSmall";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import "./Sidebar.scss";
 
 const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 	const { user } = useAuth();
-	const [modalFormVisible, setModalFormVisible] = useState(false);
+
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [modalFormVisible, setModalFormVisible] = useState(false);
 	const [modalFormData, setModalFormData] = useState("");
+	const [sidebarTeam, setSidebarTeam] = useState(true);
+	const [sidebarBuildings, setSidebarBuildings] = useState(false);
 
 	useEffect(() => {
 		const fetchBuildingData = async () => {
@@ -25,7 +31,7 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 
 				setBuildings(res.data);
 			} catch (err) {
-				setError(err.message);
+				setError(err.response.data.message);
 			} finally {
 				setLoading(false);
 			}
@@ -34,19 +40,24 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 		fetchBuildingData();
 	}, []);
 
-	const saveBuildingData = async () => {
+	const saveModalFormData = async () => {
 		setLoading(true);
 		setError(null);
 
 		try {
 			const res = await api.post(`/api/buildings`, { name: modalFormData });
 
+			// Update state with saved data
 			setBuildings((prev) => [...prev, res.data]);
+
+			// Hide modal form
 			setModalFormVisible(false);
+
+			// Clear input value in modal form
 			setModalFormData("");
-		} catch (error) {
-			// TODO: LEARN THIS
-			setError(error.response.data.message);
+		} catch (err) {
+			// TODO: learn this
+			setError(err.response.data.message);
 		} finally {
 			setLoading(false);
 		}
@@ -60,20 +71,23 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
-					saveBuildingData();
+					saveModalFormData();
 				}}
 				className={classNames("modal-form", {
 					"modal-form--visible": modalFormVisible,
 				})}
 			>
 				<div style={{ display: "flex", justifyContent: "space-between" }}>
-					<h2>Create new building</h2>
+					<h2 style={{ fontWeight: 600 }}>Vytvořit novou stavbu</h2>
 					<button
 						className="modal-form__btn"
 						type="button"
-						onClick={() => setModalFormVisible(false)}
+						onClick={() => {
+							setModalFormVisible(false);
+							setError(null);
+						}}
 					>
-						Close
+						Zavřít
 					</button>
 				</div>
 				<input
@@ -81,11 +95,18 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 					value={modalFormData}
 					className="input"
 					type="text"
-					placeholder="Enter building name"
+					placeholder="Zadejte název stavby"
 				/>
-				<p>{error}</p>
+				{error && <p style={{ color: "#f00" }}>{error}</p>}
 				<button className="modal-form__btn" type="submit">
-					Submit
+					{loading ? (
+						<LoadingSpinner />
+					) : (
+						<>
+							<PlusIconSmall />
+							<span>Přidat</span>
+						</>
+					)}
 				</button>
 			</form>
 			<div
@@ -96,64 +117,89 @@ const Sidebar = ({ allUsers, buildings, setBuildings }) => {
 			></div>
 			{/* TODO: aside tag is for sidebars */}
 			<aside className="sidebar">
-				<div className="container-title">
-					<TeamIcon size={20} />
-					<h2>Tým</h2>
-				</div>
-				<div className="sidebar-container">
-					{allUsers.map((user) => {
-						return (
-							<NavLink
-								className={({ isActive }) =>
-									classNames("sidebar__link", {
-										"sidebar__link--active": isActive,
-									})
-								}
-								key={user._id}
-								to={`/users/${user._id}`}
-							>
-								<span className="avatar">
-									{user.name.split(" ")[0][0] + user.name.split(" ")[1][0]}
-								</span>
-								<span>{user.name}</span>
-							</NavLink>
-						);
-					})}
-				</div>
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						alignItems: "center",
-					}}
-				>
-					<div className="container-title">
-						<BuildingIcon size={20} />
-						<h2>Stavby</h2>
+				<div className="sidebar-wrapper">
+					<div style={{ padding: "10px 0" }}>
+						<button
+							onClick={() => setSidebarTeam((prev) => !prev)}
+							className="sidebar__title-btn"
+						>
+							<TeamIcon size={20} />
+							<h2>Tým</h2>
+						</button>
 					</div>
-					<button
-						onClick={() => setModalFormVisible(true)}
-						className="sidebar__btn"
+					<div
+						className={classNames("sidebar-wrapper-inner", {
+							"sidebar-wrapper-inner--visible": sidebarTeam,
+						})}
 					>
-						+
-					</button>
+						<div className="sidebar-container">
+							{allUsers.map((user) => {
+								return (
+									<NavLink
+										className={({ isActive }) =>
+											classNames("sidebar__link", {
+												"sidebar__link--active": isActive,
+											})
+										}
+										key={user._id}
+										to={`/users/${user._id}`}
+									>
+										<span className="avatar">
+											{user.name.split(" ")[0][0] + user.name.split(" ")[1][0]}
+										</span>
+										<span>{user.name}</span>
+									</NavLink>
+								);
+							})}
+						</div>
+					</div>
 				</div>
-				<div className="sidebar-container">
-					{buildings.map((building) => {
-						return (
-							<NavLink
-								key={building._id}
-								className={({ isActive }) =>
-									classNames("sidebar__link", {
-										"sidebar__link--active": isActive,
-									})
-								}
-								to={`/buildings/${building._id}`}
-							>
-								{building.name}
-							</NavLink>
-						);
-					})}
+				<div className="sidebar-wrapper">
+					<div
+						style={{
+							display: "flex",
+							justifyContent: "space-between",
+							alignItems: "center",
+							padding: "5px 0",
+						}}
+					>
+						<button
+							onClick={() => setSidebarBuildings((prev) => !prev)}
+							className="sidebar__title-btn"
+						>
+							<BuildingIcon size={20} />
+							<h2>Stavby</h2>
+						</button>
+						<button
+							onClick={() => setModalFormVisible(true)}
+							className="sidebar__btn"
+						>
+							<PlusIcon size={16} />
+						</button>
+					</div>
+					<div
+						className={classNames("sidebar-wrapper-inner", {
+							"sidebar-wrapper-inner--visible": sidebarBuildings,
+						})}
+					>
+						<div className="sidebar-container">
+							{buildings.map((building) => {
+								return (
+									<NavLink
+										key={building._id}
+										className={({ isActive }) =>
+											classNames("sidebar__link", {
+												"sidebar__link--active": isActive,
+											})
+										}
+										to={`/buildings/${building._id}`}
+									>
+										{building.name}
+									</NavLink>
+								);
+							})}
+						</div>
+					</div>
 				</div>
 				<StatusIndicator error={error} loading={loading} />
 			</aside>

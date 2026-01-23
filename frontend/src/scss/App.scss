@@ -36,6 +36,11 @@ html {
 	border: var(--secondary-border);
 	border-radius: 5px;
 	padding: 5px;
+
+	&:focus {
+		outline: none;
+		border: 1px solid #000;
+	}
 }
 
 .input--green {
