@@ -19,9 +19,15 @@ const BuildingPage = ({ buildings }) => {
 		name: string;
 		text: string;
 		createdAt: string;
+		color: {
+			r: number;
+			g: number;
+			b: number;
+		};
 	}
 
 	const [comments, setComments] = useState<Comment[]>([]);
+
 	const [formData, setFormData] = useState({
 		name: user?.name,
 		text: "",
@@ -38,10 +44,12 @@ const BuildingPage = ({ buildings }) => {
 
 	useEffect(() => {
 		const getComments = async () => {
+			if (!id) return;
 			setLoading(true);
+			setError(null);
 
 			try {
-				const res = await api.get("/api/comments");
+				const res = await api.get(`/api/buildings/${id}/comments`);
 
 				setComments(res.data);
 			} catch (err) {
@@ -52,18 +60,20 @@ const BuildingPage = ({ buildings }) => {
 		};
 
 		getComments();
-	}, []);
+	}, [id]);
 
-	console.log(formData);
 	const saveComment = async (e) => {
 		e.preventDefault();
+		if (!id) return;
 		if (!formData.text.trim()) return;
 		setLoading(true);
+		setError(null);
 
 		try {
-			const res = await api.post("/api/comments", {
+			const res = await api.post(`/api/buildings/${id}/comments`, {
 				name: formData.name,
 				text: formData.text.trim(),
+				color: user.color,
 			});
 
 			setComments((prev) => [...prev, res.data]);
@@ -74,6 +84,19 @@ const BuildingPage = ({ buildings }) => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const formatDateTimeNoSpaces = (createdAt: string) => {
+		const date = new Date(createdAt);
+
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, "0");
+		const day = String(date.getDate()).padStart(2, "0");
+
+		const hours = String(date.getHours()).padStart(2, "0");
+		const minutes = String(date.getMinutes()).padStart(2, "0");
+
+		return `${hours}:${minutes} ${year}-${month}-${day}`;
 	};
 
 	return (
@@ -103,9 +126,9 @@ const BuildingPage = ({ buildings }) => {
 						<p style={{ fontWeight: 600 }}>Poznamky</p>
 						<div
 							style={{
-								background: "var(--bg-clr)",
-								padding: 10,
-								borderRadius: 10,
+								display: "flex",
+								flexDirection: "column",
+								gap: 5,
 							}}
 						>
 							{comments.map((comment, i) => {
@@ -115,14 +138,35 @@ const BuildingPage = ({ buildings }) => {
 											display: "flex",
 											justifyContent: "space-between",
 											alignItems: "flex-start",
+											padding: 5,
+											borderRadius: 5,
+											backgroundColor: `rgba(${comment.color?.r}, ${comment.color?.g}, ${comment.color?.b}, 0.1)`,
 										}}
 										key={i}
 									>
 										<div>
-											<p>{comment.name}</p>
+											<p style={{ color: "var(--accent-clr)" }}>
+												{comment.name}
+											</p>
 											<p>{comment.text}</p>
 										</div>
-										<p>{comment.createdAt}</p>
+										<p>
+											{/* TODO: learn this */}
+											{/* {new Date(comment.createdAt).toLocaleTimeString([], {
+												hour: "2-digit",
+												minute: "2-digit",
+											})} */}
+											{/* {new Date(comment.createdAt)
+												.toLocaleString("cs-CZ", {
+													hour: "2-digit",
+													minute: "2-digit",
+													day: "2-digit",
+													month: "2-digit",
+													year: "numeric",
+												})
+												.replace(/\.\s/g, ".")} */}
+											{formatDateTimeNoSpaces(comment.createdAt)}
+										</p>
 									</div>
 								);
 							})}

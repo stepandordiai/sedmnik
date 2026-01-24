@@ -5,7 +5,6 @@ import workRoutes from "./routes/work.js";
 import usersRoutes from "./routes/users.js";
 import buildingsRoutes from "./routes/buildings.js";
 import buildingRoutes from "./routes/building.js";
-import commentsRoutes from "./routes/comments.js";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 dotenv.config();
@@ -44,8 +43,6 @@ app.use("/api/work", workRoutes);
 app.use("/api/buildings", buildingsRoutes);
 
 app.use("/api/building", buildingRoutes);
-
-app.use("/api/comments", commentsRoutes);
 
 app.get("/health", (req, res) => {
 	res.status(200).write("ok");

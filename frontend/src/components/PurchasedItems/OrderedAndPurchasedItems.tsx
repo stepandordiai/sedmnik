@@ -160,7 +160,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 
 				setOrderedItems(filled);
 			} catch (err) {
-				setError(err.response.data.message);
+				setError(err.response?.data.message);
 			} finally {
 				setLoading(false);
 			}
@@ -191,7 +191,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 
 				setPurchasedItems(filled);
 			} catch (err) {
-				setError(err.response.data.message);
+				setError(err.response?.data.message);
 			} finally {
 				setLoading(false);
 			}
@@ -208,7 +208,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 		try {
 			await api.put(`/api/building/${building._id}/ordered-items`, data);
 		} catch (err) {
-			setError(err.response.data.message);
+			setError(err.response?.data.message);
 		} finally {
 			setLoading(false);
 		}
@@ -239,7 +239,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 
 			setPurchasedItems(filled);
 		} catch (err) {
-			setError(err.response.data.message);
+			setError(err.response?.data.message);
 		} finally {
 			setLoading(false);
 		}

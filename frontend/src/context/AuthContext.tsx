@@ -5,6 +5,11 @@ type User = {
 	_id: string;
 	name: string;
 	username: string;
+	color?: {
+		r: number;
+		g: number;
+		b: number;
+	};
 };
 
 type AuthContextType = {

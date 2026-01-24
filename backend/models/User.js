@@ -17,8 +17,13 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		color: {
+			r: Number,
+			g: Number,
+			b: Number,
+		},
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 userSchema.pre("save", async function () {
