@@ -6,6 +6,7 @@ import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
 import ResponsibilityIcon from "../../icons/ResponsibilityIcon";
 import "./Responsibilities.scss";
+import PlusIconSmall from "../../icons/PlusIconSmall";
 
 const weekData = [
 	"Pondělí",
@@ -205,7 +206,8 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 		.toString()
 		.padStart(2, "0")}`;
 
-	if (!currentUser) return <p>Loading...</p>; // wait for context to hydrate
+	if (!currentUser) return;
+
 	const canEdit = currentUser._id === userId;
 
 	if (isWeek)
@@ -319,9 +321,6 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 					<ResponsibilityIcon size={20} />
 					<h2>Stručný popis práce</h2>
 				</div>
-				<button onClick={handleAddInput} className="responsibilities__btn">
-					Pridat
-				</button>
 			</div>
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
 				{list.map((item) => {
@@ -387,6 +386,10 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 					</p>
 				</div>
 			</div>
+
+			<button onClick={handleAddInput} className="responsibilities__btn">
+				<PlusIconSmall /> <span>Přidat</span>
+			</button>
 			<StatusIndicator error={error} loading={loading} />
 		</section>
 	);
