@@ -18,6 +18,8 @@ const UserPage = ({ allUsers }) => {
 	const [isWeek, setIsWeek] = useState(false);
 	const [periodActive, setPeriodActive] = useState(false);
 
+	const currentUserPage = allUsers.find((user) => user._id === id);
+
 	return (
 		<main className="user-page">
 			<div
@@ -37,11 +39,13 @@ const UserPage = ({ allUsers }) => {
 				></button>
 				<span style={{ fontWeight: 600 }}>Export</span>
 			</div>
-
 			{periodActive ? (
 				<Period allUsers={allUsers} userId={id} />
 			) : (
 				<>
+					<section className="section">
+						<h1 style={{ fontSize: "2rem" }}>{currentUserPage?.name}</h1>
+					</section>
 					<Weekbar
 						shiftDate={shiftDate}
 						setShiftDate={setShiftDate}
