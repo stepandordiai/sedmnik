@@ -19,6 +19,10 @@
 	background: var(--red-tp-clr);
 	color: var(--red-clr);
 	border: 2px solid var(--red-clr);
-	width: 30px;
+	padding: 5px;
+	aspect-ratio: 1/1;
 	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }

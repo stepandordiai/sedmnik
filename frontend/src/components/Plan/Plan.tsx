@@ -4,10 +4,12 @@ import classNames from "classnames";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import ListTaskIcon from "../../icons/ListTaskIcon";
 import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
+import PlusIconSmall from "../../icons/PlusIconSmall";
+import XIcon from "../../icons/XIcon";
 import "./Plan.scss";
 
 const emptyInput = () => ({
-	// TODO: LEARN THIS
+	// TODO: learn this
 	id: crypto.randomUUID(),
 	task: "",
 	priority: "",
@@ -64,7 +66,6 @@ const Plan = ({ userId }) => {
 		setLoading(true);
 
 		try {
-			// TODO: api won't run if custom error
 			await api.put("/api/work/responsibilities/plan", data, {
 				params: { userId },
 			});
@@ -100,21 +101,10 @@ const Plan = ({ userId }) => {
 
 	return (
 		<section className="section">
-			<div
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-				}}
-			>
-				<div className="container-title">
-					<ListTaskIcon size={20} />
-					<h2>Seznam úkolů / Plán na další dny</h2>
-				</div>
-				<button onClick={handleAddInput} className="responsibilities__btn">
-					Pridat
-				</button>
+			<div className="container-title">
+				<ListTaskIcon size={20} />
+				<h2>Seznam úkolů / Plán na další dny</h2>
 			</div>
-
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
 				{plan.map((item) => {
 					return (
@@ -128,25 +118,6 @@ const Plan = ({ userId }) => {
 								holder={"Vypracujte plán práce a vyberte zhotovitele"}
 								blur={() => savePlanData(plan)}
 							/>
-							{/* <select
-								className="plan__input"
-								name="executor"
-								id=""
-								onChange={(e) =>
-									handlePlanInput(item.id, e.target.name, e.target.value)
-								}
-								value={item.executor}
-								onBlur={() => savePlanData(plan)}
-							>
-								<option value="">Nezvoleno</option>
-								{allUsers.map((user) => {
-									return (
-										<option key={user._id} value={user.name}>
-											{user.name}
-										</option>
-									);
-								})}
-							</select> */}
 							<select
 								className={classNames("plan__input", {
 									"input--green": item.priority === "Nizká",
@@ -176,12 +147,16 @@ const Plan = ({ userId }) => {
 								onClick={() => removeItem(item.id)}
 								className="plan__remove-btn"
 							>
-								X
+								<XIcon />
 							</button>
 						</div>
 					);
 				})}
 			</div>
+			<button onClick={handleAddInput} className="responsibilities__btn">
+				<PlusIconSmall />
+				<span>Přidat</span>
+			</button>
 			<StatusIndicator error={error} loading={loading} />
 		</section>
 	);
