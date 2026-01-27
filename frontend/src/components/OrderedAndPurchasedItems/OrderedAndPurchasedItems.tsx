@@ -261,19 +261,6 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 					<h2 style={{ margin: "5px 0 0 5px ", fontWeight: 600 }}>
 						Objednané materiály
 					</h2>
-					<button
-						onClick={addEmptyInput}
-						style={{
-							margin: "5px 5px 0 0",
-							display: "flex",
-							justifyContent: "center",
-							alignItems: "center",
-						}}
-						className="btn"
-					>
-						<PlusIconSmall />
-						<span>Přidat</span>
-					</button>
 				</div>
 				<table>
 					<thead>
@@ -359,7 +346,23 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 						})}
 					</tbody>
 				</table>
-				<StatusIndicator error={error} loading={loading} />
+				<button
+					onClick={addEmptyInput}
+					style={{
+						margin: "0 5px 0 0",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						alignSelf: "flex-end",
+					}}
+					className="btn"
+				>
+					<PlusIconSmall />
+					<span>Přidat</span>
+				</button>
+				<div style={{ margin: "0 0 5px 5px" }}>
+					<StatusIndicator error={error} loading={loading} />
+				</div>
 			</section>
 			<section className="section-table">
 				<div

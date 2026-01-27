@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
 import WorkSchedule from "../../components/WorkSchedule/WorkSchedule";
-import OrderedAndPurchasedItems from "../../components/PurchasedItems/OrderedAndPurchasedItems";
+import OrderedAndPurchasedItems from "../../components/OrderedAndPurchasedItems/OrderedAndPurchasedItems";
 import { useAuth } from "../../context/AuthContext";
 import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import "./BuildingPage.scss";
