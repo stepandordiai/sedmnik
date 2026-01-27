@@ -6,8 +6,8 @@ import Responsibilities from "../../components/Responsibilities/Responsibilities
 import { useState } from "react";
 import Plan from "../../components/Plan/Plan";
 import Period from "../../components/Period/Period";
-import "./UserPage.scss";
 import classNames from "classnames";
+import "./UserPage.scss";
 
 const UserPage = ({ allUsers }) => {
 	const { user } = useAuth();
@@ -17,8 +17,6 @@ const UserPage = ({ allUsers }) => {
 	const [shiftDate, setShiftDate] = useState(today.toISOString().split("T")[0]);
 	const [isWeek, setIsWeek] = useState(false);
 	const [periodActive, setPeriodActive] = useState(false);
-
-	if (!user) return <p>Loading...</p>; // wait for context to hydrate
 
 	return (
 		<main className="user-page">
@@ -37,7 +35,7 @@ const UserPage = ({ allUsers }) => {
 					})}
 					onClick={() => setPeriodActive((prev) => !prev)}
 				></button>
-				<span style={{ fontWeight: 600 }}>Obdobi</span>
+				<span style={{ fontWeight: 600 }}>Export</span>
 			</div>
 
 			{periodActive ? (
