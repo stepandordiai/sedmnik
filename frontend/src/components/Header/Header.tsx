@@ -8,6 +8,7 @@ import BuildingIcon from "../../icons/BuildingIcon";
 import PlusIcon from "../../icons/PlusIcon";
 import logo from "/logo/logo-black.png";
 import "./Header.scss";
+import ToolsIcon from "../../icons/ToolsIcon";
 
 const Header = ({ allUsers, buildings, setModalFormVisible }) => {
 	const { user, setUser } = useAuth();
@@ -177,6 +178,22 @@ const Header = ({ allUsers, buildings, setModalFormVisible }) => {
 						</div>
 					</div>
 				</div>
+				<NavLink
+					style={{ borderRadius: 10 }}
+					onClick={() => setMenuVisible(false)}
+					className={({ isActive }) =>
+						classNames("sidebar__link", {
+							"sidebar__link--active": isActive,
+						})
+					}
+					to="/tools"
+				>
+					<ToolsIcon size={20} />
+					<span>Nářadí</span>
+				</NavLink>
+				<p className="menu__author">
+					Created by <a href="https://www.heeeyooo.studio/">heeeyooo studio</a>
+				</p>
 			</div>
 		</>
 	);

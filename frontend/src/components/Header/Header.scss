@@ -99,6 +99,14 @@
 	display: flex;
 }
 
+.menu__author {
+	margin-left: auto;
+
+	a {
+		color: var(--accent-clr);
+	}
+}
+
 @media screen and (width < 700px) {
 	.menu-btn {
 		display: flex;

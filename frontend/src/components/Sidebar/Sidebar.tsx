@@ -216,13 +216,15 @@ const Sidebar = ({
 							"sidebar__link--active": isActive,
 						})
 					}
-					key={user._id}
 					to="/tools"
 				>
 					<ToolsIcon size={20} />
 					<span>Nářadí</span>
 				</NavLink>
 				<StatusIndicator error={error} loading={loading} />
+				<p className="sidebar__author">
+					Created by <a href="https://www.heeeyooo.studio/">heeeyooo studio</a>
+				</p>
 			</aside>
 		</>
 	);

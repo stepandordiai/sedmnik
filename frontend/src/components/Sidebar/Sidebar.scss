@@ -131,6 +131,14 @@
 	display: initial;
 }
 
+.sidebar__author {
+	margin-top: auto;
+
+	a {
+		color: var(--accent-clr);
+	}
+}
+
 @media screen and (width < 700px) {
 	.sidebar {
 		display: none;
