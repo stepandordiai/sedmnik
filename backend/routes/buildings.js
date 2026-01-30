@@ -111,7 +111,7 @@ router.delete("/:buildingId/comments/:commentId", protect, async (req, res) => {
 
 		const comment = await Comment.findOneAndDelete({
 			_id: commentId,
-			buildingId,
+			buildingId: buildingId,
 		});
 
 		if (!comment) {

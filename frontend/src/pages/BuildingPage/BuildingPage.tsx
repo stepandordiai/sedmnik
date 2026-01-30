@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import api from "../../axios";
 import "./BuildingPage.scss";
+import ChatIcon from "../../icons/ChatIcon";
 
 const BuildingPage = ({ buildings }) => {
 	const { id } = useParams();
@@ -28,8 +29,6 @@ const BuildingPage = ({ buildings }) => {
 	}
 
 	const [comments, setComments] = useState<Comment[]>([]);
-
-	console.log(comments);
 
 	const [formData, setFormData] = useState({
 		name: user?.name,
@@ -115,6 +114,7 @@ const BuildingPage = ({ buildings }) => {
 
 		return `${hours}:${minutes} ${year}-${month}-${day}`;
 	};
+
 	return (
 		<main className="building-page">
 			<div style={{ display: "flex", gap: 5 }}>
@@ -139,7 +139,10 @@ const BuildingPage = ({ buildings }) => {
 				<>
 					<OrderedAndPurchasedItems id={id} building={building} />
 					<section className="section">
-						<p style={{ fontWeight: 600 }}>Poznamky</p>
+						<div className="container-title">
+							<ChatIcon size={20} />
+							<h2>Poznamky</h2>
+						</div>
 						<div
 							style={{
 								display: "flex",
@@ -198,6 +201,7 @@ const BuildingPage = ({ buildings }) => {
 								style={{ width: "100%" }}
 								name="text"
 								rows={3}
+								placeholder="Napište zprávu..."
 							></textarea>
 							<button
 								style={{ marginLeft: "auto" }}
