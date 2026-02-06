@@ -23,8 +23,7 @@ const allowedOrigins = [
 	"https://sedmnik.netlify.app",
 	"http://localhost:3000",
 	"http://localhost:5173",
-	"https://www.flovas.cz/uk",
-	"https://www.flovas.cz/cs",
+	"https://www.flovas.cz",
 ];
 
 // CORS for frontend domain
