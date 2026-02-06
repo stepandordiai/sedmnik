@@ -21,7 +21,7 @@ const UserPage = ({ allUsers }) => {
 	const currentUserPage = allUsers.find((user) => user._id === id);
 
 	return (
-		<main className="user-page">
+		<main className="main">
 			<div
 				style={{
 					display: "flex",

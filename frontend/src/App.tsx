@@ -12,6 +12,7 @@ import { useAuth } from "./context/AuthContext";
 import Preload from "./components/Preload/Preload";
 import BuildingPage from "./pages/BuildingPage/BuildingPage";
 import Tools from "./pages/Tools/Tools";
+import Leads from "./pages/Leads/Leads";
 import "./scss/App.scss";
 
 function App() {
@@ -122,6 +123,7 @@ function App() {
 							element={<BuildingPage buildings={buildings} />}
 						/>
 						<Route path="/tools" element={<Tools buildings={buildings} />} />
+						<Route path="/leads" element={<Leads />} />
 					</Routes>
 				</div>
 			</div>

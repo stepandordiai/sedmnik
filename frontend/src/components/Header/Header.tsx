@@ -9,8 +9,9 @@ import PlusIcon from "../../icons/PlusIcon";
 import logo from "/logo/logo-black.png";
 import ToolsIcon from "../../icons/ToolsIcon";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
-import "./Header.scss";
 import StoreIcon from "../../icons/StoreIcon";
+import PersonIcon from "../../icons/PersonIcon";
+import "./Header.scss";
 
 const Header = ({
 	allUsers,
@@ -237,6 +238,19 @@ const Header = ({
 					<StoreIcon size={20} />
 					<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
 				</a>
+				<NavLink
+					style={{ borderRadius: 10 }}
+					onClick={() => setMenuVisible(false)}
+					className={({ isActive }) =>
+						classNames("sidebar__link", {
+							"sidebar__link--active": isActive,
+						})
+					}
+					to="/leads"
+				>
+					<PersonIcon size={20} />
+					<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
+				</NavLink>
 				<StatusIndicator error={error} loading={loading} />
 				<p className="menu__author">
 					Created by{" "}

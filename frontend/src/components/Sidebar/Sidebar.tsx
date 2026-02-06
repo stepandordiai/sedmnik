@@ -10,8 +10,9 @@ import PlusIcon from "../../icons/PlusIcon";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import ToolsIcon from "../../icons/ToolsIcon";
-import "./Sidebar.scss";
 import StoreIcon from "../../icons/StoreIcon";
+import PersonIcon from "../../icons/PersonIcon";
+import "./Sidebar.scss";
 
 const Sidebar = ({
 	allUsers,
@@ -231,6 +232,17 @@ const Sidebar = ({
 					<StoreIcon size={20} />
 					<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
 				</a>
+				<NavLink
+					className={({ isActive }) =>
+						classNames("sidebar__link", {
+							"sidebar__link--active": isActive,
+						})
+					}
+					to="/leads"
+				>
+					<PersonIcon size={20} />
+					<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
+				</NavLink>
 				<StatusIndicator error={error} loading={loading} />
 				<p className="sidebar__author">
 					Created by{" "}

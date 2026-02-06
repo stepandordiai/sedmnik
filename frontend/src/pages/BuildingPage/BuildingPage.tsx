@@ -116,7 +116,7 @@ const BuildingPage = ({ buildings }) => {
 	};
 
 	return (
-		<main className="building-page">
+		<main className="main">
 			<div style={{ display: "flex", gap: 5 }}>
 				<button
 					onClick={() => setBuildingOption("Materiály")}

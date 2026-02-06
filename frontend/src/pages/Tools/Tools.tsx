@@ -83,7 +83,7 @@ const Tools = ({ buildings }) => {
 	};
 
 	return (
-		<main className="tools-page">
+		<main className="main">
 			<section className="section">
 				<div className="container-title">
 					<ToolsIcon size={20} />

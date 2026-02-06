@@ -22,6 +22,16 @@ html {
 
 // globals
 
+.main {
+	padding: 10px;
+	background: var(--bg-clr);
+	width: 100%;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
 .section {
 	background: #fff;
 	border: var(--primary-border);
@@ -93,13 +103,6 @@ table {
 
 th {
 	white-space: nowrap;
-	width: 100%;
 	text-align: left;
 	font-weight: initial;
-}
-
-td {
-	&:first-child {
-		width: 100%;
-	}
 }
