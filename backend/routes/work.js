@@ -60,10 +60,11 @@ router.get("/monthly", protect, async (req, res) => {
 		const stats = workShifts.reduce((acc, shift) => {
 			const start = timeToMinutes(shift.startTime);
 			const end = timeToMinutes(shift.endTime);
+			const over = timeToMinutes(shift.overTime);
 			const pause = timeToMinutes(shift.pauseTime);
 
 			// Calculate duration in minutes for this specific shift
-			const duration = end > start ? end - start - pause : 0;
+			const duration = end > start ? end - start + over - pause : 0;
 
 			return acc + (duration > 0 ? duration : 0);
 		}, 0);
@@ -141,6 +142,7 @@ router.get("/", protect, async (req, res) => {
 			date,
 			startTime: "",
 			endTime: "",
+			overTime: "",
 			pauseTime: "",
 		});
 	} catch (err) {
@@ -151,7 +153,7 @@ router.get("/", protect, async (req, res) => {
 
 router.post("/", protect, async (req, res) => {
 	try {
-		const { date, startTime, endTime, pauseTime } = req.body;
+		const { date, startTime, endTime, overTime, pauseTime } = req.body;
 
 		if (!date) {
 			return res.status(400).json({ message: "Missing required fields" });
@@ -165,6 +167,7 @@ router.post("/", protect, async (req, res) => {
 		if (workShiftExists) {
 			workShiftExists.startTime = startTime;
 			workShiftExists.endTime = endTime;
+			workShiftExists.overTime = overTime;
 			workShiftExists.pauseTime = pauseTime;
 
 			await workShiftExists.save();
@@ -177,6 +180,7 @@ router.post("/", protect, async (req, res) => {
 			date,
 			startTime,
 			endTime,
+			overTime,
 			pauseTime,
 		});
 

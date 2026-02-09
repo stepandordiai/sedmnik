@@ -19,6 +19,10 @@ const workShiftSchema = new mongoose.Schema(
 			type: String,
 			required: false,
 		},
+		overTime: {
+			type: String,
+			required: false,
+		},
 		pauseTime: {
 			type: String,
 			required: false,
@@ -30,7 +34,7 @@ const workShiftSchema = new mongoose.Schema(
 			},
 		],
 	},
-	{ timestamps: true }
+	{ timestamps: true },
 );
 
 const WorkShift = mongoose.model("WorkShift", workShiftSchema);
