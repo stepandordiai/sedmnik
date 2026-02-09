@@ -11,6 +11,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 	const [data, setData] = useState({
 		startTime: "",
 		endTime: "",
+		overTime: "",
 		pauseTime: "",
 	});
 	const [total, setTotal] = useState("00:00");
@@ -24,6 +25,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 			setData({
 				startTime: "",
 				endTime: "",
+				overTime: "",
 				pauseTime: "",
 			});
 			setTotal("00:00");
@@ -34,18 +36,19 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 					// }/api/work/${shiftDate}?userId=${userId}`,
 					{
 						params: { date: shiftDate, userId },
-					}
+					},
 				);
 
 				setData({
 					startTime: res.data.startTime || "",
 					endTime: res.data.endTime || "",
+					overTime: res.data.overTime || "",
 					pauseTime: res.data.pauseTime || "",
 				});
 			} catch (error) {
 				// If 404, treat as empty shift
 				if (error.response?.status === 404) {
-					setData({ startTime: "", endTime: "", pauseTime: "" });
+					setData({ startTime: "", endTime: "", overTime: "", pauseTime: "" });
 				} else {
 					setError(error.response?.data?.message || "Něco se pokazilo");
 				}
@@ -61,10 +64,11 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 		if (data.startTime && data.endTime) {
 			const start = timeToMinutes(data.startTime);
 			const end = timeToMinutes(data.endTime);
+			const over = timeToMinutes(data.overTime);
 			const pause = timeToMinutes(data.pauseTime);
 
-			const hours = Math.floor((end - start - pause) / 60);
-			const minutes = (end - start - pause) % 60;
+			const hours = Math.floor((end - start + over - pause) / 60);
+			const minutes = (end - start + over - pause) % 60;
 
 			setTotal(hours + ":" + minutes.toString().padStart(2, "0"));
 		} else {
@@ -80,6 +84,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 				date: shiftDate,
 				startTime: data.startTime,
 				endTime: data.endTime,
+				overTime: data.overTime,
 				pauseTime: data.pauseTime,
 			});
 		} catch (err) {
@@ -221,6 +226,23 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 					</div>
 				</div>
 				<div style={{ display: "flex", gap: 5 }}>
+					<div className="visit-input-container">
+						<span>Přesčas</span>
+						<input
+							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
+							name="overTime"
+							onBlur={upsertWorkShift}
+							className="visit__input"
+							style={
+								!canEdit
+									? { background: "var(--bg-clr)" }
+									: { background: "#fff" }
+							}
+							value={data.overTime}
+							disabled={!canEdit}
+							type="time"
+						/>
+					</div>
 					<div className="visit-input-container">
 						<span>Pause</span>
 						<input
