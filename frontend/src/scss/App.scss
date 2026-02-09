@@ -95,6 +95,8 @@ html {
 	border-radius: 5px;
 }
 
+// table
+
 table {
 	border-collapse: separate;
 	border-spacing: 5px;
@@ -104,5 +106,9 @@ table {
 th {
 	white-space: nowrap;
 	text-align: left;
-	font-weight: initial;
+	font-weight: 500;
+}
+
+td {
+	width: 100%;
 }
