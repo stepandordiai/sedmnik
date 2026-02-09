@@ -14,13 +14,6 @@ const buildingSchema = new mongoose.Schema(
 				orderDate: String,
 			},
 		],
-		purchasedItems: [
-			{
-				desc: { type: String, required: true },
-				purchaseOption: String,
-				purchaseDate: String,
-			},
-		],
 		workSchedule: [
 			{
 				desc: { type: String, required: true },
