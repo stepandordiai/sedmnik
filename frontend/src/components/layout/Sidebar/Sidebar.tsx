@@ -1,17 +1,17 @@
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import classNames from "classnames";
-import TeamIcon from "../../icons/TeamIcon";
-import BuildingIcon from "../../icons/BuildingIcon";
-import api from "../../axios";
-import StatusIndicator from "../StatusIndicator/StatusIndicator";
-import PlusIcon from "../../icons/PlusIcon";
-import PlusIconSmall from "../../icons/PlusIconSmall";
-import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
-import ToolsIcon from "../../icons/ToolsIcon";
-import StoreIcon from "../../icons/StoreIcon";
-import PersonIcon from "../../icons/PersonIcon";
+import TeamIcon from "../../../icons/TeamIcon";
+import BuildingIcon from "../../../icons/BuildingIcon";
+import api from "../../../axios";
+import StatusIndicator from "../../StatusIndicator/StatusIndicator";
+import PlusIcon from "../../../icons/PlusIcon";
+import PlusIconSmall from "../../../icons/PlusIconSmall";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
+import ToolsIcon from "../../../icons/ToolsIcon";
+import StoreIcon from "../../../icons/StoreIcon";
+import PersonIcon from "../../../icons/PersonIcon";
 import "./Sidebar.scss";
 
 const Sidebar = ({

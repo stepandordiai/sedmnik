@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 import classNames from "classnames";
-import TeamIcon from "../../icons/TeamIcon";
-import BuildingIcon from "../../icons/BuildingIcon";
-import PlusIcon from "../../icons/PlusIcon";
+import TeamIcon from "../../../icons/TeamIcon";
+import BuildingIcon from "../../../icons/BuildingIcon";
+import PlusIcon from "../../../icons/PlusIcon";
 import logo from "/logo/logo-black.png";
-import ToolsIcon from "../../icons/ToolsIcon";
-import StatusIndicator from "../StatusIndicator/StatusIndicator";
-import StoreIcon from "../../icons/StoreIcon";
-import PersonIcon from "../../icons/PersonIcon";
+import ToolsIcon from "../../../icons/ToolsIcon";
+import StatusIndicator from "../../StatusIndicator/StatusIndicator";
+import StoreIcon from "../../../icons/StoreIcon";
+import PersonIcon from "../../../icons/PersonIcon";
 import "./Header.scss";
 
 const Header = ({
