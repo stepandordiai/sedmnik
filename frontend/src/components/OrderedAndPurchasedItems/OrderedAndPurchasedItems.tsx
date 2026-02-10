@@ -123,7 +123,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 					{orderedItems.map((orderedItem) => {
 						return (
 							<tr key={orderedItem.id}>
-								<td>
+								<td style={{ width: "100%" }}>
 									<AutoGrowTextArea
 										value={orderedItem.desc}
 										handleChange={(e) =>

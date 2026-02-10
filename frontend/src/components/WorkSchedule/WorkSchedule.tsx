@@ -101,7 +101,7 @@ const WorkSchedule = ({ id, building }) => {
 					{workSchedule.map((item) => {
 						return (
 							<tr key={item.id}>
-								<td>
+								<td style={{ width: "100%" }}>
 									<AutoGrowTextArea
 										value={item.desc}
 										handleChange={(e) =>

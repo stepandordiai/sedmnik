@@ -46,11 +46,16 @@ html {
 	border: var(--secondary-border);
 	border-radius: 5px;
 	padding: 5px;
+	width: 100%;
 
 	&:focus {
 		outline: none;
 		border: 1px solid #000;
 	}
+}
+
+.input[type="date"] {
+	width: min-content !important;
 }
 
 .input--green {
@@ -109,6 +114,12 @@ th {
 	font-weight: 500;
 }
 
-td {
-	width: 100%;
+// td {
+// 	width: 100%;
+// }
+
+// select
+
+select {
+	width: min-content !important;
 }
