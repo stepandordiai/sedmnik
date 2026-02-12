@@ -5,18 +5,18 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
 	try {
-		const { tel } = req.body;
+		const lead = req.body;
 
-		if (tel.trim() === "" || tel.length < 9) {
-			return res.status(400).json({ message: "Telephone number is required" });
+		if (!lead.tel || lead.tel.trim() === "") {
+			return res.status(400).json({ message: "Telefon je povinné pole" });
 		}
 
-		const newLead = await Lead.create({ tel });
+		const newLead = await Lead.create(lead);
 
 		res.status(201).json(newLead);
 	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Failed to create lead" });
+		console.error("Mongoose Error:", error.message);
+		res.status(500).json({ message: error.message });
 	}
 });
 
@@ -36,23 +36,6 @@ router.put("/", async (req, res) => {
 		const newLeads = await Lead.insertMany(validData);
 
 		res.status(200).json(newLeads);
-	} catch (error) {
-		console.error("Mongoose Error:", error.message);
-		res.status(500).json({ message: error.message });
-	}
-});
-
-router.post("/", async (req, res) => {
-	try {
-		const lead = req.body;
-
-		if (!lead.tel || lead.tel.trim() === "") {
-			return res.status(400).json({ message: "Telefon je povinné pole" });
-		}
-
-		const newLead = await Lead.create(lead);
-
-		res.status(201).json(newLead);
 	} catch (error) {
 		console.error("Mongoose Error:", error.message);
 		res.status(500).json({ message: error.message });
