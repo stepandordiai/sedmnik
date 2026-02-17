@@ -19,6 +19,8 @@ const Plan = ({ userId }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
 
 	const handleAddInput = () => {
 		setPlan((prev) => [...prev, emptyInput()]);
@@ -90,75 +92,116 @@ const Plan = ({ userId }) => {
 		});
 	}, [plan.length]);
 
-	// TODO: learn this
-	const removeItem = (id: string) => {
-		setPlan((prev) => {
-			const updated = prev.filter((item) => item.id !== id);
-			savePlanData(updated);
-			return updated;
-		});
+	const removeItem = () => {
+		if (selectedId) {
+			setPlan((prev) => {
+				const updated = prev.filter((item) => item.id !== selectedId);
+				savePlanData(updated);
+				return updated;
+			});
+		}
+		setSelectedId(null);
+		setModalOpen(false);
 	};
 
 	return (
-		<section className="section">
-			<div className="container-title">
-				<ListTaskIcon size={20} />
-				<h2>Seznam úkolů / Plán na další dny</h2>
-			</div>
-			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-				{plan.map((item) => {
-					return (
-						<div key={item.id} style={{ display: "flex", gap: 5 }}>
-							<AutoGrowTextArea
-								value={item.task}
-								handleChange={(e) =>
-									handlePlanInput(item.id, e.target.name, e.target.value)
-								}
-								name={"task"}
-								holder={"Vypracujte plán práce a vyberte zhotovitele"}
-								blur={() => savePlanData(plan)}
-							/>
-							<select
-								className={classNames("plan__input", {
-									"input--green": item.priority === "Nizká",
-									"input--orange": item.priority === "Střední",
-									"input--red": item.priority === "Vysoká",
-								})}
-								name="priority"
-								id=""
-								onChange={(e) =>
-									handlePlanInput(item.id, e.target.name, e.target.value)
-								}
-								value={item.priority}
-								onBlur={() => savePlanData(plan)}
-							>
-								<option value="">Nezvoleno</option>
-								<option className="input--green" value="Nizká">
-									Nizká
-								</option>
-								<option className="input--orange" value="Střední">
-									Střední
-								</option>
-								<option className="input--red" value="Vysoká">
-									Vysoká
-								</option>
-							</select>
-							<button
-								onClick={() => removeItem(item.id)}
-								className="plan__remove-btn"
-							>
-								<XIcon />
-							</button>
-						</div>
-					);
+		<>
+			<div
+				className={classNames("header-modal", {
+					"header-modal--visible": modalOpen,
 				})}
+			>
+				<p style={{ fontWeight: 600 }}>Opravdu chcete tuto položku smazat?</p>
+				<button
+					onClick={removeItem}
+					style={{ background: "var(--red-clr)" }}
+					className="header-modal__btn"
+				>
+					Smazat
+				</button>
+				<button
+					style={{ background: "#000" }}
+					className="header-modal__btn"
+					onClick={() => {
+						setSelectedId(null);
+						setModalOpen(false);
+					}}
+				>
+					Zrušit
+				</button>
 			</div>
-			<button onClick={handleAddInput} className="responsibilities__btn">
-				<PlusIconSmall />
-				<span>Přidat</span>
-			</button>
-			<StatusIndicator error={error} loading={loading} />
-		</section>
+			<div
+				onClick={() => {
+					setSelectedId(null);
+					setModalOpen(false);
+				}}
+				className={classNames("header__curtain", {
+					"header__curtain--visible": modalOpen,
+				})}
+			></div>
+			<section className="section">
+				<div className="container-title">
+					<ListTaskIcon size={20} />
+					<h2>Seznam úkolů / Plán na další dny</h2>
+				</div>
+				<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+					{plan.map((item) => {
+						return (
+							<div key={item.id} style={{ display: "flex", gap: 5 }}>
+								<AutoGrowTextArea
+									value={item.task}
+									handleChange={(e) =>
+										handlePlanInput(item.id, e.target.name, e.target.value)
+									}
+									name={"task"}
+									holder={"Vypracujte plán práce a vyberte zhotovitele"}
+									blur={() => savePlanData(plan)}
+								/>
+								<select
+									className={classNames("plan__input", {
+										"input--green": item.priority === "Nizká",
+										"input--orange": item.priority === "Střední",
+										"input--red": item.priority === "Vysoká",
+									})}
+									name="priority"
+									id=""
+									onChange={(e) =>
+										handlePlanInput(item.id, e.target.name, e.target.value)
+									}
+									value={item.priority}
+									onBlur={() => savePlanData(plan)}
+								>
+									<option value="">Nezvoleno</option>
+									<option className="input--green" value="Nizká">
+										Nizká
+									</option>
+									<option className="input--orange" value="Střední">
+										Střední
+									</option>
+									<option className="input--red" value="Vysoká">
+										Vysoká
+									</option>
+								</select>
+								<button
+									onClick={() => {
+										setSelectedId(item.id);
+										setModalOpen(true);
+									}}
+									className="plan__remove-btn"
+								>
+									<XIcon />
+								</button>
+							</div>
+						);
+					})}
+				</div>
+				<button onClick={handleAddInput} className="responsibilities__btn">
+					<PlusIconSmall />
+					<span>Přidat</span>
+				</button>
+				<StatusIndicator error={error} loading={loading} />
+			</section>
+		</>
 	);
 };
 
