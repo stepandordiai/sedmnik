@@ -4,7 +4,6 @@ import authRoutes from "./routes/auth.js";
 import workRoutes from "./routes/work.js";
 import usersRoutes from "./routes/users.js";
 import buildingsRoutes from "./routes/buildings.js";
-import buildingRoutes from "./routes/building.js";
 import toolsRoutes from "./routes/tools.js";
 import leadsRoutes from "./routes/leads.js";
 import { connectDB } from "./config/db.js";
@@ -44,8 +43,6 @@ app.use("/api/users", usersRoutes);
 app.use("/api/work", workRoutes);
 
 app.use("/api/buildings", buildingsRoutes);
-
-app.use("/api/building", buildingRoutes);
 
 app.use("/tools", toolsRoutes);
 

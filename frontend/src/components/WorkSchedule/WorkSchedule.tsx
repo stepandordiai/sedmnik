@@ -13,7 +13,7 @@ const workScheduleEmptyInput = () => ({
 	comment: "",
 });
 
-const WorkSchedule = ({ id, building }) => {
+const WorkSchedule = ({ building }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [workSchedule, setWorkSchedule] = useState([
@@ -35,7 +35,7 @@ const WorkSchedule = ({ id, building }) => {
 
 			try {
 				const res = await api.get(
-					`/api/building/${building._id}/work-schedule`,
+					`/api/buildings/${building._id}/work-schedule`,
 				);
 
 				const updated = res.data.map((item) => ({
@@ -62,7 +62,7 @@ const WorkSchedule = ({ id, building }) => {
 		};
 
 		fetchWorkSchedule();
-	}, [id]);
+	}, [building._id]);
 
 	const saveWorkSchedule = async () => {
 		setLoading(true);
@@ -70,7 +70,7 @@ const WorkSchedule = ({ id, building }) => {
 
 		try {
 			await api.put(
-				`/api/building/${building._id}/work-schedule`,
+				`/api/buildings/${building._id}/work-schedule`,
 				workSchedule,
 			);
 		} catch (err) {

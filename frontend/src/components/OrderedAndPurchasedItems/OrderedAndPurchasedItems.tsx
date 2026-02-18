@@ -14,7 +14,7 @@ const emptyInput = () => ({
 	orderDate: "",
 });
 
-const OrderedAndPurchasedItems = ({ id, building }) => {
+const OrderedAndPurchasedItems = ({ building }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [orderedItems, setOrderedItems] = useState([
@@ -36,7 +36,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 
 			try {
 				const res = await api.get(
-					`/api/building/${building._id}/ordered-items`,
+					`/api/buildings/${building._id}/ordered-items`,
 				);
 
 				const updated = res.data.map((item) => ({
@@ -62,7 +62,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 		};
 
 		fetchOrderedItemsData();
-	}, [id]);
+	}, [building._id]);
 
 	const saveOrderedItemsData = async () => {
 		setLoading(true);
@@ -70,7 +70,7 @@ const OrderedAndPurchasedItems = ({ id, building }) => {
 
 		try {
 			const res = await api.put(
-				`/api/building/${building._id}/ordered-items`,
+				`/api/buildings/${building._id}/ordered-items`,
 				orderedItems,
 			);
 
