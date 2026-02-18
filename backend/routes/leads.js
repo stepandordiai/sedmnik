@@ -24,18 +24,15 @@ router.put("/", async (req, res) => {
 	try {
 		const leads = req.body;
 
-		const validData = leads.filter(
+		const validLeads = leads.filter(
 			(lead) => lead.tel && lead.tel.trim() !== "",
 		);
 
-		// if (validData === 0) {
-		// 	return res.status(400).json({ message: "Telefon je povinné pole" });
-		// }
-
 		await Lead.deleteMany({});
-		const newLeads = await Lead.insertMany(validData);
 
-		res.status(200).json(newLeads);
+		const updatedLeads = await Lead.insertMany(validLeads);
+
+		res.status(200).json(updatedLeads);
 	} catch (error) {
 		console.error("Mongoose Error:", error.message);
 		res.status(500).json({ message: error.message });

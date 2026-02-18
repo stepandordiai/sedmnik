@@ -82,6 +82,11 @@ html {
 	color: var(--blue-clr) !important;
 }
 
+.input--disabled {
+	cursor: not-allowed;
+	background: var(--bg-clr);
+}
+
 .container-title {
 	display: flex;
 	justify-content: flex-start;
