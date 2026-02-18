@@ -40,7 +40,10 @@ const Period = ({ allUsers, userId }) => {
 				},
 			);
 
-			setData(res.data);
+			// TODO: learn this
+			const sorted = res.data.sort((a, b) => a.date.localeCompare(b.date));
+
+			setData(sorted);
 		} catch (err) {
 			setError(err);
 		} finally {
