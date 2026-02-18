@@ -80,6 +80,8 @@ function App() {
 		fetchUser();
 	}, []);
 
+	console.log(error);
+
 	if (preloader && user) {
 		return <Preload loading={loading} />;
 	}
@@ -91,9 +93,7 @@ function App() {
 					allUsers={allUsers}
 					setBuildings={setBuildings}
 					buildings={buildings}
-					error={error}
 					setError={setError}
-					loading={loading}
 					setModalFormVisible={setModalFormVisible}
 				/>
 				<div className="wrapper-inner">

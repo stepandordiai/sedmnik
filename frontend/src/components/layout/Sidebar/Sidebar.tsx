@@ -262,6 +262,7 @@ const Sidebar = ({
 					}}
 				>
 					<NavLink
+						style={{ borderRadius: 10 }}
 						className={({ isActive }) =>
 							classNames("sidebar__link", {
 								"sidebar__link--active": isActive,
