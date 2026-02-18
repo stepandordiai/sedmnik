@@ -40,6 +40,7 @@ html {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	width: min(100%, min-content);
 }
 
 .input {
@@ -96,6 +97,14 @@ html {
 	h2 {
 		font-weight: 600;
 	}
+}
+
+.container {
+	border: var(--secondary-border);
+	border-radius: 5px;
+	padding: 5px;
+	text-align: center;
+	white-space: nowrap;
 }
 
 .btn {

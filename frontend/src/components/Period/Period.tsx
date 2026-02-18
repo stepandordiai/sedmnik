@@ -1,13 +1,13 @@
-import dateToDayName from "../../utils/dateToDayName";
 import { useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
 import api from "../../axios";
-import "./Period.scss";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import classNames from "classnames";
 import timeToMinutes from "../../utils/timeToMinutes";
+import { capitalizeDay, dateToDayName } from "../../utils/helpers";
+import "./Period.scss";
 
 const Period = ({ allUsers, userId }) => {
 	const [error, setError] = useState(null);
@@ -19,15 +19,29 @@ const Period = ({ allUsers, userId }) => {
 	const [data, setData] = useState([]);
 	const [initPdf, setInitPdf] = useState(false);
 
-	const handleDateRange = (name, value) => {
+	const pdfRef = useRef<HTMLDivElement>(null);
+
+	const handleDateRange = (name: string, value: string) => {
 		setDateRange((prev) => ({ ...prev, [name]: value }));
 	};
 
 	const currentUser = allUsers.find((user) => user._id === userId);
 
 	const fetchDataRange = async () => {
-		setLoading(true);
 		setError(null);
+
+		if (dateRange.startDate === "" || dateRange.endDate === "") {
+			setError(
+				dateRange.startDate === "" && dateRange.endDate === ""
+					? "Vyberte prosím datum od a do"
+					: dateRange.startDate === ""
+						? "Vyberte prosím datum od"
+						: "Vyberte prosím datum do",
+			);
+			return;
+		}
+
+		setLoading(true);
 
 		try {
 			const res = await api.get(
@@ -51,15 +65,15 @@ const Period = ({ allUsers, userId }) => {
 		}
 	};
 
-	console.log(error);
-
 	// PDF
-
-	const pdfRef = useRef<HTMLDivElement>(null);
-
 	// TODO: LEARN THIS
 	const exportPDF = async () => {
 		if (!pdfRef.current) return;
+
+		if (data.length < 1) {
+			setError("Žádná data k dispozici");
+			return;
+		}
 		document.body.classList.add("content-page");
 		setInitPdf(true);
 
@@ -106,9 +120,6 @@ const Period = ({ allUsers, userId }) => {
 		setInitPdf(false);
 	};
 
-	// Helper arrow function
-	const capitalizeDay = (day) => day?.charAt(0).toUpperCase() + day.slice(1);
-
 	const totalMinutes = data.reduce((acc, item) => {
 		if (!item.startTime || !item.endTime) {
 			return acc;
@@ -152,8 +163,7 @@ const Period = ({ allUsers, userId }) => {
 						alignItems: "flex-start",
 					}}
 				>
-					<p style={{ fontSize: "2rem" }}>{currentUser.name}</p>
-					<p>Období</p>
+					<p style={{ fontSize: "2rem" }}>{currentUser.name} | Období</p>
 					<div
 						style={{
 							display: "flex",
@@ -165,25 +175,31 @@ const Period = ({ allUsers, userId }) => {
 						<div>
 							<label htmlFor="from">Od </label>
 							<input
-								className="input"
+								className={classNames("input", {
+									"input--disabled": loading,
+								})}
 								id="from"
 								type="date"
 								onChange={(e) => handleDateRange(e.target.name, e.target.value)}
 								name="startDate"
 								value={dateRange.startDate}
+								disabled={loading}
 							/>
 							<label htmlFor="to"> Do </label>
 							<input
-								className="input"
+								className={classNames("input", {
+									"input--disabled": loading,
+								})}
 								id="to"
 								onChange={(e) => handleDateRange(e.target.name, e.target.value)}
 								name="endDate"
 								type="date"
 								value={dateRange.endDate}
+								disabled={loading}
 							/>
 						</div>
 						<div style={{ display: "flex", flexDirection: "column" }}>
-							<span>Odpracováno</span>
+							<span>Odpracováno za měsíc</span>
 							<span style={{ textAlign: "center" }} className="input">
 								{totalTime}
 							</span>
@@ -203,6 +219,22 @@ const Period = ({ allUsers, userId }) => {
 				) : (
 					<div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 						{data.map((item, i) => {
+							const totalDayShift = () => {
+								if (item.startTime && item.endTime) {
+									const start = timeToMinutes(item.startTime);
+									const end = timeToMinutes(item.endTime);
+									const over = timeToMinutes(item.overTime);
+									const pause = timeToMinutes(item.pauseTime);
+
+									const hours = Math.floor((end - start + over - pause) / 60);
+									const minutes = (end - start + over - pause) % 60;
+
+									return hours + ":" + minutes.toString().padStart(2, "0");
+								} else {
+									return "--:--";
+								}
+							};
+
 							return (
 								<div
 									className="pdf-avoid-break"
@@ -212,17 +244,12 @@ const Period = ({ allUsers, userId }) => {
 										flexDirection: "column",
 										gap: 5,
 										width: "100%",
-										background: "var(--bg-clr)",
+										border: "var(--secondary-border)",
 										padding: 10,
 										borderRadius: 10,
 									}}
 								>
-									<p
-										style={{
-											width: "max-content",
-										}}
-										className="input"
-									>
+									<p style={{ width: "min-content" }} className="container">
 										{capitalizeDay(dateToDayName(item.date))} | {item.date}
 									</p>
 									<div
@@ -241,7 +268,10 @@ const Period = ({ allUsers, userId }) => {
 												>
 													Žádná data
 												</p>
-												<p style={{ whiteSpace: "nowrap" }} className="input">
+												<p
+													style={{ whiteSpace: "nowrap", width: "min-content" }}
+													className="input"
+												>
 													--:--
 												</p>
 											</div>
@@ -257,7 +287,10 @@ const Period = ({ allUsers, userId }) => {
 																{responsibility.task}
 															</p>
 															<p
-																style={{ whiteSpace: "nowrap" }}
+																style={{
+																	whiteSpace: "nowrap",
+																	width: "min-content",
+																}}
 																className="input"
 															>
 																{responsibility.time || "--:--"}
@@ -271,15 +304,23 @@ const Period = ({ allUsers, userId }) => {
 										<div style={{ display: "flex", marginTop: "auto", gap: 5 }}>
 											<div>
 												<p>Prichod</p>
-												<p className="input">{item.startTime || "--:--"}</p>
+												<p className="container">{item.startTime || "--:--"}</p>
 											</div>
 											<div>
 												<p>Odchod</p>
-												<p className="input">{item.endTime || "--:--"}</p>
+												<p className="container">{item.endTime || "--:--"}</p>
 											</div>
 											<div>
 												<p>Pauza</p>
-												<p className="input">{item.pauseTime || "--:--"}</p>
+												<p className="container">{item.pauseTime || "--:--"}</p>
+											</div>
+											<div className="visit-input-container">
+												<span>Přesčas</span>
+												<p className="container">{item.overTime || "--:--"}</p>
+											</div>
+											<div className="visit-input-container">
+												<span>Odpracovano</span>
+												<p className="container">{totalDayShift()}</p>
 											</div>
 										</div>
 									</div>
