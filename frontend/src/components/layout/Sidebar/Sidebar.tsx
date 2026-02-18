@@ -5,7 +5,6 @@ import classNames from "classnames";
 import TeamIcon from "../../../icons/TeamIcon";
 import BuildingIcon from "../../../icons/BuildingIcon";
 import api from "../../../axios";
-import StatusIndicator from "../../StatusIndicator/StatusIndicator";
 import PlusIcon from "../../../icons/PlusIcon";
 import PlusIconSmall from "../../../icons/PlusIconSmall";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
@@ -125,131 +124,158 @@ const Sidebar = ({
 			></div>
 			{/* TODO: aside tag is for sidebars */}
 			<aside className="sidebar">
-				<div className="sidebar-wrapper">
-					<div style={{ padding: "10px 0" }}>
-						<button
-							onClick={() => setSidebarTeam((prev) => !prev)}
-							className="sidebar__title-btn"
+				<div className="sidebar-inner">
+					<div className="sidebar-wrapper">
+						<div style={{ padding: "10px 0" }}>
+							<button
+								onClick={() => setSidebarTeam((prev) => !prev)}
+								className="sidebar__title-btn"
+							>
+								<TeamIcon size={20} />
+								<h2>Tým</h2>
+							</button>
+						</div>
+						<div
+							className={classNames("sidebar-wrapper-inner", {
+								"sidebar-wrapper-inner--visible": sidebarTeam,
+							})}
 						>
-							<TeamIcon size={20} />
-							<h2>Tým</h2>
-						</button>
-					</div>
-					<div
-						className={classNames("sidebar-wrapper-inner", {
-							"sidebar-wrapper-inner--visible": sidebarTeam,
-						})}
-					>
-						<div className="sidebar-container">
-							{allUsers.map((user) => {
-								const [firstName, lastName] = user.name.split(" ");
+							<div className="sidebar-container">
+								{[...allUsers].slice(1).map((user) => {
+									const [firstName, lastName] = user.name.split(" ");
 
-								return (
-									<NavLink
-										className={({ isActive }) =>
-											classNames("sidebar__link", {
-												"sidebar__link--active": isActive,
-											})
-										}
-										key={user._id}
-										to={`/users/${user._id}`}
-									>
-										<span className="avatar">
-											{firstName.charAt(0) + lastName.charAt(0)}
-										</span>
-										<span>{user.name}</span>
-									</NavLink>
-								);
-							})}
+									return (
+										<NavLink
+											className={({ isActive }) =>
+												classNames("sidebar__link", {
+													"sidebar__link--active": isActive,
+												})
+											}
+											key={user._id}
+											to={`/users/${user._id}`}
+										>
+											<span className="avatar">
+												{firstName.charAt(0) + lastName.charAt(0)}
+											</span>
+											<span>{user.name}</span>
+										</NavLink>
+									);
+								})}
+							</div>
 						</div>
 					</div>
-				</div>
-				<div className="sidebar-wrapper">
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "space-between",
-							alignItems: "center",
-							padding: "5px 0",
-						}}
-					>
-						<button
-							onClick={() => setSidebarBuildings((prev) => !prev)}
-							className="sidebar__title-btn"
+					<div className="sidebar-wrapper">
+						<div
+							style={{
+								display: "flex",
+								justifyContent: "space-between",
+								alignItems: "center",
+								padding: "5px 0",
+							}}
 						>
-							<BuildingIcon size={20} />
-							<h2>Stavby</h2>
-						</button>
-						<button
-							onClick={() => setModalFormVisible(true)}
-							className="sidebar__btn"
-						>
-							<PlusIcon size={16} />
-						</button>
-					</div>
-					<div
-						className={classNames("sidebar-wrapper-inner", {
-							"sidebar-wrapper-inner--visible": sidebarBuildings,
-						})}
-					>
-						<div className="sidebar-container">
-							{buildings?.map((building) => {
-								return (
-									<NavLink
-										key={building._id}
-										className={({ isActive }) =>
-											classNames("sidebar__link", {
-												"sidebar__link--active": isActive,
-											})
-										}
-										to={`/buildings/${building._id}`}
-									>
-										{building.name}
-									</NavLink>
-								);
+							<button
+								onClick={() => setSidebarBuildings((prev) => !prev)}
+								className="sidebar__title-btn"
+							>
+								<BuildingIcon size={20} />
+								<h2>Stavby</h2>
+							</button>
+							<button
+								onClick={() => setModalFormVisible(true)}
+								className="sidebar__btn"
+							>
+								<PlusIcon size={16} />
+							</button>
+						</div>
+						<div
+							className={classNames("sidebar-wrapper-inner", {
+								"sidebar-wrapper-inner--visible": sidebarBuildings,
 							})}
+						>
+							<div className="sidebar-container">
+								{buildings?.map((building) => {
+									return (
+										<NavLink
+											key={building._id}
+											className={({ isActive }) =>
+												classNames("sidebar__link", {
+													"sidebar__link--active": isActive,
+												})
+											}
+											to={`/buildings/${building._id}`}
+										>
+											{building.name}
+										</NavLink>
+									);
+								})}
+							</div>
 						</div>
 					</div>
-				</div>
-				<NavLink
-					style={{ borderRadius: 10 }}
-					className={({ isActive }) =>
-						classNames("sidebar__link", {
-							"sidebar__link--active": isActive,
-						})
-					}
-					to="/tools"
-				>
-					<ToolsIcon size={20} />
-					<span style={{ fontWeight: 600 }}>Nářadí</span>
-				</NavLink>
-				<a
-					style={{ borderRadius: 10 }}
-					className="sidebar__link"
-					href="https://neresen-as.odoo.com/odoo/action-288"
-					target="_blank"
-				>
-					<StoreIcon size={20} />
-					<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
-				</a>
-				<NavLink
-					className={({ isActive }) =>
-						classNames("sidebar__link", {
-							"sidebar__link--active": isActive,
-						})
-					}
-					to="/leads"
-				>
-					<PersonIcon size={20} />
-					<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
-				</NavLink>
-				<StatusIndicator error={error} loading={loading} />
-				<p className="sidebar__author">
+					<NavLink
+						style={{ borderRadius: 10 }}
+						className={({ isActive }) =>
+							classNames("sidebar__link", {
+								"sidebar__link--active": isActive,
+							})
+						}
+						to="/tools"
+					>
+						<ToolsIcon size={20} />
+						<span style={{ fontWeight: 600 }}>Nářadí</span>
+					</NavLink>
+					<a
+						style={{ borderRadius: 10 }}
+						className="sidebar__link"
+						href="https://neresen-as.odoo.com/odoo/action-288"
+						target="_blank"
+					>
+						<StoreIcon size={20} />
+						<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
+					</a>
+					<NavLink
+						className={({ isActive }) =>
+							classNames("sidebar__link", {
+								"sidebar__link--active": isActive,
+							})
+						}
+						to="/leads"
+					>
+						<PersonIcon size={20} />
+						<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
+					</NavLink>
+					{/* <p className="sidebar__author">
 					Created by{" "}
 					<a href="https://www.heeeyooo.studio/" target="_blank">
 						heeeyooo studio
 					</a>
-				</p>
+				</p>  */}
+				</div>
+				<div
+					style={{
+						position: "sticky",
+						bottom: 0,
+						left: 0,
+						right: 0,
+						background: "#fff",
+						marginTop: "auto",
+						padding: 10,
+					}}
+				>
+					<NavLink
+						className={({ isActive }) =>
+							classNames("sidebar__link", {
+								"sidebar__link--active": isActive,
+							})
+						}
+						key={user._id}
+						to={`/users/${user._id}`}
+					>
+						<span className="avatar">
+							{user.name[0].charAt(0) + user.name[1].charAt(0)}
+						</span>
+						<span>{user.name}</span>
+					</NavLink>
+				</div>
 			</aside>
 		</>
 	);
