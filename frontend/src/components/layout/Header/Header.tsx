@@ -250,13 +250,6 @@ const Header = ({
 						<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
 					</NavLink>
 				</div>
-				{/* <StatusIndicator error={error} loading={loading} />
-				<p className="menu__author">
-					Created by{" "}
-					<a href="https://www.heeeyooo.studio/" target="_blank">
-						heeeyooo studio
-					</a>
-				</p> */}
 				<div
 					style={{
 						position: "sticky",

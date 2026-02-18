@@ -14,7 +14,7 @@ const emptyInput = () => ({
 	orderDate: "",
 });
 
-const OrderedAndPurchasedItems = ({ building }) => {
+const OrderedAndPurchasedItems = ({ buildingId }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [orderedItems, setOrderedItems] = useState([
@@ -35,9 +35,7 @@ const OrderedAndPurchasedItems = ({ building }) => {
 			setError(null);
 
 			try {
-				const res = await api.get(
-					`/api/buildings/${building._id}/ordered-items`,
-				);
+				const res = await api.get(`/api/buildings/${buildingId}/ordered-items`);
 
 				const updated = res.data.map((item) => ({
 					id: crypto.randomUUID(),
@@ -62,7 +60,7 @@ const OrderedAndPurchasedItems = ({ building }) => {
 		};
 
 		fetchOrderedItemsData();
-	}, [building._id]);
+	}, [buildingId]);
 
 	const saveOrderedItemsData = async () => {
 		setLoading(true);
@@ -70,7 +68,7 @@ const OrderedAndPurchasedItems = ({ building }) => {
 
 		try {
 			const res = await api.put(
-				`/api/buildings/${building._id}/ordered-items`,
+				`/api/buildings/${buildingId}/ordered-items`,
 				orderedItems,
 			);
 

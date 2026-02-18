@@ -4,6 +4,7 @@ import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import "./Tools.scss";
 import api from "../../axios";
+import Footer from "../../components/layout/Footer/Footer";
 
 interface Tool {
 	id: string;
@@ -186,6 +187,7 @@ const Tools = ({ buildings }) => {
 				</button>
 				<StatusIndicator error={error} loading={loading} />
 			</section>
+			<Footer />
 		</main>
 	);
 };

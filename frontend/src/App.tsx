@@ -118,10 +118,7 @@ function App() {
 							path="/users/:id"
 							element={<UserPage allUsers={allUsers} />}
 						/>
-						<Route
-							path="/buildings/:id"
-							element={<BuildingPage buildings={buildings} />}
-						/>
+						<Route path="/buildings/:id" element={<BuildingPage />} />
 						<Route path="/tools" element={<Tools buildings={buildings} />} />
 						<Route path="/leads" element={<Leads />} />
 					</Routes>

@@ -5,6 +5,7 @@ import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import classNames from "classnames";
 import XIcon from "../../icons/XIcon";
 import "./Leads.scss";
+import Footer from "../../components/layout/Footer/Footer";
 
 const emptyLeadRow = () => ({
 	id: crypto.randomUUID(),
@@ -299,6 +300,7 @@ const Leads = () => {
 					</table>
 					<StatusIndicator error={error} loading={loading} />
 				</section>
+				<Footer />
 			</main>
 		</>
 	);

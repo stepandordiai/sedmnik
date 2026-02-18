@@ -4,14 +4,13 @@ import classNames from "classnames";
 import WorkSchedule from "../../components/WorkSchedule/WorkSchedule";
 import OrderedAndPurchasedItems from "../../components/OrderedAndPurchasedItems/OrderedAndPurchasedItems";
 import Comments from "../../components/Comments/Comments";
+import Footer from "../../components/layout/Footer/Footer";
 import "./BuildingPage.scss";
 
-const BuildingPage = ({ buildings }) => {
+const BuildingPage = () => {
 	const { id } = useParams();
 
 	const [buildingOption, setBuildingOption] = useState<string>("Materiály");
-
-	const building = buildings.find((b) => b._id === id);
 
 	return (
 		<>
@@ -36,12 +35,13 @@ const BuildingPage = ({ buildings }) => {
 				</div>
 				{buildingOption === "Materiály" ? (
 					<>
-						<OrderedAndPurchasedItems building={building} />
-						<Comments building={building} />
+						<OrderedAndPurchasedItems buildingId={id} />
+						<Comments buildingId={id} />
 					</>
 				) : (
-					<WorkSchedule building={building} />
+					<WorkSchedule buildingId={id} />
 				)}
+				<Footer />
 			</main>
 		</>
 	);

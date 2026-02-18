@@ -13,7 +13,7 @@ const workScheduleEmptyInput = () => ({
 	comment: "",
 });
 
-const WorkSchedule = ({ building }) => {
+const WorkSchedule = ({ buildingId }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [workSchedule, setWorkSchedule] = useState([
@@ -34,9 +34,7 @@ const WorkSchedule = ({ building }) => {
 			setError(null);
 
 			try {
-				const res = await api.get(
-					`/api/buildings/${building._id}/work-schedule`,
-				);
+				const res = await api.get(`/api/buildings/${buildingId}/work-schedule`);
 
 				const updated = res.data.map((item) => ({
 					id: crypto.randomUUID(),
@@ -62,17 +60,14 @@ const WorkSchedule = ({ building }) => {
 		};
 
 		fetchWorkSchedule();
-	}, [building._id]);
+	}, [buildingId]);
 
 	const saveWorkSchedule = async () => {
 		setLoading(true);
 		setError(null);
 
 		try {
-			await api.put(
-				`/api/buildings/${building._id}/work-schedule`,
-				workSchedule,
-			);
+			await api.put(`/api/buildings/${buildingId}/work-schedule`, workSchedule);
 		} catch (err) {
 			setError(err.response.data.message);
 		} finally {

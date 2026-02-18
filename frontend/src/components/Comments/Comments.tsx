@@ -19,7 +19,7 @@ interface Comment {
 	};
 }
 
-const Comments = ({ building }) => {
+const Comments = ({ buildingId }) => {
 	const { user } = useAuth();
 
 	const [loading, setLoading] = useState(false);
@@ -39,12 +39,12 @@ const Comments = ({ building }) => {
 
 	useEffect(() => {
 		const getComments = async () => {
-			if (!building._id) return;
+			if (buildingId) return;
 			setLoading(true);
 			setError(null);
 
 			try {
-				const res = await api.get(`/api/buildings/${building._id}/comments`);
+				const res = await api.get(`/api/buildings/${buildingId}/comments`);
 
 				setComments(res.data);
 			} catch (err) {
@@ -55,17 +55,17 @@ const Comments = ({ building }) => {
 		};
 
 		getComments();
-	}, [building._id]);
+	}, [buildingId]);
 
 	const saveComment = async (e) => {
 		e.preventDefault();
-		if (!building._id) return;
+		if (buildingId) return;
 		if (!formData.text.trim()) return;
 		setLoading(true);
 		setError(null);
 
 		try {
-			const res = await api.post(`/api/buildings/${building._id}/comments`, {
+			const res = await api.post(`/api/buildings/${buildingId}/comments`, {
 				name: formData.name,
 				text: formData.text.trim(),
 				color: user.color,
@@ -103,7 +103,7 @@ const Comments = ({ building }) => {
 		setError(null);
 
 		try {
-			await api.delete(`/api/buildings/${building._id}/comments/${selectedId}`);
+			await api.delete(`/api/buildings/${buildingId}/comments/${selectedId}`);
 		} catch (err) {
 			setError(err.response?.data?.message);
 		} finally {

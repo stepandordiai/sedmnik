@@ -8,6 +8,7 @@ import Plan from "../../components/Plan/Plan";
 import Period from "../../components/Period/Period";
 import classNames from "classnames";
 import "./UserPage.scss";
+import Footer from "../../components/layout/Footer/Footer";
 
 const UserPage = ({ allUsers }) => {
 	const { user } = useAuth();
@@ -70,6 +71,7 @@ const UserPage = ({ allUsers }) => {
 					<Plan userId={id} />
 				</>
 			)}
+			<Footer />
 		</main>
 	);
 };

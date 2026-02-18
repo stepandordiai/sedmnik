@@ -1,0 +1,13 @@
+.footer {
+	display: flex;
+	justify-content: space-between;
+}
+
+.footer__author {
+	margin-top: auto;
+	align-self: flex-end;
+
+	a {
+		color: var(--accent-clr);
+	}
+}
