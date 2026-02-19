@@ -22,6 +22,8 @@ const Sidebar = ({
 }) => {
 	const { user } = useAuth();
 
+	console.log(user);
+
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [modalFormData, setModalFormData] = useState("");
@@ -141,26 +143,28 @@ const Sidebar = ({
 							})}
 						>
 							<div className="sidebar-container">
-								{[...allUsers].slice(1).map((user) => {
-									const [firstName, lastName] = user.name.split(" ");
+								{allUsers
+									.filter((u) => u._id !== user._id)
+									.map((user) => {
+										const [firstName, lastName] = user.name.split(" ");
 
-									return (
-										<NavLink
-											className={({ isActive }) =>
-												classNames("sidebar__link", {
-													"sidebar__link--active": isActive,
-												})
-											}
-											key={user._id}
-											to={`/users/${user._id}`}
-										>
-											<span className="avatar">
-												{firstName.charAt(0) + lastName.charAt(0)}
-											</span>
-											<span>{user.name}</span>
-										</NavLink>
-									);
-								})}
+										return (
+											<NavLink
+												className={({ isActive }) =>
+													classNames("sidebar__link", {
+														"sidebar__link--active": isActive,
+													})
+												}
+												key={user._id}
+												to={`/users/${user._id}`}
+											>
+												<span className="avatar">
+													{firstName.charAt(0) + lastName.charAt(0)}
+												</span>
+												<span>{user.name}</span>
+											</NavLink>
+										);
+									})}
 							</div>
 						</div>
 					</div>
