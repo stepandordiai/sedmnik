@@ -3,6 +3,7 @@ import api from "../../axios";
 import timeToMinutes from "../../utils/timeToMinutes";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import ClockIcon from "../../icons/ClockIcon";
+import classNames from "classnames";
 import "./Visit.scss";
 
 const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
@@ -146,10 +147,13 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 						<label htmlFor="fudfugf">Datum</label>
 						<input
 							id="fudfugf"
-							className="input"
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
 							type="month"
 							onChange={(e) => setMonthInput(e.target.value)}
 							value={monthInput}
+							disabled={loading}
 						/>
 					</div>
 
@@ -184,10 +188,13 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 					<div className="visit-input-container">
 						<span>Datum</span>
 						<input
-							className="visit__input"
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
 							value={shiftDate}
 							onChange={(e) => setShiftDate(e.target.value)}
 							type="date"
+							disabled={loading}
 						/>
 					</div>
 					<div className="visit-input-container">
@@ -197,13 +204,10 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							name="startTime"
 							onBlur={upsertWorkShift}
 							value={data.startTime}
-							className="visit__input"
-							style={
-								!canEdit
-									? { background: "var(--bg-clr)" }
-									: { background: "#fff" }
-							}
-							disabled={!canEdit}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
+							disabled={!canEdit || loading}
 							type="time"
 						/>
 					</div>
@@ -213,14 +217,11 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
 							name="endTime"
 							onBlur={upsertWorkShift}
-							className="visit__input"
-							style={
-								!canEdit
-									? { background: "var(--bg-clr)" }
-									: { background: "#fff" }
-							}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
 							value={data.endTime}
-							disabled={!canEdit}
+							disabled={!canEdit || loading}
 							type="time"
 						/>
 					</div>
@@ -232,15 +233,12 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
 							name="overTime"
 							onBlur={upsertWorkShift}
-							className="visit__input"
-							style={
-								!canEdit
-									? { background: "var(--bg-clr)" }
-									: { background: "#fff" }
-							}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
 							value={data.overTime}
-							disabled={!canEdit}
 							type="time"
+							disabled={!canEdit || loading}
 						/>
 					</div>
 					<div className="visit-input-container">
@@ -249,15 +247,12 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							onChange={(e) => handleDataInput(e.target.name, e.target.value)}
 							name="pauseTime"
 							onBlur={upsertWorkShift}
-							className="visit__input"
-							style={
-								!canEdit
-									? { background: "var(--bg-clr)" }
-									: { background: "#fff" }
-							}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
 							value={data.pauseTime}
-							disabled={!canEdit}
 							type="time"
+							disabled={!canEdit || loading}
 						/>
 					</div>
 					<div className="visit-input-container">
