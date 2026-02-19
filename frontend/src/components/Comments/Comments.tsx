@@ -1,4 +1,3 @@
-import "./Comments.scss";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import ChatIcon from "../../icons/ChatIcon";
 import XIcon from "../../icons/XIcon";
@@ -6,6 +5,7 @@ import classNames from "classnames";
 import api from "../../axios";
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
+import "./Comments.scss";
 
 interface Comment {
 	id: string;
@@ -39,7 +39,7 @@ const Comments = ({ buildingId }) => {
 
 	useEffect(() => {
 		const getComments = async () => {
-			if (buildingId) return;
+			if (!buildingId) return;
 			setLoading(true);
 			setError(null);
 
@@ -59,7 +59,7 @@ const Comments = ({ buildingId }) => {
 
 	const saveComment = async (e) => {
 		e.preventDefault();
-		if (buildingId) return;
+		if (!buildingId) return;
 		if (!formData.text.trim()) return;
 		setLoading(true);
 		setError(null);
