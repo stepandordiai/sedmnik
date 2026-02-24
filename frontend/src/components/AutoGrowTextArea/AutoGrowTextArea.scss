@@ -7,3 +7,8 @@
 	flex-grow: 1;
 	width: 100%;
 }
+
+.auto-grow-text-area--disable {
+	cursor: not-allowed;
+	background: var(--bg-clr) !important;
+}

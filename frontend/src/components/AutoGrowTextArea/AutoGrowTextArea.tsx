@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import "./AutoGrowTextArea.scss";
+import classNames from "classnames";
 
 const AutoGrowTextArea = ({
 	value,
@@ -30,7 +31,9 @@ const AutoGrowTextArea = ({
 	return (
 		<textarea
 			ref={autoGrowTextArea}
-			className="auto-grow-text-area"
+			className={classNames("auto-grow-text-area", {
+				"auto-grow-text-area--disable": disable,
+			})}
 			style={customStyle}
 			name={name}
 			value={value}

@@ -133,6 +133,7 @@ const OrderedAndPurchasedItems = ({ buildingId }) => {
 										}
 										name="desc"
 										blur={saveOrderedItemsData}
+										disable={loading}
 									/>
 								</td>
 								<td>
@@ -152,6 +153,7 @@ const OrderedAndPurchasedItems = ({ buildingId }) => {
 												orderedItem.orderOption === "K výzvednutí",
 											"input--red": orderedItem.orderOption === "Poptáno",
 											"input--blue": orderedItem.orderOption === "Dodáno",
+											"select--disabled": loading,
 										})}
 										onBlur={saveOrderedItemsData}
 									>
@@ -183,8 +185,11 @@ const OrderedAndPurchasedItems = ({ buildingId }) => {
 										value={orderedItem.orderDate}
 										name="orderDate"
 										style={{ width: "100%" }}
-										className="input"
+										className={classNames("input", {
+											"input--disabled": loading,
+										})}
 										type="date"
+										disabled={loading}
 									/>
 								</td>
 							</tr>

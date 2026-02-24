@@ -104,6 +104,7 @@ const WorkSchedule = ({ buildingId }) => {
 										}
 										name="desc"
 										blur={saveWorkSchedule}
+										disable={loading}
 									/>
 								</td>
 								<td>

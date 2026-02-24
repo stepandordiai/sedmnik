@@ -156,20 +156,22 @@ const Plan = ({ userId }) => {
 									name={"task"}
 									holder={"Vypracujte plán práce a vyberte zhotovitele"}
 									blur={() => savePlanData(plan)}
+									disable={loading}
 								/>
 								<select
 									className={classNames("plan__input", {
 										"input--green": item.priority === "Nizká",
 										"input--orange": item.priority === "Střední",
 										"input--red": item.priority === "Vysoká",
+										"select--disabled": loading,
 									})}
 									name="priority"
-									id=""
 									onChange={(e) =>
 										handlePlanInput(item.id, e.target.name, e.target.value)
 									}
 									value={item.priority}
 									onBlur={() => savePlanData(plan)}
+									disabled={loading}
 								>
 									<option value="">Nezvoleno</option>
 									<option className="input--green" value="Nizká">
@@ -187,7 +189,10 @@ const Plan = ({ userId }) => {
 										setSelectedId(item.id);
 										setModalOpen(true);
 									}}
-									className="plan__remove-btn"
+									className={classNames("plan__remove-btn", {
+										"btn--disabled": loading,
+									})}
+									disabled={loading}
 								>
 									<XIcon />
 								</button>

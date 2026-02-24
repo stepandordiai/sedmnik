@@ -128,6 +128,16 @@ html {
 	flex-shrink: 0;
 }
 
+.select--disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.btn--disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
 // table
 
 table {

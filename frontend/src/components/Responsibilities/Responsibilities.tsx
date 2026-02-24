@@ -5,8 +5,8 @@ import classNames from "classnames";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
 import ResponsibilityIcon from "../../icons/ResponsibilityIcon";
-import "./Responsibilities.scss";
 import PlusIconSmall from "../../icons/PlusIconSmall";
+import "./Responsibilities.scss";
 
 const weekData = [
 	"Pondělí",
@@ -268,14 +268,10 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 														name={"task"}
 														holder={"Napište si své pracovní povinnosti"}
 														blur={saveWeekData}
-														disable={!canEdit}
-														customStyle={
-															!canEdit
-																? { background: "var(--bg-clr)" }
-																: { background: "#fff" }
-														}
+														disable={!canEdit || loading}
 													/>
 													<input
+														style={{ width: "min-content" }}
 														onChange={(e) =>
 															handleWeekListInput(
 																day.date,
@@ -285,16 +281,13 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 															)
 														}
 														value={item.time}
-														style={
-															!canEdit
-																? { background: "var(--bg-clr)" }
-																: { background: "#fff" }
-														}
-														className="week-section__input"
+														className={classNames("input", {
+															"input--disabled": loading,
+														})}
 														type="time"
 														name="time"
 														onBlur={saveWeekData}
-														disabled={!canEdit}
+														disabled={!canEdit || loading}
 													/>
 												</div>
 											);
@@ -335,12 +328,7 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 									name={"task"}
 									holder={"Napište si své pracovní povinnosti"}
 									blur={saveData}
-									disable={!canEdit}
-									customStyle={
-										!canEdit
-											? { background: "var(--bg-clr)" }
-											: { background: "#fff" }
-									}
+									disable={!canEdit || loading}
 								/>
 							</div>
 							<div className="responsibilities-input-container">
@@ -349,17 +337,14 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 										handleChangeInput(item.id, e.target.name, e.target.value)
 									}
 									value={item.time}
-									className="responsibilities__input"
-									style={
-										!canEdit
-											? { background: "var(--bg-clr)" }
-											: { background: "#fff" }
-									}
+									className={classNames("input", {
+										"input--disabled": !canEdit || loading,
+									})}
 									type="time"
 									name="time"
 									id="djfufu"
 									onBlur={saveData}
-									disabled={!canEdit}
+									disabled={!canEdit || loading}
 								/>
 							</div>
 						</div>
