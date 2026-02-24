@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import ToolsIcon from "../../icons/ToolsIcon";
 import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import PlusIconSmall from "../../icons/PlusIconSmall";
-import "./Tools.scss";
 import api from "../../axios";
 import Footer from "../../components/layout/Footer/Footer";
+import classNames from "classnames";
+import "./Tools.scss";
 
 interface Tool {
 	id: string;
@@ -36,7 +37,7 @@ const Tools = ({ buildings }) => {
 
 	// const sortedTools = tools.sort((tool)=> )
 
-	const handleTools = (id, name, value) => {
+	const handleTools = (id: string, name: string, value: string) => {
 		setTools((prev) =>
 			prev.map((tool) => (tool.id === id ? { ...tool, [name]: value } : tool)),
 		);
@@ -48,7 +49,7 @@ const Tools = ({ buildings }) => {
 			try {
 				const res = await api.get("/tools/all");
 
-				const updated = (res.data || []).map((tool) => ({
+				const updated = (res.data || []).map((tool: Tool) => ({
 					id: crypto.randomUUID(),
 					name: tool.name,
 					building: tool.building,
@@ -131,7 +132,9 @@ const Tools = ({ buildings }) => {
 									<td>
 										<input
 											style={{ width: "100%" }}
-											className="input"
+											className={classNames("input", {
+												"input--disabled": loading,
+											})}
 											type="text"
 											onChange={(e) =>
 												handleTools(tool.id, e.target.name, e.target.value)
@@ -140,18 +143,21 @@ const Tools = ({ buildings }) => {
 											name="name"
 											placeholder="Nazev"
 											onBlur={saveTools}
+											disabled={loading}
 										/>
 									</td>
 									<td>
 										<select
-											className="input"
+											className={classNames("input", {
+												"select--disabled": loading,
+											})}
 											onChange={(e) =>
 												handleTools(tool.id, e.target.name, e.target.value)
 											}
 											onBlur={saveTools}
 											name="building"
 											value={tool.building}
-											id=""
+											disabled={loading}
 										>
 											<option value="">Ne nazvano</option>
 											{buildings.map((building, i) => {
@@ -170,10 +176,13 @@ const Tools = ({ buildings }) => {
 											}
 											value={tool.desc}
 											name="desc"
-											className="input"
+											className={classNames("input", {
+												"input--disabled": loading,
+											})}
 											type="text"
 											placeholder="Poznamky"
 											onBlur={saveTools}
+											disabled={loading}
 										/>
 									</td>
 								</tr>
