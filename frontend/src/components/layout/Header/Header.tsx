@@ -146,28 +146,30 @@ const Header = ({
 								</div>
 								<div className="sidebar-wrapper-inner sidebar-wrapper-inner--visible">
 									<div className="sidebar-container">
-										{allUsers.map((user) => {
-											// TODO: learn this
-											const [firstName, lastName] = user.name.split(" ");
+										{allUsers
+											.filter((u) => u._id !== user._id)
+											.map((user) => {
+												// TODO: learn this
+												const [firstName, lastName] = user.name.split(" ");
 
-											return (
-												<NavLink
-													key={user._id}
-													onClick={() => setMenuVisible(false)}
-													className={({ isActive }) =>
-														classNames("sidebar__link", {
-															"sidebar__link--active": isActive,
-														})
-													}
-													to={`/users/${user._id}`}
-												>
-													<span className="avatar">
-														{firstName.charAt(0) + lastName.charAt(0)}
-													</span>
-													<span>{user.name}</span>
-												</NavLink>
-											);
-										})}
+												return (
+													<NavLink
+														key={user._id}
+														onClick={() => setMenuVisible(false)}
+														className={({ isActive }) =>
+															classNames("sidebar__link", {
+																"sidebar__link--active": isActive,
+															})
+														}
+														to={`/users/${user._id}`}
+													>
+														<span className="avatar">
+															{firstName.charAt(0) + lastName.charAt(0)}
+														</span>
+														<span>{user.name}</span>
+													</NavLink>
+												);
+											})}
 									</div>
 								</div>
 							</div>
