@@ -3,9 +3,18 @@ import api from "../../axios";
 import StatusIndicator from "../StatusIndicator/StatusIndicator";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
+import classNames from "classnames";
 import "./WorkSchedule.scss";
 
-const workScheduleEmptyInput = () => ({
+interface WorkSchedule {
+	id: string;
+	desc: string;
+	start: string;
+	finish: string;
+	comment: string;
+}
+
+const workScheduleEmptyInput = (): WorkSchedule => ({
 	id: crypto.randomUUID(),
 	desc: "",
 	start: "",
@@ -16,7 +25,7 @@ const workScheduleEmptyInput = () => ({
 const WorkSchedule = ({ buildingId }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
-	const [workSchedule, setWorkSchedule] = useState([
+	const [workSchedule, setWorkSchedule] = useState<WorkSchedule[]>([
 		workScheduleEmptyInput(),
 		workScheduleEmptyInput(),
 		workScheduleEmptyInput(),
@@ -36,7 +45,7 @@ const WorkSchedule = ({ buildingId }) => {
 			try {
 				const res = await api.get(`/api/buildings/${buildingId}/work-schedule`);
 
-				const updated = res.data.map((item) => ({
+				const updated = res.data.map((item: WorkSchedule) => ({
 					id: crypto.randomUUID(),
 					desc: item.desc,
 					start: item.start,
@@ -99,7 +108,8 @@ const WorkSchedule = ({ buildingId }) => {
 								<td style={{ width: "100%" }}>
 									<AutoGrowTextArea
 										value={item.desc}
-										handleChange={(e) =>
+										// TODO: learn this
+										handleChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
 											handleWorkSchedule(item.id, e.target.name, e.target.value)
 										}
 										name="desc"
@@ -112,11 +122,14 @@ const WorkSchedule = ({ buildingId }) => {
 										onChange={(e) =>
 											handleWorkSchedule(item.id, e.target.name, e.target.value)
 										}
-										className="input"
+										className={classNames("input", {
+											"input--disabled": loading,
+										})}
 										name="start"
 										value={item.start}
 										type="date"
 										onBlur={saveWorkSchedule}
+										disabled={loading}
 									/>
 								</td>
 								<td>
@@ -124,11 +137,14 @@ const WorkSchedule = ({ buildingId }) => {
 										onChange={(e) =>
 											handleWorkSchedule(item.id, e.target.name, e.target.value)
 										}
-										className="input"
+										className={classNames("input", {
+											"input--disabled": loading,
+										})}
 										name="finish"
 										value={item.finish}
 										type="date"
 										onBlur={saveWorkSchedule}
+										disabled={loading}
 									/>
 								</td>
 								<td>
@@ -136,11 +152,14 @@ const WorkSchedule = ({ buildingId }) => {
 										onChange={(e) =>
 											handleWorkSchedule(item.id, e.target.name, e.target.value)
 										}
-										className="input"
+										className={classNames("input", {
+											"input--disabled": loading,
+										})}
 										name="comment"
 										value={item.comment}
 										type="text"
 										onBlur={saveWorkSchedule}
+										disabled={loading}
 									/>
 								</td>
 							</tr>
