@@ -13,6 +13,7 @@ import Preload from "./components/Preload/Preload";
 import BuildingPage from "./pages/BuildingPage/BuildingPage";
 import Tools from "./pages/Tools/Tools";
 import Leads from "./pages/Leads/Leads";
+import type { Building } from "./interfaces";
 import "./scss/App.scss";
 
 function App() {
@@ -21,7 +22,7 @@ function App() {
 	const { user, setUser } = useAuth();
 	const [preloader, setPreloader] = useState(true);
 	const [allUsers, setAllUsers] = useState<any[]>([]);
-	const [buildings, setBuildings] = useState([]);
+	const [buildings, setBuildings] = useState<Building[]>([]);
 	const [modalFormVisible, setModalFormVisible] = useState(false);
 
 	// TODO: learn this

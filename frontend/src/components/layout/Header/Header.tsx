@@ -10,6 +10,8 @@ import logo from "/logo/logo-black.png";
 import ToolsIcon from "../../../icons/ToolsIcon";
 import StoreIcon from "../../../icons/StoreIcon";
 import PersonIcon from "../../../icons/PersonIcon";
+import type { Building } from "../../../interfaces";
+import { extractNameInitials } from "../../../utils/helpers";
 import "./Header.scss";
 
 const Header = ({
@@ -149,9 +151,6 @@ const Header = ({
 										{allUsers
 											.filter((u) => u._id !== user._id)
 											.map((user) => {
-												// TODO: learn this
-												const [firstName, lastName] = user.name.split(" ");
-
 												return (
 													<NavLink
 														key={user._id}
@@ -164,7 +163,7 @@ const Header = ({
 														to={`/users/${user._id}`}
 													>
 														<span className="avatar">
-															{firstName.charAt(0) + lastName.charAt(0)}
+															{user.name ? extractNameInitials(user.name) : ""}
 														</span>
 														<span>{user.name}</span>
 													</NavLink>
@@ -195,17 +194,17 @@ const Header = ({
 								</div>
 								<div className="sidebar-wrapper-inner sidebar-wrapper-inner--visible">
 									<div className="sidebar-container">
-										{buildings?.map((building) => {
+										{buildings?.map((building: Building) => {
 											return (
 												<NavLink
-													key={building._id}
+													key={building.id}
 													onClick={() => setMenuVisible(false)}
 													className={({ isActive }) =>
 														classNames("sidebar__link", {
 															"sidebar__link--active": isActive,
 														})
 													}
-													to={`/buildings/${building._id}`}
+													to={`/buildings/${building.id}`}
 												>
 													{building.name}
 												</NavLink>
@@ -274,7 +273,7 @@ const Header = ({
 						to={`/users/${user?._id}`}
 					>
 						<span className="avatar">
-							{user?.name[0].charAt(0) + user?.name[1].charAt(0)}
+							{user?.name ? extractNameInitials(user.name) : ""}
 						</span>
 						<span>{user?.name}</span>
 					</NavLink>

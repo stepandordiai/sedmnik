@@ -5,14 +5,9 @@ import PlusIconSmall from "../../icons/PlusIconSmall";
 import api from "../../axios";
 import Footer from "../../components/layout/Footer/Footer";
 import classNames from "classnames";
+import type { Tool } from "../../interfaces";
+import type { Building } from "../../interfaces";
 import "./Tools.scss";
-
-interface Tool {
-	id: string;
-	name: string;
-	building: string;
-	desc: string;
-}
 
 const emptyObject = () => ({
 	id: crypto.randomUUID(),
@@ -61,7 +56,9 @@ const Tools = ({ buildings }) => {
 						? updated
 						: [emptyObject(), emptyObject(), emptyObject()],
 				);
-			} catch (error) {}
+			} catch (error) {
+				setError(error.response?.data?.message);
+			}
 		};
 
 		fetchToolsData();
@@ -72,7 +69,7 @@ const Tools = ({ buildings }) => {
 		setError(null);
 
 		try {
-			await api.put("/tools", tools, {});
+			await api.put("/tools", tools);
 		} catch (err) {
 			setError(err.response?.data.message);
 		} finally {
@@ -160,9 +157,9 @@ const Tools = ({ buildings }) => {
 											disabled={loading}
 										>
 											<option value="">Ne nazvano</option>
-											{buildings.map((building, i) => {
+											{buildings.map((building: Building) => {
 												return (
-													<option key={i} value={building.name}>
+													<option key={building.id} value={building.name}>
 														{building.name}
 													</option>
 												);

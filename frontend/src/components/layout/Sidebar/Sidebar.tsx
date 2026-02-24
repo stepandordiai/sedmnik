@@ -11,7 +11,9 @@ import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 import ToolsIcon from "../../../icons/ToolsIcon";
 import StoreIcon from "../../../icons/StoreIcon";
 import PersonIcon from "../../../icons/PersonIcon";
+import type { Building } from "../../../interfaces";
 import "./Sidebar.scss";
+import { extractNameInitials } from "../../../utils/helpers";
 
 const Sidebar = ({
 	allUsers,
@@ -21,8 +23,6 @@ const Sidebar = ({
 	setModalFormVisible,
 }) => {
 	const { user } = useAuth();
-
-	console.log(user);
 
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
@@ -38,7 +38,12 @@ const Sidebar = ({
 			try {
 				const res = await api.get(`/api/buildings/all`);
 
-				setBuildings(res.data);
+				const updated = (res.data || []).map((building) => ({
+					id: building._id,
+					name: building.name,
+				}));
+
+				setBuildings(updated);
 			} catch (err) {
 				setError(err.response.data.message);
 			} finally {
@@ -146,8 +151,6 @@ const Sidebar = ({
 								{allUsers
 									.filter((u) => u._id !== user._id)
 									.map((user) => {
-										const [firstName, lastName] = user.name.split(" ");
-
 										return (
 											<NavLink
 												className={({ isActive }) =>
@@ -159,7 +162,7 @@ const Sidebar = ({
 												to={`/users/${user._id}`}
 											>
 												<span className="avatar">
-													{firstName.charAt(0) + lastName.charAt(0)}
+													{user.name ? extractNameInitials(user.name) : ""}
 												</span>
 												<span>{user.name}</span>
 											</NavLink>
@@ -197,16 +200,16 @@ const Sidebar = ({
 							})}
 						>
 							<div className="sidebar-container">
-								{buildings?.map((building) => {
+								{buildings?.map((building: Building) => {
 									return (
 										<NavLink
-											key={building._id}
+											key={building.id}
 											className={({ isActive }) =>
 												classNames("sidebar__link", {
 													"sidebar__link--active": isActive,
 												})
 											}
-											to={`/buildings/${building._id}`}
+											to={`/buildings/${building.id}`}
 										>
 											{building.name}
 										</NavLink>
@@ -247,12 +250,6 @@ const Sidebar = ({
 						<PersonIcon size={20} />
 						<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
 					</NavLink>
-					{/* <p className="sidebar__author">
-					Created by{" "}
-					<a href="https://www.heeeyooo.studio/" target="_blank">
-						heeeyooo studio
-					</a>
-				</p>  */}
 				</div>
 				<div
 					style={{
@@ -276,7 +273,7 @@ const Sidebar = ({
 						to={`/users/${user._id}`}
 					>
 						<span className="avatar">
-							{user.name[0].charAt(0) + user.name[1].charAt(0)}
+							{user.name ? extractNameInitials(user.name) : ""}
 						</span>
 						<span>{user.name}</span>
 					</NavLink>
