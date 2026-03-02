@@ -241,58 +241,62 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 									>
 										{weekDay.day}
 									</p>
-									<div
-										style={{
-											display: "flex",
-											flexDirection: "column",
-											gap: 5,
-											flexGrow: 1,
-										}}
-									>
-										{filterItems.map((item, index) => {
-											return (
-												<div
-													key={index}
-													className="week-section-input-container"
-												>
-													<AutoGrowTextArea
-														value={item.task}
-														handleChange={(e) =>
-															handleWeekListInput(
-																day.date,
-																index,
-																e.target.name,
-																e.target.value,
-															)
-														}
-														name={"task"}
-														holder={"Napište si své pracovní povinnosti"}
-														blur={saveWeekData}
-														disable={!canEdit || loading}
-													/>
-													<input
-														style={{ width: "min-content" }}
-														onChange={(e) =>
-															handleWeekListInput(
-																day.date,
-																index,
-																e.target.name,
-																e.target.value,
-															)
-														}
-														value={item.time}
-														className={classNames("input", {
-															"input--disabled": loading,
-														})}
-														type="time"
-														name="time"
-														onBlur={saveWeekData}
-														disabled={!canEdit || loading}
-													/>
-												</div>
-											);
-										})}
-									</div>
+									<table>
+										<thead>
+											<tr>
+												<th>
+													Nazev <span style={{ color: "#f00" }}>*</span>
+												</th>
+												<th>Cas</th>
+											</tr>
+										</thead>
+										<tbody>
+											{filterItems.map((item, index) => {
+												return (
+													<tr key={index}>
+														<td className="td__textarea">
+															<AutoGrowTextArea
+																value={item.task}
+																handleChange={(e) =>
+																	handleWeekListInput(
+																		day.date,
+																		index,
+																		e.target.name,
+																		e.target.value,
+																	)
+																}
+																name={"task"}
+																holder={"Napište si své pracovní povinnosti"}
+																blur={saveWeekData}
+																disable={!canEdit || loading}
+															/>
+														</td>
+														<td>
+															<input
+																style={{ width: "min-content" }}
+																onChange={(e) =>
+																	handleWeekListInput(
+																		day.date,
+																		index,
+																		e.target.name,
+																		e.target.value,
+																	)
+																}
+																value={item.time}
+																className={classNames("input", {
+																	"input--disabled": loading,
+																})}
+																type="time"
+																name="time"
+																onBlur={saveWeekData}
+																disabled={!canEdit || loading}
+															/>
+														</td>
+													</tr>
+												);
+											})}
+										</tbody>
+									</table>
 								</div>
 							);
 						})}
@@ -381,7 +385,13 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 					{totalTimeFixed}
 				</p>
 			</div>
-			<button onClick={handleAddInput} className="responsibilities__btn">
+			<button
+				onClick={handleAddInput}
+				className={classNames("responsibilities__btn", {
+					"btn--disabled": !canEdit || loading,
+				})}
+				disabled={!canEdit || loading}
+			>
 				<PlusIconSmall /> <span>Přidat</span>
 			</button>
 			<StatusIndicator error={error} loading={loading} />
