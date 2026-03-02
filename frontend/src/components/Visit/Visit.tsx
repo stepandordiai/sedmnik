@@ -139,7 +139,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 					style={{
 						display: "flex",
 						gap: 5,
-						width: "max-content",
+						flexWrap: "wrap",
 						marginLeft: "auto",
 					}}
 				>
@@ -156,7 +156,6 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							disabled={loading}
 						/>
 					</div>
-
 					<div>
 						<p>Odpracováno</p>
 						<p
@@ -205,7 +204,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							onBlur={upsertWorkShift}
 							value={data.startTime}
 							className={classNames("input", {
-								"input--disabled": loading,
+								"input--disabled": !canEdit || loading,
 							})}
 							disabled={!canEdit || loading}
 							type="time"
@@ -218,7 +217,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							name="endTime"
 							onBlur={upsertWorkShift}
 							className={classNames("input", {
-								"input--disabled": loading,
+								"input--disabled": !canEdit || loading,
 							})}
 							value={data.endTime}
 							disabled={!canEdit || loading}
@@ -226,7 +225,14 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 						/>
 					</div>
 				</div>
-				<div style={{ display: "flex", gap: 5 }}>
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "flex-end",
+						gap: 5,
+						flexWrap: "wrap",
+					}}
+				>
 					<div className="visit-input-container">
 						<span>Přesčas</span>
 						<input
@@ -234,7 +240,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							name="overTime"
 							onBlur={upsertWorkShift}
 							className={classNames("input", {
-								"input--disabled": loading,
+								"input--disabled": !canEdit || loading,
 							})}
 							value={data.overTime}
 							type="time"
@@ -248,7 +254,7 @@ const Visit = ({ userId, currentUser, shiftDate, setShiftDate, isWeek }) => {
 							name="pauseTime"
 							onBlur={upsertWorkShift}
 							className={classNames("input", {
-								"input--disabled": loading,
+								"input--disabled": !canEdit || loading,
 							})}
 							value={data.pauseTime}
 							type="time"
