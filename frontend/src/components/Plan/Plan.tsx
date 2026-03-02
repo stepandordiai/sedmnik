@@ -15,7 +15,7 @@ const emptyInput = () => ({
 	priority: "",
 });
 
-const Plan = ({ userId }) => {
+const Plan = ({ userId, currentUser }) => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
@@ -104,6 +104,10 @@ const Plan = ({ userId }) => {
 		setModalOpen(false);
 	};
 
+	if (!currentUser) return;
+
+	const canEdit = currentUser._id === userId;
+
 	return (
 		<>
 			<div
@@ -167,7 +171,7 @@ const Plan = ({ userId }) => {
 											name={"task"}
 											holder={"Vypracujte plán práce a vyberte zhotovitele"}
 											blur={() => savePlanData(plan)}
-											disable={loading}
+											disable={!canEdit || loading}
 										/>
 									</td>
 									<td>
@@ -176,7 +180,7 @@ const Plan = ({ userId }) => {
 												"input--green": item.priority === "Nizká",
 												"input--orange": item.priority === "Střední",
 												"input--red": item.priority === "Vysoká",
-												"select--disabled": loading,
+												"select--disabled": !canEdit || loading,
 											})}
 											name="priority"
 											onChange={(e) =>
@@ -184,7 +188,7 @@ const Plan = ({ userId }) => {
 											}
 											value={item.priority}
 											onBlur={() => savePlanData(plan)}
-											disabled={loading}
+											disabled={!canEdit || loading}
 										>
 											<option value="">Nezvoleno</option>
 											<option className="input--green" value="Nizká">
@@ -205,9 +209,9 @@ const Plan = ({ userId }) => {
 												setModalOpen(true);
 											}}
 											className={classNames("plan__remove-btn", {
-												"btn--disabled": loading,
+												"btn--disabled": !canEdit || loading,
 											})}
-											disabled={loading}
+											disabled={!canEdit || loading}
 										>
 											<XIcon />
 										</button>

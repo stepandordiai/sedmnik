@@ -68,7 +68,7 @@ const UserPage = ({ allUsers }) => {
 						currentUser={user}
 						isWeek={isWeek}
 					/>
-					<Plan userId={id} />
+					<Plan userId={id} currentUser={user} />
 				</>
 			)}
 			<Footer />
