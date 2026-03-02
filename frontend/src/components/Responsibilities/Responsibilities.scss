@@ -15,13 +15,8 @@
 	border-radius: 5px;
 }
 
-.responsibilities-input-container {
-	display: flex;
-	flex-direction: column;
-
-	&:nth-child(1) {
-		flex-grow: 1;
-	}
+.td__textarea {
+	width: 100%;
 }
 
 //

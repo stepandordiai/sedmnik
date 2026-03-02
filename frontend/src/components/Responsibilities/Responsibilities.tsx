@@ -316,40 +316,58 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 				</div>
 			</div>
 			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-				{list.map((item) => {
-					return (
-						<div key={item.id} style={{ display: "flex", gap: 5 }}>
-							<div className="responsibilities-input-container">
-								<AutoGrowTextArea
-									value={item.task}
-									handleChange={(e) =>
-										handleChangeInput(item.id, e.target.name, e.target.value)
-									}
-									name={"task"}
-									holder={"Napište si své pracovní povinnosti"}
-									blur={saveData}
-									disable={!canEdit || loading}
-								/>
-							</div>
-							<div className="responsibilities-input-container">
-								<input
-									onChange={(e) =>
-										handleChangeInput(item.id, e.target.name, e.target.value)
-									}
-									value={item.time}
-									className={classNames("input", {
-										"input--disabled": !canEdit || loading,
-									})}
-									type="time"
-									name="time"
-									id="djfufu"
-									onBlur={saveData}
-									disabled={!canEdit || loading}
-								/>
-							</div>
-						</div>
-					);
-				})}
+				<table>
+					<thead>
+						<tr>
+							{/* TODO: ? */}
+							<th scope="col">Nazev</th>
+							<th scope="col">Čas</th>
+						</tr>
+					</thead>
+					<tbody>
+						{list.map((item) => {
+							return (
+								<tr key={item.id}>
+									<td className="td__textarea">
+										<AutoGrowTextArea
+											value={item.task}
+											handleChange={(e) =>
+												handleChangeInput(
+													item.id,
+													e.target.name,
+													e.target.value,
+												)
+											}
+											name={"task"}
+											holder={"Napište si své pracovní povinnosti"}
+											blur={saveData}
+											disable={!canEdit || loading}
+										/>
+									</td>
+									<td>
+										<input
+											onChange={(e) =>
+												handleChangeInput(
+													item.id,
+													e.target.name,
+													e.target.value,
+												)
+											}
+											value={item.time}
+											className={classNames("input", {
+												"input--disabled": !canEdit || loading,
+											})}
+											type="time"
+											name="time"
+											onBlur={saveData}
+											disabled={!canEdit || loading}
+										/>
+									</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
 				<div
 					style={{
 						display: "flex",

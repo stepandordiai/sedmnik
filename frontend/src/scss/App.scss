@@ -55,7 +55,8 @@ html {
 	}
 }
 
-.input[type="date"] {
+.input[type="date"],
+.input[type="time"] {
 	width: min-content !important;
 }
 
