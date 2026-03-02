@@ -144,62 +144,79 @@ const Plan = ({ userId }) => {
 					<ListTaskIcon size={20} />
 					<h2>Seznam úkolů / Plán na další dny</h2>
 				</div>
-				<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-					{plan.map((item) => {
-						return (
-							<div key={item.id} style={{ display: "flex", gap: 5 }}>
-								<AutoGrowTextArea
-									value={item.task}
-									handleChange={(e) =>
-										handlePlanInput(item.id, e.target.name, e.target.value)
-									}
-									name={"task"}
-									holder={"Vypracujte plán práce a vyberte zhotovitele"}
-									blur={() => savePlanData(plan)}
-									disable={loading}
-								/>
-								<select
-									className={classNames("plan__input", {
-										"input--green": item.priority === "Nizká",
-										"input--orange": item.priority === "Střední",
-										"input--red": item.priority === "Vysoká",
-										"select--disabled": loading,
-									})}
-									name="priority"
-									onChange={(e) =>
-										handlePlanInput(item.id, e.target.name, e.target.value)
-									}
-									value={item.priority}
-									onBlur={() => savePlanData(plan)}
-									disabled={loading}
-								>
-									<option value="">Nezvoleno</option>
-									<option className="input--green" value="Nizká">
-										Nizká
-									</option>
-									<option className="input--orange" value="Střední">
-										Střední
-									</option>
-									<option className="input--red" value="Vysoká">
-										Vysoká
-									</option>
-								</select>
-								<button
-									onClick={() => {
-										setSelectedId(item.id);
-										setModalOpen(true);
-									}}
-									className={classNames("plan__remove-btn", {
-										"btn--disabled": loading,
-									})}
-									disabled={loading}
-								>
-									<XIcon />
-								</button>
-							</div>
-						);
-					})}
-				</div>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">
+								Nazev <span style={{ color: "#f00" }}>*</span>
+							</th>
+							<th scope="col">Priorita</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{plan.map((item) => {
+							return (
+								<tr key={item.id}>
+									<td className="td__textarea">
+										<AutoGrowTextArea
+											value={item.task}
+											handleChange={(e) =>
+												handlePlanInput(item.id, e.target.name, e.target.value)
+											}
+											name={"task"}
+											holder={"Vypracujte plán práce a vyberte zhotovitele"}
+											blur={() => savePlanData(plan)}
+											disable={loading}
+										/>
+									</td>
+									<td>
+										<select
+											className={classNames("plan__input", {
+												"input--green": item.priority === "Nizká",
+												"input--orange": item.priority === "Střední",
+												"input--red": item.priority === "Vysoká",
+												"select--disabled": loading,
+											})}
+											name="priority"
+											onChange={(e) =>
+												handlePlanInput(item.id, e.target.name, e.target.value)
+											}
+											value={item.priority}
+											onBlur={() => savePlanData(plan)}
+											disabled={loading}
+										>
+											<option value="">Nezvoleno</option>
+											<option className="input--green" value="Nizká">
+												Nizká
+											</option>
+											<option className="input--orange" value="Střední">
+												Střední
+											</option>
+											<option className="input--red" value="Vysoká">
+												Vysoká
+											</option>
+										</select>
+									</td>
+									<td>
+										<button
+											onClick={() => {
+												setSelectedId(item.id);
+												setModalOpen(true);
+											}}
+											className={classNames("plan__remove-btn", {
+												"btn--disabled": loading,
+											})}
+											disabled={loading}
+										>
+											<XIcon />
+										</button>
+									</td>
+								</tr>
+							);
+						})}
+					</tbody>
+				</table>
 				<button onClick={handleAddInput} className="responsibilities__btn">
 					<PlusIconSmall />
 					<span>Přidat</span>

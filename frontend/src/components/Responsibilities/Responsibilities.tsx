@@ -315,81 +315,72 @@ const Responsibilities = ({ shiftDate, userId, currentUser, isWeek }) => {
 					<h2>Stručný popis práce</h2>
 				</div>
 			</div>
-			<div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-				<table>
-					<thead>
-						<tr>
-							{/* TODO: ? */}
-							<th scope="col">Nazev</th>
-							<th scope="col">Čas</th>
-						</tr>
-					</thead>
-					<tbody>
-						{list.map((item) => {
-							return (
-								<tr key={item.id}>
-									<td className="td__textarea">
-										<AutoGrowTextArea
-											value={item.task}
-											handleChange={(e) =>
-												handleChangeInput(
-													item.id,
-													e.target.name,
-													e.target.value,
-												)
-											}
-											name={"task"}
-											holder={"Napište si své pracovní povinnosti"}
-											blur={saveData}
-											disable={!canEdit || loading}
-										/>
-									</td>
-									<td>
-										<input
-											onChange={(e) =>
-												handleChangeInput(
-													item.id,
-													e.target.name,
-													e.target.value,
-												)
-											}
-											value={item.time}
-											className={classNames("input", {
-												"input--disabled": !canEdit || loading,
-											})}
-											type="time"
-											name="time"
-											onBlur={saveData}
-											disabled={!canEdit || loading}
-										/>
-									</td>
-								</tr>
-							);
-						})}
-					</tbody>
-				</table>
-				<div
+			<table>
+				<thead>
+					<tr>
+						{/* TODO: ? */}
+						<th scope="col">
+							Nazev <span style={{ color: "#f00" }}>*</span>
+						</th>
+						<th scope="col">Čas</th>
+					</tr>
+				</thead>
+				<tbody>
+					{list.map((item) => {
+						return (
+							<tr key={item.id}>
+								<td className="td__textarea">
+									<AutoGrowTextArea
+										value={item.task}
+										handleChange={(e) =>
+											handleChangeInput(item.id, e.target.name, e.target.value)
+										}
+										name={"task"}
+										holder={"Napište si své pracovní povinnosti"}
+										blur={saveData}
+										disable={!canEdit || loading}
+									/>
+								</td>
+								<td>
+									<input
+										onChange={(e) =>
+											handleChangeInput(item.id, e.target.name, e.target.value)
+										}
+										value={item.time}
+										className={classNames("input", {
+											"input--disabled": !canEdit || loading,
+										})}
+										type="time"
+										name="time"
+										onBlur={saveData}
+										disabled={!canEdit || loading}
+									/>
+								</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+			<div
+				style={{
+					display: "flex",
+					alignItems: "flex-end",
+					flexDirection: "column",
+				}}
+			>
+				<span>Odpracovano</span>
+				<p
 					style={{
-						display: "flex",
-						alignItems: "flex-end",
-						flexDirection: "column",
+						border: "var(--secondary-border)",
+						background: "var(--bg-clr)",
+						borderRadius: 5,
+						padding: 5,
+						textAlign: "center",
 					}}
 				>
-					<span>Odpracovano</span>
-					<p
-						style={{
-							border: "var(--secondary-border)",
-							background: "var(--bg-clr)",
-							borderRadius: 5,
-							padding: 5,
-							textAlign: "center",
-						}}
-					>
-						{totalTimeFixed}
-					</p>
-				</div>
+					{totalTimeFixed}
+				</p>
 			</div>
-
 			<button onClick={handleAddInput} className="responsibilities__btn">
 				<PlusIconSmall /> <span>Přidat</span>
 			</button>
