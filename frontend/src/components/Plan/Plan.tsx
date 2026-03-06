@@ -7,6 +7,7 @@ import AutoGrowTextArea from "../AutoGrowTextArea/AutoGrowTextArea";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import XIcon from "../../icons/XIcon";
 import "./Plan.scss";
+import Filter from "../Filter/Filter";
 
 const emptyInput = () => ({
 	// TODO: learn this
@@ -21,6 +22,7 @@ const Plan = ({ userId, currentUser }) => {
 	const [plan, setPlan] = useState([emptyInput(), emptyInput(), emptyInput()]);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [filter, setFilter] = useState("");
 
 	const handleAddInput = () => {
 		setPlan((prev) => [...prev, emptyInput()]);
@@ -144,9 +146,19 @@ const Plan = ({ userId, currentUser }) => {
 				})}
 			></div>
 			<section className="section">
-				<div className="container-title">
-					<ListTaskIcon size={20} />
-					<h2>Seznam úkolů / Plán na další dny</h2>
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						gap: 10,
+						flexWrap: "wrap",
+					}}
+				>
+					<div className="container-title">
+						<ListTaskIcon size={20} />
+						<h2>Seznam úkolů / Plán na další dny</h2>
+					</div>
+					<Filter onChange={(e) => setFilter(e.target.value)} />
 				</div>
 				<table>
 					<thead>
@@ -159,66 +171,78 @@ const Plan = ({ userId, currentUser }) => {
 						</tr>
 					</thead>
 					<tbody>
-						{plan.map((item) => {
-							return (
-								<tr key={item.id}>
-									<td className="td__textarea">
-										<AutoGrowTextArea
-											value={item.task}
-											handleChange={(e) =>
-												handlePlanInput(item.id, e.target.name, e.target.value)
-											}
-											name={"task"}
-											holder={"Vypracujte plán práce a vyberte zhotovitele"}
-											blur={() => savePlanData(plan)}
-											disable={!canEdit || loading}
-										/>
-									</td>
-									<td>
-										<select
-											className={classNames("plan__input", {
-												"input--green": item.priority === "Nizká",
-												"input--orange": item.priority === "Střední",
-												"input--red": item.priority === "Vysoká",
-												"select--disabled": !canEdit || loading,
-											})}
-											name="priority"
-											onChange={(e) =>
-												handlePlanInput(item.id, e.target.name, e.target.value)
-											}
-											value={item.priority}
-											onBlur={() => savePlanData(plan)}
-											disabled={!canEdit || loading}
-										>
-											<option value="">Nezvoleno</option>
-											<option className="input--green" value="Nizká">
-												Nizká
-											</option>
-											<option className="input--orange" value="Střední">
-												Střední
-											</option>
-											<option className="input--red" value="Vysoká">
-												Vysoká
-											</option>
-										</select>
-									</td>
-									<td>
-										<button
-											onClick={() => {
-												setSelectedId(item.id);
-												setModalOpen(true);
-											}}
-											className={classNames("plan__remove-btn", {
-												"btn--disabled": !canEdit || loading,
-											})}
-											disabled={!canEdit || loading}
-										>
-											<XIcon />
-										</button>
-									</td>
-								</tr>
-							);
-						})}
+						{plan
+							.filter((item) =>
+								item.task.toLowerCase().includes(filter.toLowerCase().trim()),
+							)
+							.map((item) => {
+								return (
+									<tr key={item.id}>
+										<td className="td__textarea">
+											<AutoGrowTextArea
+												value={item.task}
+												handleChange={(e) =>
+													handlePlanInput(
+														item.id,
+														e.target.name,
+														e.target.value,
+													)
+												}
+												name={"task"}
+												holder={"Vypracujte plán práce a vyberte zhotovitele"}
+												blur={() => savePlanData(plan)}
+												disable={!canEdit || loading}
+											/>
+										</td>
+										<td>
+											<select
+												className={classNames("plan__input", {
+													"input--green": item.priority === "Nizká",
+													"input--orange": item.priority === "Střední",
+													"input--red": item.priority === "Vysoká",
+													"select--disabled": !canEdit || loading,
+												})}
+												name="priority"
+												onChange={(e) =>
+													handlePlanInput(
+														item.id,
+														e.target.name,
+														e.target.value,
+													)
+												}
+												value={item.priority}
+												onBlur={() => savePlanData(plan)}
+												disabled={!canEdit || loading}
+											>
+												<option value="">Nezvoleno</option>
+												<option className="input--green" value="Nizká">
+													Nizká
+												</option>
+												<option className="input--orange" value="Střední">
+													Střední
+												</option>
+												<option className="input--red" value="Vysoká">
+													Vysoká
+												</option>
+											</select>
+										</td>
+										<td>
+											<button
+												onClick={() => {
+													setSelectedId(item.id);
+													setModalOpen(true);
+												}}
+												className={classNames("plan__remove-btn", {
+													"btn--disabled": !canEdit || loading,
+												})}
+												disabled={!canEdit || loading}
+											>
+												<XIcon />
+											</button>
+										</td>
+									</tr>
+								);
+							})}
 					</tbody>
 				</table>
 				<button onClick={handleAddInput} className="responsibilities__btn">

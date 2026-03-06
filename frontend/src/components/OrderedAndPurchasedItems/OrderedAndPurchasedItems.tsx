@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import classNames from "classnames";
 import "./OrderedAndPurchasedItems.scss";
+import Filter from "../Filter/Filter";
 
 const emptyInput = () => ({
 	id: crypto.randomUUID(),
@@ -139,23 +140,7 @@ const OrderedAndPurchasedItems = ({ buildingId }) => {
 				}}
 			>
 				<h2 style={{ fontWeight: 600 }}>Objednané a dodané materiály</h2>
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center",
-						gap: 5,
-					}}
-				>
-					<label htmlFor="filter">Filter</label>
-					<input
-						onChange={(e) => setFilter(e.target.value)}
-						className="input filter"
-						id="filter"
-						type="text"
-						placeholder="Hledat materiály..."
-					/>
-				</div>
+				<Filter onChange={(e) => setFilter(e.target.value)} />
 			</div>
 			<table>
 				<thead>
