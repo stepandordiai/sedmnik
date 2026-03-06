@@ -84,6 +84,12 @@ textarea {
 	resize: vertical;
 }
 
+textarea:disabled {
+	opacity: 1;
+	-webkit-opacity: 1;
+	-webkit-text-fill-color: currentColor;
+}
+
 button,
 input[type="submit"] {
 	display: inline-block;
