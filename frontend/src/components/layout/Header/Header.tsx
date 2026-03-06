@@ -263,6 +263,7 @@ const Header = ({
 					}}
 				>
 					<NavLink
+						onClick={() => setMenuVisible(false)}
 						style={{ borderRadius: 10 }}
 						className={({ isActive }) =>
 							classNames("sidebar__link", {
