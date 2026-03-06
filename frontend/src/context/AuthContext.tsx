@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 type User = {
 	// FIXME:
@@ -23,12 +23,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 	const [user, setUser] = useState<User | null>(null);
 
 	// hydrate from localStorage on refresh
-	useEffect(() => {
-		const storedUser = localStorage.getItem("user");
-		if (storedUser) {
-			setUser(JSON.parse(storedUser));
-		}
-	}, []);
+	// useEffect(() => {
+	// 	const storedUser = localStorage.getItem("user");
+	// 	if (storedUser) {
+	// 		setUser(JSON.parse(storedUser));
+	// 	}
+	// }, []);
 
 	return (
 		<AuthContext.Provider value={{ user, setUser }}>

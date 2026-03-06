@@ -52,8 +52,6 @@ function App() {
 				setError(err.response?.data.message);
 			} finally {
 				setLoading(false);
-				await new Promise((resolve) => setTimeout(resolve, 500));
-				setPreloader(false);
 			}
 		};
 
@@ -71,10 +69,18 @@ function App() {
 					setUser(res.data);
 				} catch (err) {
 					setError(err.response?.data.message);
+					localStorage.removeItem("user");
 					localStorage.removeItem("token");
+					window.location.replace("/login");
+					return;
 				} finally {
 					setLoading(false);
+					// await new Promise((resolve) => setTimeout(resolve, 500));
+					setPreloader(false);
 				}
+			} else {
+				setLoading(false);
+				setPreloader(false);
 			}
 		};
 
@@ -83,7 +89,7 @@ function App() {
 
 	console.log(error);
 
-	if (preloader && user) {
+	if (preloader && !user) {
 		return <Preload loading={loading} />;
 	}
 
