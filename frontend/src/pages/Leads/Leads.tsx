@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import PersonIcon from "../../icons/PersonIcon";
 import axios from "axios";
-import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import classNames from "classnames";
-import XIcon from "../../icons/XIcon";
-import "./Leads.scss";
+import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import Footer from "../../components/layout/Footer/Footer";
+import PersonIcon from "../../icons/PersonIcon";
+import XIcon from "../../icons/XIcon";
+import PlusIconSmall from "../../icons/PlusIconSmall";
+import "./Leads.scss";
 
 const emptyLeadRow = () => ({
 	id: crypto.randomUUID(),
@@ -125,6 +126,10 @@ const Leads = () => {
 		}
 		setSelectedId(null);
 		setModalOpen(false);
+	};
+
+	const addEmptyLead = () => {
+		setLeads((prev) => [...prev, emptyLeadRow()]);
 	};
 
 	return (
@@ -298,6 +303,10 @@ const Leads = () => {
 							})}
 						</tbody>
 					</table>
+					<button onClick={addEmptyLead} className="leads__btn">
+						<PlusIconSmall />
+						<span>Přidat</span>
+					</button>
 					<StatusIndicator error={error} loading={loading} />
 				</section>
 				<Footer />
