@@ -132,7 +132,11 @@ const Sidebar = ({
 			{/* TODO: aside tag is for sidebars */}
 			<aside className="sidebar">
 				<div className="sidebar-inner">
-					<div className="sidebar-wrapper">
+					<div
+						className={classNames("sidebar-wrapper", {
+							"sidebar-wrapper--active": sidebarTeam,
+						})}
+					>
 						<div style={{ padding: "10px 0" }}>
 							<button
 								onClick={() => setSidebarTeam((prev) => !prev)}
@@ -171,7 +175,11 @@ const Sidebar = ({
 							</div>
 						</div>
 					</div>
-					<div className="sidebar-wrapper">
+					<div
+						className={classNames("sidebar-wrapper", {
+							"sidebar-wrapper--active": sidebarBuildings,
+						})}
+					>
 						<div
 							style={{
 								display: "flex",
