@@ -6,6 +6,14 @@ const toolSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		qty: {
+			type: Number,
+			required: true,
+		},
+		status: {
+			type: String,
+			required: true,
+		},
 		building: {
 			type: String,
 		},

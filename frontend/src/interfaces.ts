@@ -3,9 +3,11 @@ export interface Icon {
 }
 
 export interface Tool {
-	id: string;
+	_id: string;
 	name: string;
 	building: string;
+	qty: number;
+	status: string;
 	desc: string;
 }
 

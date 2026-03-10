@@ -4,23 +4,61 @@ import Tool from "./../models/Tool.js";
 
 const router = express.Router();
 
-router.put("/", protect, async (req, res) => {
+router.post("/", protect, async (req, res) => {
 	try {
-		const tools = req.body;
+		const tool = req.body;
 
-		const validData = tools.filter(
-			(tool) => tool.name && tool.name.trim() !== "",
-		);
+		if (!tool.name || tool.name.trim() === "") {
+			return res.status(400).json({ message: "Name is required" });
+		}
 
-		// if (validData.length === 0) {
-		// 	return res.status(400).json({ message: "No valid tool data provided" });
-		// }
+		const newTool = await Tool.create(tool);
 
-		// 2. Clear and Insert (Atomic-like)
-		await Tool.deleteMany({});
-		const newTools = await Tool.insertMany(validData);
+		// TODO: 201 Created
+		res.status(201).json(newTool);
+	} catch (error) {
+		console.error("Mongoose Error:", error.message);
+		res.status(500).json({ message: error.message });
+	}
+});
 
-		res.status(200).json(newTools);
+router.delete("/:id", protect, async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const deletedTool = await Tool.findByIdAndDelete(id);
+
+		if (!deletedTool) {
+			return res.status(404).json({ message: "Tool not found" });
+		}
+
+		res.status(200).json(deletedTool);
+	} catch (error) {
+		console.error("Mongoose Error:", error.message);
+		res.status(500).json({ message: error.message });
+	}
+});
+
+router.put("/:id", protect, async (req, res) => {
+	try {
+		const { id } = req.params;
+		const tool = req.body;
+
+		if (!tool.name || tool.name.trim() === "") {
+			return res.status(400).json({ message: "Name is required" });
+		}
+
+		// TODO: learn this
+		const updatedTool = await Tool.findByIdAndUpdate(id, tool, {
+			new: true,
+			runValidators: true,
+		});
+
+		if (!updatedTool) {
+			return res.status(404).json({ message: "Tool not found" });
+		}
+
+		res.status(200).json(updatedTool);
 	} catch (error) {
 		console.error("Mongoose Error:", error.message);
 		res.status(500).json({ message: error.message });
