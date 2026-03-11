@@ -5,7 +5,10 @@ export interface Icon {
 export interface Tool {
 	_id: string;
 	name: string;
-	building: string;
+	building: {
+		name: string;
+		qty: number;
+	}[];
 	qty: number;
 	status: string;
 	desc: string;

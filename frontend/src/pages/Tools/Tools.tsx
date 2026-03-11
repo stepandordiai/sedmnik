@@ -22,12 +22,31 @@ const Tools = ({ buildings }) => {
 		name: "",
 		qty: 1,
 		status: "",
-		building: "",
+		building: [
+			{
+				name: "",
+				qty: 0,
+			},
+		],
 		desc: "",
 	});
 
-	const handleToolForm = (name, value) => {
-		setToolForm((prev) => ({ ...prev, [name]: value }));
+	const handleToolForm = (name, value, index?: number) => {
+		if (name === "building" && index !== undefined) {
+			setToolForm((prev) => {
+				const updated = [...prev.building];
+				updated[index] = { ...updated[index], name: value };
+				return { ...prev, building: updated };
+			});
+		} else if (name === "buildingQty" && index !== undefined) {
+			setToolForm((prev) => {
+				const updated = [...prev.building];
+				updated[index] = { ...updated[index], qty: Number(value) };
+				return { ...prev, building: updated };
+			});
+		} else {
+			setToolForm((prev) => ({ ...prev, [name]: value }));
+		}
 	};
 
 	const createTool = async () => {
@@ -41,7 +60,12 @@ const Tools = ({ buildings }) => {
 				name: "",
 				qty: 1,
 				status: "",
-				building: "",
+				building: [
+					{
+						name: "",
+						qty: 0,
+					},
+				],
 				desc: "",
 			});
 			setFormVisible(false);
@@ -85,7 +109,12 @@ const Tools = ({ buildings }) => {
 				name: "",
 				qty: 1,
 				status: "",
-				building: "",
+				building: [
+					{
+						name: "",
+						qty: 0,
+					},
+				],
 				desc: "",
 			});
 			setFormVisible(false);
@@ -109,7 +138,9 @@ const Tools = ({ buildings }) => {
 
 	// TODO: learn this
 	const filteredTools = tools.filter((t) => {
-		const matchesBuilding = filter === "" || t.building === filter;
+		const buildingNames = t.building.map((b) => b.name);
+		const matchesBuilding =
+			filter === "" || buildingNames.find((bn) => bn === filter);
 		const matchesName = toolsFilter === "" || t.name === toolsFilter;
 		return matchesBuilding && matchesName;
 	});
@@ -138,6 +169,13 @@ const Tools = ({ buildings }) => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const addBuilding = () => {
+		setToolForm((prev) => ({
+			...prev,
+			building: [...prev.building, { name: "", qty: 0 }],
+		}));
 	};
 
 	return (
@@ -231,26 +269,64 @@ const Tools = ({ buildings }) => {
 						/>
 					</div>
 				</div>
-				<div style={{ display: "flex", flexDirection: "column" }}>
-					<label htmlFor="place">Lokalita</label>
-					<select
-						className="input"
-						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
-						value={toolForm.building}
-						name="building"
-						id="place"
-					>
-						<option value="Sklad">Sklad</option>
-						<option value="Servis">Servis</option>
-						{buildings.map((b, i) => {
-							return (
-								<option key={i} value={b.name}>
-									{b.name}
-								</option>
-							);
-						})}
-					</select>
-				</div>
+				{toolForm.building.map((buildingItem, index) => {
+					const allBuildings = [
+						"Sklad",
+						"Servis",
+						...buildings.map((b) => b.name),
+					];
+
+					const selectedBuildings = toolForm.building
+						.map((b) => b.name)
+						.filter((_, i) => i !== index);
+
+					// const availableBuildings = buildings.filter(
+					// 	(b) => !selectedBuildings.includes(b.name),
+					// );
+					return (
+						<div key={index} style={{ display: "flex" }}>
+							<div>
+								<label htmlFor="place">Lokalita</label>
+								<select
+									className="input"
+									onChange={(e) =>
+										handleToolForm(e.target.name, e.target.value, index)
+									}
+									value={buildingItem.name}
+									name="building"
+									id="place"
+								>
+									<option value="">-- Vyberte --</option>
+									{allBuildings.map((b, i) => {
+										return (
+											<option
+												key={i}
+												value={b}
+												disabled={selectedBuildings.includes(b)}
+											>
+												{b}
+											</option>
+										);
+									})}
+								</select>
+							</div>
+							<div>
+								<label htmlFor="">Počet kusů</label>
+								<input
+									onChange={(e) =>
+										handleToolForm("buildingQty", e.target.value, index)
+									}
+									value={buildingItem.qty}
+									className="input"
+									type="number"
+								/>
+							</div>
+						</div>
+					);
+				})}
+				<button onClick={addBuilding} className="btn">
+					Pridat Lokalitu
+				</button>
 				<div>
 					<label htmlFor="desc">Poznámka</label>
 					<input
@@ -275,7 +351,12 @@ const Tools = ({ buildings }) => {
 								name: "",
 								qty: 1,
 								status: "",
-								building: "",
+								building: [
+									{
+										name: "",
+										qty: 0,
+									},
+								],
 								desc: "",
 							});
 							setError(null);
@@ -308,7 +389,7 @@ const Tools = ({ buildings }) => {
 									"tools__filter-btn--active": filter === "",
 								})}
 							>
-								All
+								Vše ({tools.length})
 							</button>
 							<button
 								onClick={() => setFilter("Sklad")}
@@ -316,7 +397,13 @@ const Tools = ({ buildings }) => {
 									"tools__filter-btn--active": filter === "Sklad",
 								})}
 							>
-								Sklad
+								Sklad (
+								{
+									tools.filter((tool) =>
+										tool.building.find((t) => t.name === "Sklad"),
+									).length
+								}
+								)
 							</button>
 							<button
 								onClick={() => setFilter("Servis")}
@@ -335,7 +422,7 @@ const Tools = ({ buildings }) => {
 										),
 									})}
 								>
-									AKCE
+									Akce
 								</button>
 								<div
 									className={classNames("select-container", {
@@ -383,7 +470,7 @@ const Tools = ({ buildings }) => {
 						<thead>
 							<tr>
 								<th>Nazev</th>
-								<th>Stavba</th>
+								{/* <th>Stavba</th> */}
 								<th>Kusy</th>
 								<th>Stav</th>
 								<th>Poznamky</th>
@@ -396,7 +483,7 @@ const Tools = ({ buildings }) => {
 								return (
 									<tr key={tool._id}>
 										<td>{tool.name}</td>
-										<td>{tool.building}</td>
+										{/* <td>{tool.building}</td> */}
 										<td>
 											<span>{tool.qty}</span>
 										</td>
@@ -441,7 +528,12 @@ const Tools = ({ buildings }) => {
 								name: "",
 								qty: 1,
 								status: "",
-								building: "",
+								building: [
+									{
+										name: "",
+										qty: 0,
+									},
+								],
 								desc: "",
 							});
 							setFormVisible(true);

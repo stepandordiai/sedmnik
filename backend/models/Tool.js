@@ -8,15 +8,20 @@ const toolSchema = new mongoose.Schema(
 		},
 		qty: {
 			type: Number,
-			required: true,
 		},
 		status: {
 			type: String,
-			required: true,
 		},
-		building: {
-			type: String,
-		},
+		building: [
+			{
+				name: {
+					type: String,
+				},
+				qty: {
+					type: Number,
+				},
+			},
+		],
 		desc: {
 			type: String,
 		},
