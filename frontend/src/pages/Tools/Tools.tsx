@@ -6,15 +6,9 @@ import api from "../../axios";
 import Footer from "../../components/layout/Footer/Footer";
 import classNames from "classnames";
 import type { Tool } from "../../interfaces";
-// import type { Building } from "../../interfaces";
+import XIcon from "../../icons/XIcon";
+import PencilIcon from "../../icons/PencilIcon";
 import "./Tools.scss";
-
-// const emptyObject = () => ({
-// 	id: crypto.randomUUID(),
-// 	name: "",
-// 	building: "",
-// 	desc: "",
-// });
 
 const Tools = ({ buildings }) => {
 	const [error, setError] = useState(null);
@@ -22,7 +16,8 @@ const Tools = ({ buildings }) => {
 	const [tools, setTools] = useState<Tool[]>([]);
 	const [toolsFilter, setToolsFilter] = useState("");
 	const [editingTool, setEditingTool] = useState<Tool | null>(null);
-
+	const [modalOpen, setModalOpen] = useState(false);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [toolForm, setToolForm] = useState({
 		name: "",
 		qty: 1,
@@ -34,23 +29,6 @@ const Tools = ({ buildings }) => {
 	const handleToolForm = (name, value) => {
 		setToolForm((prev) => ({ ...prev, [name]: value }));
 	};
-
-	// const filteredTools = tools.filter((tool) => {
-	// 	// If the filter is empty, show everything
-	// 	if (!toolsFilter) return true;
-
-	// 	// Perform a case-insensitive search
-	// 	return tool.name?.toLowerCase().includes(toolsFilter.toLowerCase());
-	// });
-
-	// const sortedTools = tools.sort((tool)=> )
-
-	// const handleTools = (id: string, name: string, value: string) => {
-	// 	setTools((prev) =>
-	// 		prev.map((tool) => (tool.id === id ? { ...tool, [name]: value } : tool)),
-	// 	);
-	// 	setToolsFilter("");
-	// };
 
 	const createTool = async () => {
 		setLoading(true);
@@ -89,11 +67,6 @@ const Tools = ({ buildings }) => {
 				}));
 
 				setTools(updated);
-				// setTools(
-				// 	updated.length > 0
-				// 		? updated
-				// 		: [emptyObject(), emptyObject(), emptyObject()],
-				// );
 			} catch (error) {
 				setError(error.response?.data?.message);
 			}
@@ -132,25 +105,34 @@ const Tools = ({ buildings }) => {
 		}
 	};
 
-	// const addEmptyObject = () => {
-	// 	setTools((prev) => [...prev, emptyObject()]);
-	// };
-
 	const [filter, setFilter] = useState("");
 
-	const filteredTools =
-		filter === "" ? tools : tools.filter((p) => p.building === filter);
+	// TODO: learn this
+	const filteredTools = tools.filter((t) => {
+		const matchesBuilding = filter === "" || t.building === filter;
+		const matchesName = toolsFilter === "" || t.name === toolsFilter;
+		return matchesBuilding && matchesName;
+	});
 
 	const [selectActive, setSelectActive] = useState(false);
 
 	const [formVisible, setFormVisible] = useState(false);
 
-	const removeTool = async (id) => {
-		setLoading(true);
+	const removeTool = async () => {
 		setError(null);
+
+		if (!selectedId) {
+			return;
+		}
+
+		setLoading(true);
+
 		try {
-			await api.delete(`/tools/${id}`);
-			setTools((prev) => prev.filter((p) => p._id !== id));
+			await api.delete(`/tools/${selectedId}`);
+			setTools((prev) => prev.filter((p) => p._id !== selectedId));
+
+			setSelectedId(null);
+			setModalOpen(false);
 		} catch (error) {
 			setError(error.response?.data.message);
 		} finally {
@@ -160,14 +142,53 @@ const Tools = ({ buildings }) => {
 
 	return (
 		<>
+			{/* Banner */}
+			<div
+				className={classNames("header-modal", {
+					"header-modal--visible": modalOpen,
+				})}
+			>
+				<p style={{ fontWeight: 600 }}>Opravdu chcete tuto položku smazat?</p>
+				<button
+					onClick={removeTool}
+					style={{ background: "var(--red-clr)" }}
+					className="header-modal__btn"
+				>
+					Smazat
+				</button>
+				<button
+					style={{ background: "#000" }}
+					className="header-modal__btn"
+					onClick={() => {
+						setSelectedId(null);
+						setModalOpen(false);
+					}}
+				>
+					Zrušit
+				</button>
+			</div>
+			{/* Curtain */}
+			<div
+				onClick={() => {
+					setSelectedId(null);
+					setModalOpen(false);
+				}}
+				className={classNames("header__curtain", {
+					"header__curtain--visible": modalOpen,
+				})}
+			></div>
+			{/* Form */}
 			<form
 				onSubmit={handleSubmit}
 				className={classNames("tools-form", {
 					"tools-form--visible": formVisible,
 				})}
 			>
+				<p style={{ fontWeight: 600 }}>Přidat nářadí</p>
 				<div>
-					<label htmlFor="">Nazev</label>
+					<label htmlFor="name">
+						Název nářadí <span style={{ color: "#f00" }}>*</span>
+					</label>
 					<input
 						style={{ width: "100%" }}
 						className={classNames("input", {
@@ -177,45 +198,50 @@ const Tools = ({ buildings }) => {
 						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
 						value={toolForm.name}
 						name="name"
+						id="name"
 						disabled={loading}
 					/>
 				</div>
-				<div>
-					<label htmlFor="">Pocet kusu</label>
-					<input
-						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
-						value={toolForm.qty}
-						className={classNames("input", {
-							"input--disabled": loading,
-						})}
-						type="number"
-						min={1}
-						name="qty"
-					/>
+				<div style={{ display: "flex", gap: 5 }}>
+					<div style={{ flexGrow: 1 }}>
+						<label htmlFor="qty">Počet kusů</label>
+						<input
+							onChange={(e) => handleToolForm(e.target.name, e.target.value)}
+							value={toolForm.qty}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
+							type="number"
+							min={1}
+							name="qty"
+							id="qty"
+						/>
+					</div>
+					<div style={{ flexGrow: 1 }}>
+						<label htmlFor="status">Stav</label>
+						<input
+							onChange={(e) => handleToolForm(e.target.name, e.target.value)}
+							value={toolForm.status}
+							className={classNames("input", {
+								"input--disabled": loading,
+							})}
+							type="text"
+							name="status"
+							id="status"
+						/>
+					</div>
 				</div>
-				<div>
-					<label htmlFor="Stav">Stav</label>
-					<input
-						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
-						value={toolForm.status}
-						className={classNames("input", {
-							"input--disabled": loading,
-						})}
-						type="text"
-						name="status"
-					/>
-				</div>
-				<div>
-					<label htmlFor="">Lokalita</label>
+				<div style={{ display: "flex", flexDirection: "column" }}>
+					<label htmlFor="place">Lokalita</label>
 					<select
 						className="input"
 						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
 						value={toolForm.building}
 						name="building"
-						id=""
+						id="place"
 					>
-						<option value="storage">Storage</option>
-						<option value="service">Service</option>
+						<option value="Sklad">Sklad</option>
+						<option value="Servis">Servis</option>
 						{buildings.map((b, i) => {
 							return (
 								<option key={i} value={b.name}>
@@ -226,7 +252,7 @@ const Tools = ({ buildings }) => {
 					</select>
 				</div>
 				<div>
-					<label htmlFor="">Poznamka</label>
+					<label htmlFor="desc">Poznámka</label>
 					<input
 						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
 						value={toolForm.desc}
@@ -235,12 +261,13 @@ const Tools = ({ buildings }) => {
 						})}
 						type="text"
 						name="desc"
+						id="desc"
 					/>
 				</div>
-				<div style={{ display: "flex" }}>
+				<div style={{ display: "flex", gap: 5 }}>
 					<button
 						style={{ background: "#000" }}
-						className="btn"
+						className="tools-form__btn"
 						onClick={(e) => {
 							e.preventDefault();
 							setFormVisible(false);
@@ -251,12 +278,13 @@ const Tools = ({ buildings }) => {
 								building: "",
 								desc: "",
 							});
+							setError(null);
 						}}
 					>
-						Zrusit
+						Zrušit
 					</button>
-					<button className="btn" type="submit">
-						Submit
+					<button className="tools-form__btn" type="submit">
+						Přidat
 					</button>
 				</div>
 				<StatusIndicator error={error} loading={loading} />
@@ -273,13 +301,6 @@ const Tools = ({ buildings }) => {
 						<h2>Nářadí</h2>
 					</div>
 					<div>
-						{/* <div>
-						<select onChange={(e)=> se} className="input" name="" id="">
-							<option value="">Sort</option>
-							<option value="">A - Z</option>
-							<option value="">Z - A</option>
-						</select>
-					</div> */}
 						<div style={{ display: "flex", gap: 5 }}>
 							<button
 								onClick={() => setFilter("")}
@@ -290,20 +311,20 @@ const Tools = ({ buildings }) => {
 								All
 							</button>
 							<button
-								onClick={() => setFilter("storage")}
+								onClick={() => setFilter("Sklad")}
 								className={classNames("tools__filter-btn", {
-									"tools__filter-btn--active": filter === "storage",
+									"tools__filter-btn--active": filter === "Sklad",
 								})}
 							>
-								Storage
+								Sklad
 							</button>
 							<button
-								onClick={() => setFilter("service")}
+								onClick={() => setFilter("Servis")}
 								className={classNames("tools__filter-btn", {
-									"tools__filter-btn--active": filter === "service",
+									"tools__filter-btn--active": filter === "Servis",
 								})}
 							>
-								Service
+								Servis
 							</button>
 							<div className="select">
 								<button
@@ -366,6 +387,8 @@ const Tools = ({ buildings }) => {
 								<th>Kusy</th>
 								<th>Stav</th>
 								<th>Poznamky</th>
+								<th></th>
+								<th></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -383,19 +406,28 @@ const Tools = ({ buildings }) => {
 										<td>
 											<span>{tool.desc}</span>
 										</td>
-										<td>
+										<td style={{ width: "1%", paddingRight: 10 }}>
 											<button
+												className="tools__edit-btn"
 												onClick={() => {
 													setFormVisible(true);
 													setEditingTool(tool);
 													setToolForm(tool);
 												}}
 											>
-												Update
+												<PencilIcon />
 											</button>
 										</td>
-										<td>
-											<button onClick={() => removeTool(tool._id)}>X</button>
+										<td style={{ width: "1%" }}>
+											<button
+												className="tools__remove-btn"
+												onClick={() => {
+													setSelectedId(tool._id);
+													setModalOpen(true);
+												}}
+											>
+												<XIcon />
+											</button>
 										</td>
 									</tr>
 								);
@@ -403,7 +435,17 @@ const Tools = ({ buildings }) => {
 						</tbody>
 					</table>
 					<button
-						onClick={() => setFormVisible(true)}
+						onClick={() => {
+							setEditingTool(null);
+							setToolForm({
+								name: "",
+								qty: 1,
+								status: "",
+								building: "",
+								desc: "",
+							});
+							setFormVisible(true);
+						}}
 						className="responsibilities__btn"
 					>
 						<PlusIconSmall />

@@ -40,7 +40,8 @@ html {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	width: min(100%, min-content);
+	min-width: 100%;
+	width: max-content;
 }
 
 .input {
