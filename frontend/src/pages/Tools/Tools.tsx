@@ -10,6 +10,21 @@ import XIcon from "../../icons/XIcon";
 import PencilIcon from "../../icons/PencilIcon";
 import "./Tools.scss";
 
+const initTool = {
+	code: "",
+	name: "",
+	qty: 1,
+	storageQty: 1,
+	status: "",
+	building: [
+		{
+			name: "",
+			qty: 0,
+		},
+	],
+	desc: "",
+};
+
 const Tools = ({ buildings }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
@@ -18,18 +33,14 @@ const Tools = ({ buildings }) => {
 	const [editingTool, setEditingTool] = useState<Tool | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-	const [toolForm, setToolForm] = useState({
-		name: "",
-		qty: 1,
-		status: "",
-		building: [
-			{
-				name: "",
-				qty: 0,
-			},
-		],
-		desc: "",
-	});
+
+	const [toolForm, setToolForm] = useState(initTool);
+
+	const totalSpreadedQty = toolForm.building.reduce((acc, b) => {
+		return acc + b.qty;
+	}, 0);
+
+	const remainingQty = toolForm.qty - totalSpreadedQty;
 
 	const handleToolForm = (name, value, index?: number) => {
 		if (name === "building" && index !== undefined) {
@@ -41,9 +52,21 @@ const Tools = ({ buildings }) => {
 		} else if (name === "buildingQty" && index !== undefined) {
 			setToolForm((prev) => {
 				const updated = [...prev.building];
-				updated[index] = { ...updated[index], qty: Number(value) };
+				const current = updated[index].qty;
+				const next = current + Number(value);
+
+				updated[index] = {
+					...updated[index],
+					qty: Math.max(0, Math.min(next, remainingQty + current)),
+				};
 				return { ...prev, building: updated };
 			});
+		} else if (name === "qty") {
+			setToolForm((prev) => ({
+				...prev,
+				qty: Number(value),
+				building: prev.building.map((b) => ({ ...b, qty: 0 })), // ← reset all
+			}));
 		} else {
 			setToolForm((prev) => ({ ...prev, [name]: value }));
 		}
@@ -54,20 +77,14 @@ const Tools = ({ buildings }) => {
 		setError(null);
 
 		try {
-			await api.post("/tools", toolForm);
-
-			setToolForm({
-				name: "",
-				qty: 1,
-				status: "",
-				building: [
-					{
-						name: "",
-						qty: 0,
-					},
-				],
-				desc: "",
+			const res = await api.post("/tools", {
+				...toolForm,
+				storageQty: toolForm.qty - totalSpreadedQty,
 			});
+
+			setTools((prev) => [...prev, res.data]);
+
+			setToolForm(initTool);
 			setFormVisible(false);
 		} catch (error) {
 			setError(error.response?.data.message);
@@ -81,42 +98,28 @@ const Tools = ({ buildings }) => {
 			try {
 				const res = await api.get("/tools/all");
 
-				const updated = (res.data || []).map((tool: Tool) => ({
-					_id: tool._id,
-					name: tool.name,
-					building: tool.building,
-					qty: tool.qty,
-					status: tool.status,
-					desc: tool.desc,
-				}));
-
-				setTools(updated);
+				setTools(res.data || []);
 			} catch (error) {
 				setError(error.response?.data?.message);
 			}
 		};
 
 		fetchToolsData();
-	}, [createTool]);
+	}, []);
 
 	const updateTool = async (id) => {
 		setLoading(true);
 		setError(null);
 
 		try {
-			await api.put(`/tools/${id}`, toolForm);
-			setToolForm({
-				name: "",
-				qty: 1,
-				status: "",
-				building: [
-					{
-						name: "",
-						qty: 0,
-					},
-				],
-				desc: "",
+			const res = await api.put(`/tools/${id}`, {
+				...toolForm,
+				storageQty: toolForm.qty - totalSpreadedQty,
 			});
+
+			setTools((prev) => [...prev, res.data]);
+
+			setToolForm(initTool);
 			setFormVisible(false);
 		} catch (err) {
 			setError(err.response?.data.message);
@@ -140,7 +143,7 @@ const Tools = ({ buildings }) => {
 	const filteredTools = tools.filter((t) => {
 		const buildingNames = t.building.map((b) => b.name);
 		const matchesBuilding =
-			filter === "" || buildingNames.find((bn) => bn === filter);
+			filter === "" || ["Sklad", ...buildingNames].find((bn) => bn === filter);
 		const matchesName = toolsFilter === "" || t.name === toolsFilter;
 		return matchesBuilding && matchesName;
 	});
@@ -224,6 +227,21 @@ const Tools = ({ buildings }) => {
 			>
 				<p style={{ fontWeight: 600 }}>Přidat nářadí</p>
 				<div>
+					<label htmlFor="code">Kod</label>
+					<input
+						style={{ width: "100%" }}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
+						value={toolForm.code}
+						name="code"
+						id="code"
+						disabled={loading}
+					/>
+				</div>
+				<div>
 					<label htmlFor="name">
 						Název nářadí <span style={{ color: "#f00" }}>*</span>
 					</label>
@@ -270,22 +288,15 @@ const Tools = ({ buildings }) => {
 					</div>
 				</div>
 				{toolForm.building.map((buildingItem, index) => {
-					const allBuildings = [
-						"Sklad",
-						"Servis",
-						...buildings.map((b) => b.name),
-					];
+					const allBuildings = ["Servis", ...buildings.map((b) => b.name)];
 
 					const selectedBuildings = toolForm.building
 						.map((b) => b.name)
 						.filter((_, i) => i !== index);
 
-					// const availableBuildings = buildings.filter(
-					// 	(b) => !selectedBuildings.includes(b.name),
-					// );
 					return (
-						<div key={index} style={{ display: "flex" }}>
-							<div>
+						<div key={index} style={{ display: "flex", gap: 5, width: "100%" }}>
+							<div style={{ display: "flex", flexDirection: "column" }}>
 								<label htmlFor="place">Lokalita</label>
 								<select
 									className="input"
@@ -310,21 +321,69 @@ const Tools = ({ buildings }) => {
 									})}
 								</select>
 							</div>
-							<div>
-								<label htmlFor="">Počet kusů</label>
-								<input
-									onChange={(e) =>
-										handleToolForm("buildingQty", e.target.value, index)
-									}
-									value={buildingItem.qty}
-									className="input"
-									type="number"
-								/>
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									width: "100%",
+								}}
+							>
+								<span>Počet kusů</span>
+								<div
+									style={{
+										display: "flex",
+										gap: 5,
+										width: "100%",
+										height: "100%",
+									}}
+								>
+									<button
+										style={{
+											aspectRatio: "1/1",
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+										}}
+										type="button"
+										className="btn"
+										onClick={() => handleToolForm("buildingQty", -1, index)}
+										disabled={buildingItem.qty < 1}
+									>
+										-
+									</button>
+									<div
+										style={{
+											flexGrow: 1,
+											background: "var(--bg-clr)",
+											border: "var(--secondary-border)",
+											borderRadius: 5,
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+										}}
+									>
+										{buildingItem.qty}
+									</div>
+									<button
+										style={{
+											aspectRatio: "1/1",
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+										}}
+										type="button"
+										className="btn"
+										onClick={() => handleToolForm("buildingQty", +1, index)}
+										disabled={remainingQty <= 0}
+									>
+										+
+									</button>
+								</div>
 							</div>
 						</div>
 					);
 				})}
-				<button onClick={addBuilding} className="btn">
+				<button type="button" onClick={addBuilding} className="btn">
 					Pridat Lokalitu
 				</button>
 				<div>
@@ -347,18 +406,7 @@ const Tools = ({ buildings }) => {
 						onClick={(e) => {
 							e.preventDefault();
 							setFormVisible(false);
-							setToolForm({
-								name: "",
-								qty: 1,
-								status: "",
-								building: [
-									{
-										name: "",
-										qty: 0,
-									},
-								],
-								desc: "",
-							});
+							setToolForm(initTool);
 							setError(null);
 						}}
 					>
@@ -397,13 +445,7 @@ const Tools = ({ buildings }) => {
 									"tools__filter-btn--active": filter === "Sklad",
 								})}
 							>
-								Sklad (
-								{
-									tools.filter((tool) =>
-										tool.building.find((t) => t.name === "Sklad"),
-									).length
-								}
-								)
+								Sklad ({tools.filter((tool) => tool.storageQty > 0).length})
 							</button>
 							<button
 								onClick={() => setFilter("Servis")}
@@ -411,19 +453,37 @@ const Tools = ({ buildings }) => {
 									"tools__filter-btn--active": filter === "Servis",
 								})}
 							>
-								Servis
+								Servis (
+								{
+									tools.filter((tool) =>
+										tool.building.find((t) => t.name === "Servis"),
+									).length
+								}
+								)
 							</button>
 							<div className="select">
-								<button
-									onClick={() => setSelectActive((prev) => !prev)}
-									className={classNames("tools__filter-btn", {
-										"tools__filter-btn--active": buildings.some(
-											(b) => b.name.includes(filter) && filter !== "",
-										),
-									})}
-								>
-									Akce
-								</button>
+								<div>
+									<button
+										onClick={() => setSelectActive((prev) => !prev)}
+										className={classNames("tools__filter-btn", {
+											"tools__filter-btn--active": buildings.some(
+												(b) => b.name.includes(filter) && filter !== "",
+											),
+										})}
+									>
+										Akce
+									</button>
+									{filter !== "" &&
+										filter !== "Sklad" &&
+										filter !== "Servis" && (
+											<span className="tools__filter-btn-extra">
+												{/* TODO: learn this */}
+												{buildings.find((b) => b.name === filter)?.name ??
+													filter}{" "}
+												({filter !== "" ? filteredTools.length : ""})
+											</span>
+										)}
+								</div>
 								<div
 									className={classNames("select-container", {
 										"select-container--active": selectActive,
@@ -469,11 +529,60 @@ const Tools = ({ buildings }) => {
 					<table className="tools-table">
 						<thead>
 							<tr>
-								<th>Nazev</th>
-								{/* <th>Stavba</th> */}
-								<th>Kusy</th>
-								<th>Stav</th>
-								<th>Poznamky</th>
+								<th
+									style={{
+										width: "1%",
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Foto
+								</th>
+								<th
+									style={{
+										width: "1%",
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Kod
+								</th>
+								<th
+									style={{
+										width: "1%",
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Nazev
+								</th>
+								{filter !== "" && filter !== "Sklad" && <th>Lokalita</th>}
+								<th
+									style={{
+										width: "1%",
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Kusy
+								</th>
+								<th
+									style={{
+										width: "1%",
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Stav
+								</th>
+								<th
+									style={{
+										whiteSpace: "nowrap",
+										paddingRight: 20,
+									}}
+								>
+									Poznamky
+								</th>
 								<th></th>
 								<th></th>
 							</tr>
@@ -482,15 +591,81 @@ const Tools = ({ buildings }) => {
 							{filteredTools.map((tool) => {
 								return (
 									<tr key={tool._id}>
-										<td>{tool.name}</td>
-										{/* <td>{tool.building}</td> */}
-										<td>
-											<span>{tool.qty}</span>
+										<td
+											style={{
+												width: "1%",
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
+											{/* <span style={{ color: "#f00" }}>Foto</span> */}
+											<img
+												src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ9rK6D7hqxf_cdMKKLd2TnI1QnK3HMe_loMsn6xGPsaCZ9CWbkEtcdkfTBda_ikLg67ByI2gniaHHeSSHkMHR2Yh60_PgvMuqJLZXRcmBfEmfr-iVmDmvJWgY"
+												// width={50}
+												// height={50}
+												alt=""
+											/>
 										</td>
-										<td>
+										<td
+											style={{
+												width: "1%",
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
+											<span style={{ color: "#f00" }}>{tool.code}</span>
+										</td>
+										<td
+											style={{
+												width: "1%",
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
+											{tool.name}
+										</td>
+										{tool.building.find((b) => b.name === filter)?.name && (
+											<td
+												style={{
+													width: "1%",
+													whiteSpace: "nowrap",
+													paddingRight: 20,
+												}}
+											>
+												{filter}
+											</td>
+										)}
+										<td
+											style={{
+												width: "1%",
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
+											<span>
+												{filter === "Sklad"
+													? tool.storageQty
+													: filter !== ""
+														? (tool.building.find((b) => b.name === filter)
+																?.qty ?? 0)
+														: tool.qty}
+											</span>
+										</td>
+										<td
+											style={{
+												width: "1%",
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
 											<span>{tool.status}</span>
 										</td>
-										<td>
+										<td
+											style={{
+												whiteSpace: "nowrap",
+												paddingRight: 20,
+											}}
+										>
 											<span>{tool.desc}</span>
 										</td>
 										<td style={{ width: "1%", paddingRight: 10 }}>
@@ -524,18 +699,7 @@ const Tools = ({ buildings }) => {
 					<button
 						onClick={() => {
 							setEditingTool(null);
-							setToolForm({
-								name: "",
-								qty: 1,
-								status: "",
-								building: [
-									{
-										name: "",
-										qty: 0,
-									},
-								],
-								desc: "",
-							});
+							setToolForm(toolForm);
 							setFormVisible(true);
 						}}
 						className="responsibilities__btn"

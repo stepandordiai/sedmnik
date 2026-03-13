@@ -18,6 +18,9 @@ connectDB();
 
 app.use(express.json());
 
+// TODO: LEARN THIS
+app.use("/uploads", express.static("C:/SynologyDrive/RŮZNÉ/tools"));
+
 const allowedOrigins = [
 	"https://sedmnik.netlify.app",
 	"http://localhost:3000",

@@ -1,4 +1,6 @@
 .tools__filter-btn {
+	position: relative;
+	z-index: 1;
 	padding: 10px;
 	border-radius: 10px;
 	background: rgba(0, 0, 0, 0.05);
@@ -7,6 +9,14 @@
 		background: var(--accent-clr);
 		color: #fff;
 	}
+}
+
+.tools__filter-btn-extra {
+	position: relative;
+	padding: 10px 10px 10px 20px;
+	border-radius: 0 10px 10px 0;
+	margin-left: -10px;
+	background: rgba(0, 0, 0, 0.05);
 }
 
 .select {

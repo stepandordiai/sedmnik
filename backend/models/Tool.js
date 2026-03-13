@@ -2,11 +2,17 @@ import mongoose from "mongoose";
 
 const toolSchema = new mongoose.Schema(
 	{
+		code: {
+			type: String,
+		},
 		name: {
 			type: String,
 			required: true,
 		},
 		qty: {
+			type: Number,
+		},
+		storageQty: {
 			type: Number,
 		},
 		status: {

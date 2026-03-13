@@ -4,12 +4,14 @@ export interface Icon {
 
 export interface Tool {
 	_id: string;
+	code: string;
 	name: string;
 	building: {
 		name: string;
 		qty: number;
 	}[];
 	qty: number;
+	storageQty: number;
 	status: string;
 	desc: string;
 }
