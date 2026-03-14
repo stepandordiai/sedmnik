@@ -18,6 +18,7 @@ const Period = ({ allUsers, userId }) => {
 	});
 	const [data, setData] = useState([]);
 	const [initPdf, setInitPdf] = useState(false);
+	const [responsibilities, setResponsibilities] = useState(false);
 
 	const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -213,6 +214,26 @@ const Period = ({ allUsers, userId }) => {
 					>
 						Získat data
 					</button>
+					<div
+						style={{
+							display: "flex",
+							justifyContent: "flex-start",
+							alignItems: "center",
+							gap: 5,
+						}}
+						className={classNames({
+							"pdf-btn--hidden": initPdf,
+						})}
+					>
+						<button
+							style={{ justifyContent: "flex-end", width: "max-content" }}
+							className={classNames("switch-btn", {
+								"switch-btn--active": responsibilities,
+							})}
+							onClick={() => setResponsibilities((prev) => !prev)}
+						></button>
+						<span style={{ fontWeight: 600 }}>Responsibilities</span>
+					</div>
 				</div>
 				{data.length === 0 ? (
 					"Vyberte období pro zobrazení data"
@@ -249,58 +270,15 @@ const Period = ({ allUsers, userId }) => {
 										borderRadius: 10,
 									}}
 								>
-									<p style={{ width: "min-content" }} className="container">
-										{capitalizeDay(dateToDayName(item.date))} | {item.date}
-									</p>
 									<div
-										style={{
-											display: "flex",
-											flexDirection: "column",
-											gap: 5,
-											flexGrow: 1,
-										}}
+										style={{ display: "flex", justifyContent: "space-between" }}
 									>
-										{item.responsibilities.length < 1 ? (
-											<div key={i} style={{ display: "flex", gap: 5 }}>
-												<p
-													style={{ width: "100%", flexGrow: 1 }}
-													className="input"
-												>
-													Žádná data
-												</p>
-												<p
-													style={{ whiteSpace: "nowrap", width: "min-content" }}
-													className="input"
-												>
-													--:--
-												</p>
-											</div>
-										) : (
-											<>
-												{item.responsibilities.map((responsibility, i) => {
-													return (
-														<div key={i} style={{ display: "flex", gap: 5 }}>
-															<p
-																style={{ width: "100%", flexGrow: 1 }}
-																className="input"
-															>
-																{responsibility.task}
-															</p>
-															<p
-																style={{
-																	whiteSpace: "nowrap",
-																	width: "min-content",
-																}}
-																className="input"
-															>
-																{responsibility.time || "--:--"}
-															</p>
-														</div>
-													);
-												})}
-											</>
-										)}
-
+										<div>
+											<span>Datum</span>
+											<p style={{ width: "min-content" }} className="container">
+												{capitalizeDay(dateToDayName(item.date))} | {item.date}
+											</p>
+										</div>
 										<div style={{ display: "flex", marginTop: "auto", gap: 5 }}>
 											<div>
 												<p>Prichod</p>
@@ -324,6 +302,57 @@ const Period = ({ allUsers, userId }) => {
 											</div>
 										</div>
 									</div>
+
+									{responsibilities && (
+										<>
+											{item.responsibilities.length < 1 ? (
+												<>
+													<span>Popis prace</span>
+													<div key={i} style={{ display: "flex", gap: 5 }}>
+														<p
+															style={{ width: "100%", flexGrow: 1 }}
+															className="input"
+														>
+															Žádná data
+														</p>
+														<p
+															style={{
+																whiteSpace: "nowrap",
+																width: "min-content",
+															}}
+															className="input"
+														>
+															--:--
+														</p>
+													</div>
+												</>
+											) : (
+												<>
+													{item.responsibilities.map((responsibility, i) => {
+														return (
+															<div key={i} style={{ display: "flex", gap: 5 }}>
+																<p
+																	style={{ width: "100%", flexGrow: 1 }}
+																	className="input"
+																>
+																	{responsibility.task}
+																</p>
+																<p
+																	style={{
+																		whiteSpace: "nowrap",
+																		width: "min-content",
+																	}}
+																	className="input"
+																>
+																	{responsibility.time || "--:--"}
+																</p>
+															</div>
+														);
+													})}
+												</>
+											)}
+										</>
+									)}
 								</div>
 							);
 						})}
