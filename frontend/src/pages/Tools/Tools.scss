@@ -58,6 +58,7 @@
 
 .tools-form {
 	position: fixed;
+	width: min(100%, 500px);
 	top: 50%;
 	left: 50%;
 	z-index: 9999;
@@ -90,7 +91,7 @@
 	display: none;
 	position: fixed;
 	inset: 0;
-	// z-index: 100;
+	z-index: 9998;
 	background: rgba(0, 0, 0, 0.5);
 	pointer-events: none;
 

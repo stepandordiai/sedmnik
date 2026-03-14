@@ -33,7 +33,6 @@ const Tools = ({ buildings }) => {
 	const [editingTool, setEditingTool] = useState<Tool | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-
 	const [toolForm, setToolForm] = useState(initTool);
 
 	const totalSpreadedQty = toolForm.building.reduce((acc, b) => {
@@ -70,6 +69,13 @@ const Tools = ({ buildings }) => {
 		} else {
 			setToolForm((prev) => ({ ...prev, [name]: value }));
 		}
+	};
+
+	const removeBuilding = (index: number) => {
+		setToolForm((prev) => ({
+			...prev,
+			building: prev.building.filter((_, i) => i !== index),
+		}));
 	};
 
 	const createTool = async () => {
@@ -117,7 +123,10 @@ const Tools = ({ buildings }) => {
 				storageQty: toolForm.qty - totalSpreadedQty,
 			});
 
-			setTools((prev) => [...prev, res.data]);
+			// setTools((prev) => [...prev, res.data]);
+			setTools((prev) =>
+				prev.map((tool) => (tool._id === id ? res.data : tool)),
+			);
 
 			setToolForm(initTool);
 			setFormVisible(false);
@@ -143,8 +152,11 @@ const Tools = ({ buildings }) => {
 	const filteredTools = tools.filter((t) => {
 		const buildingNames = t.building.map((b) => b.name);
 		const matchesBuilding =
-			filter === "" || ["Sklad", ...buildingNames].find((bn) => bn === filter);
-		const matchesName = toolsFilter === "" || t.name === toolsFilter;
+			filter === "" ||
+			buildingNames.includes(filter) ||
+			filter === "Sklad" || // only if these are actual fields on the tool
+			filter === "Servis";
+		const matchesName = toolsFilter === "" || t.name.includes(toolsFilter);
 		return matchesBuilding && matchesName;
 	});
 
@@ -378,6 +390,18 @@ const Tools = ({ buildings }) => {
 									>
 										+
 									</button>
+									<button
+										style={{
+											aspectRatio: "1/1",
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+										}}
+										className="btn--delete"
+										onClick={() => removeBuilding(index)}
+									>
+										<XIcon />
+									</button>
 								</div>
 							</div>
 						</div>
@@ -598,11 +622,8 @@ const Tools = ({ buildings }) => {
 												paddingRight: 20,
 											}}
 										>
-											{/* <span style={{ color: "#f00" }}>Foto</span> */}
 											<img
 												src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ9rK6D7hqxf_cdMKKLd2TnI1QnK3HMe_loMsn6xGPsaCZ9CWbkEtcdkfTBda_ikLg67ByI2gniaHHeSSHkMHR2Yh60_PgvMuqJLZXRcmBfEmfr-iVmDmvJWgY"
-												// width={50}
-												// height={50}
 												alt=""
 											/>
 										</td>
@@ -613,7 +634,7 @@ const Tools = ({ buildings }) => {
 												paddingRight: 20,
 											}}
 										>
-											<span style={{ color: "#f00" }}>{tool.code}</span>
+											<span>{tool.code}</span>
 										</td>
 										<td
 											style={{
