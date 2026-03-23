@@ -6,24 +6,113 @@ import Footer from "../../components/layout/Footer/Footer";
 import PersonIcon from "../../icons/PersonIcon";
 import XIcon from "../../icons/XIcon";
 import PlusIconSmall from "../../icons/PlusIconSmall";
+import PencilIcon from "../../icons/PencilIcon";
 import "./Leads.scss";
 
-const emptyLeadRow = () => ({
-	id: crypto.randomUUID(),
+interface Lead {
+	_id?: string;
+	name: string;
+	tel: string;
+	address: string;
+	position: string;
+	details: string;
+}
+
+// TODO: learn this
+const initLead: Omit<Lead, "_id"> = {
 	name: "",
 	tel: "",
 	address: "",
 	position: "",
 	details: "",
-	createdAt: "",
-});
+};
 
 const Leads = () => {
-	const [leads, setLeads] = useState([emptyLeadRow()]);
+	const [leads, setLeads] = useState([]);
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [formVisible, setFormVisible] = useState(false);
+	const [leadForm, setLeadForm] = useState<Lead>(initLead);
+	const [editingLead, setEditingLead] = useState<Lead | null>(null);
+
+	const handleLeadForm = (name, value) => {
+		setLeadForm((prev) => ({ ...prev, [name]: value }));
+	};
+
+	const createLead = async () => {
+		setError(null);
+		setLoading(true);
+
+		try {
+			const res = await axios.post(
+				`${import.meta.env.VITE_API_URL}/leads`,
+				leadForm,
+			);
+
+			// TODO: learn this
+			setLeads((prev) => [...prev, res.data]);
+
+			setFormVisible(false);
+			setLeadForm(initLead);
+		} catch (err) {
+			setError(err.response?.data.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const updateLead = async (id) => {
+		setError(null);
+		setLoading(true);
+
+		try {
+			const res = await axios.put(
+				`${import.meta.env.VITE_API_URL}/leads/${id}`,
+				leadForm,
+			);
+
+			// TODO: learn this
+			setLeads((prev) =>
+				prev.map((lead) => (lead.id === id ? res.data : lead)),
+			);
+
+			setLeadForm(initLead);
+			setFormVisible(false);
+		} catch (err) {
+			setError(err.response?.data.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const deleteLead = async () => {
+		setError(null);
+		setLoading(true);
+
+		try {
+			await axios.delete(`${import.meta.env.VITE_API_URL}/leads/${selectedId}`);
+
+			setLeads((prev) => prev.filter((lead) => lead._id !== selectedId));
+
+			setModalOpen(false);
+			setSelectedId(null);
+		} catch (err) {
+			setError(err.response?.data.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleLead = (e) => {
+		e.preventDefault();
+		if (editingLead) {
+			updateLead(editingLead._id);
+		} else {
+			createLead();
+		}
+	};
 
 	useEffect(() => {
 		const getLeads = async () => {
@@ -35,23 +124,23 @@ const Leads = () => {
 					`${import.meta.env.VITE_API_URL}/leads/all`,
 				);
 
-				const updated = res.data.map((lead) => ({
-					id: lead._id,
-					name: lead.name,
-					tel: lead.tel,
-					address: lead.address,
-					position: lead.position,
-					details: lead.details,
-					createdAt: lead.createdAt,
-				}));
+				// const updated = res.data.map((lead) => ({
+				// 	id: lead._id,
+				// 	name: lead.name,
+				// 	tel: lead.tel,
+				// 	address: lead.address,
+				// 	position: lead.position,
+				// 	details: lead.details,
+				// 	createdAt: lead.createdAt,
+				// }));
 
-				const filled = [...updated];
+				// const filled = [...updated];
 
-				while (filled.length < 1) {
-					filled.push(emptyLeadRow());
-				}
+				// while (filled.length < 1) {
+				// 	filled.push(emptyLeadRow());
+				// }
 
-				setLeads(filled);
+				setLeads(res.data);
 			} catch (err) {
 				setError(error.response?.data.message);
 			} finally {
@@ -62,78 +151,157 @@ const Leads = () => {
 		getLeads();
 	}, []);
 
-	const handleLeadsInput = (id, name, value) => {
-		setLeads((prev) =>
-			prev.map((lead) => (lead.id === id ? { ...lead, [name]: value } : lead)),
-		);
-	};
+	// const handleLeadsInput = (id, name, value) => {
+	// 	setLeads((prev) =>
+	// 		prev.map((lead) => (lead.id === id ? { ...lead, [name]: value } : lead)),
+	// 	);
+	// };
 
-	const saveLeads = async (data) => {
-		const hasInvalidLead = data.some((lead) => {
-			const hasOtherData =
-				(lead.name && lead.name.trim() !== "") ||
-				(lead.address && lead.address.trim() !== "") ||
-				(lead.position && lead.position.trim() !== "") ||
-				(lead.details && lead.details.trim() !== "");
+	// const saveLeads = async (data) => {
+	// 	const hasInvalidLead = data.some((lead) => {
+	// 		const hasOtherData =
+	// 			(lead.name && lead.name.trim() !== "") ||
+	// 			(lead.address && lead.address.trim() !== "") ||
+	// 			(lead.position && lead.position.trim() !== "") ||
+	// 			(lead.details && lead.details.trim() !== "");
 
-			return (
-				hasOtherData &&
-				(!lead.tel || lead.tel.trim() === "" || lead.tel.length < 9)
-			);
-		});
+	// 		return (
+	// 			hasOtherData &&
+	// 			(!lead.tel || lead.tel.trim() === "" || lead.tel.length < 9)
+	// 		);
+	// 	});
 
-		if (hasInvalidLead) {
-			setError("Telefon je povinné pole");
-			return;
-		}
+	// 	if (hasInvalidLead) {
+	// 		setError("Telefon je povinné pole");
+	// 		return;
+	// 	}
 
-		setError(null);
-		setLoading(true);
+	// 	setError(null);
+	// 	setLoading(true);
 
-		try {
-			const res = await axios.put(
-				`${import.meta.env.VITE_API_URL}/leads`,
-				data,
-			);
+	// 	try {
+	// 		const res = await axios.put(
+	// 			`${import.meta.env.VITE_API_URL}/leads`,
+	// 			data,
+	// 		);
 
-			const updated = res.data.map((lead) => ({
-				id: lead._id,
-				name: lead.name,
-				tel: lead.tel,
-				address: lead.address,
-				position: lead.position,
-				details: lead.details,
-				createdAt: lead.createdAt,
-			}));
+	// 		setLeads(res.data);
+	// 	} catch (err) {
+	// 		setError(err.response?.data.message);
+	// 	} finally {
+	// 		setLoading(false);
+	// 	}
+	// };
 
-			const filled = [...updated];
+	// const removeLead = () => {
+	// 	if (selectedId) {
+	// 		const updated = leads.filter((lead) => lead.id !== selectedId);
+	// 		setLeads(updated);
+	// 		saveLeads(updated);
+	// 	}
+	// 	setSelectedId(null);
+	// 	setModalOpen(false);
+	// };
 
-			while (filled.length < 1) {
-				filled.push(emptyLeadRow());
-			}
-		} catch (err) {
-			setError(err.response?.data.message);
-		} finally {
-			setLoading(false);
-		}
-	};
+	const [copiedId, setCopiedId] = useState<string | null>(null);
 
-	const removeLead = () => {
-		if (selectedId) {
-			const updated = leads.filter((lead) => lead.id !== selectedId);
-			setLeads(updated);
-			saveLeads(updated);
-		}
-		setSelectedId(null);
-		setModalOpen(false);
-	};
-
-	const addEmptyLead = () => {
-		setLeads((prev) => [...prev, emptyLeadRow()]);
+	const handleCopy = (text: string, id: string) => {
+		navigator.clipboard.writeText(text);
+		setCopiedId(id);
+		setTimeout(() => setCopiedId(null), 1500);
 	};
 
 	return (
 		<>
+			<form
+				onSubmit={handleLead}
+				className={classNames("leads-form", {
+					"leads-form--active": formVisible,
+				})}
+			>
+				<div>
+					<label htmlFor="name">Jmeno</label>
+					<input
+						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
+						value={leadForm.name}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						name="name"
+						type="text"
+						id="name"
+						disabled={loading}
+					/>
+				</div>
+				<div>
+					<label htmlFor="tel">Telefon</label>
+					<input
+						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
+						name="tel"
+						value={leadForm.tel}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+						required
+						disabled={loading}
+					/>
+				</div>
+				<div>
+					<label htmlFor="address">Adresa</label>
+					<input
+						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
+						name="address"
+						value={leadForm.address}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+					/>
+				</div>
+				<div>
+					<label htmlFor="position">Pozice</label>
+					<input
+						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
+						name="position"
+						value={leadForm.position}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+					/>
+				</div>
+				<div>
+					<label htmlFor="details">Poznamky</label>
+					<input
+						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
+						name="details"
+						value={leadForm.details}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+					/>
+				</div>
+				<div style={{ display: "flex", gap: 5 }}>
+					<button
+						style={{ background: "#000" }}
+						className="tools-form__btn"
+						onClick={(e) => {
+							e.preventDefault();
+							setFormVisible(false);
+							setLeadForm(initLead);
+							setError(null);
+						}}
+					>
+						Zrušit
+					</button>
+					<button className="tools-form__btn" type="submit">
+						Přidat
+					</button>
+				</div>
+				<StatusIndicator error={error} loading={loading} />
+			</form>
 			<div
 				className={classNames("header-modal", {
 					"header-modal--visible": modalOpen,
@@ -141,7 +309,7 @@ const Leads = () => {
 			>
 				<p style={{ fontWeight: 600 }}>Opravdu chcete tuto položku smazat?</p>
 				<button
-					onClick={removeLead}
+					onClick={deleteLead}
 					style={{ background: "var(--red-clr)" }}
 					className="header-modal__btn"
 				>
@@ -164,7 +332,7 @@ const Leads = () => {
 					setModalOpen(false);
 				}}
 				className={classNames("header__curtain", {
-					"header__curtain--visible": modalOpen,
+					"header__curtain--visible": formVisible || modalOpen,
 				})}
 			></div>
 			<main className="main">
@@ -173,7 +341,18 @@ const Leads = () => {
 						<PersonIcon size={20} />
 						<h2>Potenciální pracovníci</h2>
 					</div>
-					<table>
+					<button
+						onClick={() => {
+							setEditingLead(null);
+							setLeadForm(leadForm);
+							setFormVisible(true);
+						}}
+						className="leads__btn"
+					>
+						<PlusIconSmall />
+						<span>Přidat</span>
+					</button>
+					<table className="leads-table">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -183,114 +362,46 @@ const Leads = () => {
 								</th>
 								<th>Adresa</th>
 								<th>Pozice</th>
-								<th>Poznamky</th>
+								<th className="fixed-data">Poznamky</th>
 								<th>Datum</th>
+								<th></th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							{leads.map((lead, i) => {
 								return (
-									<tr key={lead.id}>
+									<tr key={lead._id}>
 										<td>{i + 1}</td>
+										<td>{lead.name}</td>
 										<td>
-											<input
-												onChange={(e) =>
-													handleLeadsInput(
-														lead.id,
-														e.target.name,
-														e.target.value,
-													)
-												}
-												value={lead.name}
-												className={classNames("input", {
-													"input--disabled": loading,
-												})}
-												name="name"
-												type="text"
-												onBlur={() => saveLeads(leads)}
-												disabled={loading}
-											/>
+											<button
+												className={`copy-btn ${copiedId ? "copy-btn--disable" : ""}`}
+												onClick={() => handleCopy(lead.tel, lead._id)}
+											>
+												{copiedId === lead._id ? "Copied!" : lead.tel}
+											</button>
 										</td>
-										<td>
-											<input
-												onChange={(e) =>
-													handleLeadsInput(
-														lead.id,
-														e.target.name,
-														e.target.value,
-													)
-												}
-												name="tel"
-												value={lead.tel}
-												className={classNames("input", {
-													"input--disabled": loading,
-												})}
-												type="text"
-												onBlur={() => saveLeads(leads)}
-												required
-												disabled={loading}
-											/>
-										</td>
-										<td>
-											<input
-												onChange={(e) =>
-													handleLeadsInput(
-														lead.id,
-														e.target.name,
-														e.target.value,
-													)
-												}
-												name="address"
-												value={lead.address}
-												className={classNames("input", {
-													"input--disabled": loading,
-												})}
-												type="text"
-												onBlur={() => saveLeads(leads)}
-											/>
-										</td>
-										<td>
-											<input
-												onChange={(e) =>
-													handleLeadsInput(
-														lead.id,
-														e.target.name,
-														e.target.value,
-													)
-												}
-												name="position"
-												value={lead.position}
-												className={classNames("input", {
-													"input--disabled": loading,
-												})}
-												type="text"
-												onBlur={() => saveLeads(leads)}
-											/>
-										</td>
-										<td>
-											<input
-												onChange={(e) =>
-													handleLeadsInput(
-														lead.id,
-														e.target.name,
-														e.target.value,
-													)
-												}
-												name="details"
-												value={lead.details}
-												className={classNames("input", {
-													"input--disabled": loading,
-												})}
-												type="text"
-												onBlur={() => saveLeads(leads)}
-											/>
-										</td>
+										<td>{lead.address}</td>
+										<td>{lead.position}</td>
+										<td className="fixed-data">{lead.details}</td>
 										<td>{lead.createdAt.split("T")[0]}</td>
 										<td>
 											<button
 												onClick={() => {
-													setSelectedId(lead.id);
+													setLeadForm(lead);
+													setEditingLead(lead);
+													setFormVisible(true);
+												}}
+												className="plan__remove-btn"
+											>
+												<PencilIcon />
+											</button>
+										</td>
+										<td>
+											<button
+												onClick={() => {
+													setSelectedId(lead._id);
 													setModalOpen(true);
 												}}
 												className="plan__remove-btn"
@@ -303,10 +414,6 @@ const Leads = () => {
 							})}
 						</tbody>
 					</table>
-					<button onClick={addEmptyLead} className="leads__btn">
-						<PlusIconSmall />
-						<span>Přidat</span>
-					</button>
 					<StatusIndicator error={error} loading={loading} />
 				</section>
 				<Footer />

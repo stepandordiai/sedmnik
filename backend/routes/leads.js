@@ -20,19 +20,43 @@ router.post("/", async (req, res) => {
 	}
 });
 
-router.put("/", async (req, res) => {
+router.put("/:id", async (req, res) => {
 	try {
-		const leads = req.body;
+		const { id } = req.params;
+		const lead = req.body;
 
-		const validLeads = leads.filter(
-			(lead) => lead.tel && lead.tel.trim() !== "",
-		);
+		// FIXME:
+		// const validLeads = leads.filter(
+		// 	(lead) => lead.tel && lead.tel.trim() !== "",
+		// );
 
-		await Lead.deleteMany({});
+		const updatedLead = await Lead.findByIdAndUpdate(id, lead, {
+			new: true,
+			runValidators: true,
+		});
 
-		const updatedLeads = await Lead.insertMany(validLeads);
+		if (!updatedLead) {
+			return res.status(404).json({ message: "Lead not found" });
+		}
 
-		res.status(200).json(updatedLeads);
+		res.status(200).json(updatedLead);
+	} catch (error) {
+		console.error("Mongoose Error:", error.message);
+		res.status(500).json({ message: error.message });
+	}
+});
+
+router.delete("/:id", async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const deletedLead = await Lead.findByIdAndDelete(id);
+
+		if (!deletedLead) {
+			return res.status(404).json({ message: "Lead not found" });
+		}
+
+		res.status(200).json(deletedLead);
 	} catch (error) {
 		console.error("Mongoose Error:", error.message);
 		res.status(500).json({ message: error.message });
