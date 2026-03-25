@@ -1,3 +1,47 @@
+.tools-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: min(calc(100% - 20px), 500px);
+	background: #fff;
+	z-index: 999;
+	border-radius: 10px;
+	overflow: hidden;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.tools-modal--visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.tools-modal-btn-container {
+	display: flex;
+}
+
+.tools-modal__btn {
+	background: var(--accent-clr);
+	color: #fff;
+	padding: 10px;
+	border-top: var(--primary-border);
+	width: 100%;
+
+	&:hover {
+		background: rgba(0, 179, 255, 0.9);
+	}
+
+	&:nth-last-child(1) {
+		background: var(--bg-clr);
+		color: #000;
+
+		&:hover {
+			background: rgba(0, 0, 0, 0.05);
+		}
+	}
+}
+
 .tools__filter-btn {
 	position: relative;
 	z-index: 1;
@@ -88,15 +132,16 @@
 }
 
 .tools-curtain {
-	display: none;
 	position: fixed;
 	inset: 0;
-	z-index: 9998;
+	z-index: 888;
 	background: rgba(0, 0, 0, 0.5);
+	opacity: 0;
 	pointer-events: none;
 
 	&--visible {
-		display: initial;
+		opacity: 1;
+		pointer-events: auto;
 	}
 }
 

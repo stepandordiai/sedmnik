@@ -4,6 +4,7 @@ export interface Icon {
 
 export interface Tool {
 	_id: string;
+	img: string;
 	code: string;
 	name: string;
 	building: {

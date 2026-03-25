@@ -5,7 +5,7 @@
 	transform: translate(-50%, -50%);
 	width: min(calc(100% - 20px), 500px);
 	background: #fff;
-	z-index: 3;
+	z-index: 999;
 	padding: 25px;
 	border-radius: 10px;
 	display: none;

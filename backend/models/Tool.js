@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const toolSchema = new mongoose.Schema(
 	{
+		img: {
+			type: String,
+		},
 		code: {
 			type: String,
 		},

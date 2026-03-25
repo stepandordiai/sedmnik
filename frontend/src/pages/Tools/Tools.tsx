@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ToolsIcon from "../../icons/ToolsIcon";
 import StatusIndicator from "../../components/StatusIndicator/StatusIndicator";
 import PlusIconSmall from "../../icons/PlusIconSmall";
@@ -11,6 +11,7 @@ import PencilIcon from "../../icons/PencilIcon";
 import "./Tools.scss";
 
 const initTool = {
+	img: "",
 	code: "",
 	name: "",
 	qty: 1,
@@ -154,15 +155,34 @@ const Tools = ({ buildings }) => {
 		const matchesBuilding =
 			filter === "" ||
 			buildingNames.includes(filter) ||
-			filter === "Sklad" || // only if these are actual fields on the tool
+			(filter === "Sklad" && t.storageQty > 0) || // only if these are actual fields on the tool
 			filter === "Servis";
 		const matchesName = toolsFilter === "" || t.name.includes(toolsFilter);
 		return matchesBuilding && matchesName;
 	});
 
 	const [selectActive, setSelectActive] = useState(false);
-
 	const [formVisible, setFormVisible] = useState(false);
+
+	const selectContainerRef = useRef<HTMLDivElement>(null);
+
+	const handleSelect = () => {
+		setSelectActive((prev) => !prev);
+	};
+
+	useEffect(() => {
+		const handleClickOutside = (e: MouseEvent) => {
+			if (
+				selectContainerRef.current &&
+				!selectContainerRef.current.contains(e.target as Node)
+			) {
+				setSelectActive(false);
+			}
+		};
+
+		document.addEventListener("click", handleClickOutside);
+		return () => document.removeEventListener("click", handleClickOutside);
+	}, []);
 
 	const removeTool = async () => {
 		setError(null);
@@ -197,39 +217,28 @@ const Tools = ({ buildings }) => {
 		<>
 			{/* Banner */}
 			<div
-				className={classNames("header-modal", {
-					"header-modal--visible": modalOpen,
+				className={classNames("tools-modal", {
+					"tools-modal--visible": modalOpen,
 				})}
 			>
-				<p style={{ fontWeight: 600 }}>Opravdu chcete tuto položku smazat?</p>
-				<button
-					onClick={removeTool}
-					style={{ background: "var(--red-clr)" }}
-					className="header-modal__btn"
-				>
-					Smazat
-				</button>
-				<button
-					style={{ background: "#000" }}
-					className="header-modal__btn"
-					onClick={() => {
-						setSelectedId(null);
-						setModalOpen(false);
-					}}
-				>
-					Zrušit
-				</button>
+				<p style={{ fontWeight: 600, padding: 10 }}>
+					Opravdu chcete tuto položku smazat?
+				</p>
+				<div className="tools-modal-btn-container">
+					<button onClick={removeTool} className="tools-modal__btn">
+						Smazat
+					</button>
+					<button
+						className="tools-modal__btn"
+						onClick={() => {
+							setSelectedId(null);
+							setModalOpen(false);
+						}}
+					>
+						Zrušit
+					</button>
+				</div>
 			</div>
-			{/* Curtain */}
-			<div
-				onClick={() => {
-					setSelectedId(null);
-					setModalOpen(false);
-				}}
-				className={classNames("header__curtain", {
-					"header__curtain--visible": modalOpen,
-				})}
-			></div>
 			{/* Form */}
 			<form
 				onSubmit={handleSubmit}
@@ -239,7 +248,22 @@ const Tools = ({ buildings }) => {
 			>
 				<p style={{ fontWeight: 600 }}>Přidat nářadí</p>
 				<div>
-					<label htmlFor="code">Kod</label>
+					<label htmlFor="foto">Foto</label>
+					<input
+						style={{ width: "100%" }}
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						type="text"
+						onChange={(e) => handleToolForm(e.target.name, e.target.value)}
+						value={toolForm.img}
+						name="img"
+						id="foto"
+						disabled={loading}
+					/>
+				</div>
+				<div>
+					<label htmlFor="code">Kód</label>
 					<input
 						style={{ width: "100%" }}
 						className={classNames("input", {
@@ -408,7 +432,7 @@ const Tools = ({ buildings }) => {
 					);
 				})}
 				<button type="button" onClick={addBuilding} className="btn">
-					Pridat Lokalitu
+					Přidat lokalitu
 				</button>
 				<div>
 					<label htmlFor="desc">Poznámka</label>
@@ -442,9 +466,15 @@ const Tools = ({ buildings }) => {
 				</div>
 				<StatusIndicator error={error} loading={loading} />
 			</form>
+			{/* Curtain */}
 			<div
+				onClick={() => {
+					setSelectedId(null);
+					setModalOpen(false);
+					setFormVisible(false);
+				}}
 				className={classNames("tools-curtain", {
-					"tools-curtain--visible": formVisible,
+					"tools-curtain--visible": formVisible || modalOpen,
 				})}
 			></div>
 			<main className="main">
@@ -485,10 +515,10 @@ const Tools = ({ buildings }) => {
 								}
 								)
 							</button>
-							<div className="select">
+							<div ref={selectContainerRef} className="select">
 								<div>
 									<button
-										onClick={() => setSelectActive((prev) => !prev)}
+										onClick={handleSelect}
 										className={classNames("tools__filter-btn", {
 											"tools__filter-btn--active": buildings.some(
 												(b) => b.name.includes(filter) && filter !== "",
@@ -550,6 +580,17 @@ const Tools = ({ buildings }) => {
 							/>
 						</div>
 					</div>
+					<button
+						onClick={() => {
+							setEditingTool(null);
+							setToolForm(toolForm);
+							setFormVisible(true);
+						}}
+						className="responsibilities__btn"
+					>
+						<PlusIconSmall />
+						<span>Přidat</span>
+					</button>
 					<table className="tools-table">
 						<thead>
 							<tr>
@@ -569,7 +610,7 @@ const Tools = ({ buildings }) => {
 										paddingRight: 20,
 									}}
 								>
-									Kod
+									Kód
 								</th>
 								<th
 									style={{
@@ -578,9 +619,19 @@ const Tools = ({ buildings }) => {
 										paddingRight: 20,
 									}}
 								>
-									Nazev
+									Název
 								</th>
-								{filter !== "" && filter !== "Sklad" && <th>Lokalita</th>}
+								{filter !== "" && filter !== "Sklad" && (
+									<th
+										style={{
+											width: "1%",
+											whiteSpace: "nowrap",
+											paddingRight: 20,
+										}}
+									>
+										Lokalita
+									</th>
+								)}
 								<th
 									style={{
 										width: "1%",
@@ -605,7 +656,7 @@ const Tools = ({ buildings }) => {
 										paddingRight: 20,
 									}}
 								>
-									Poznamky
+									Poznámky
 								</th>
 								<th></th>
 								<th></th>
@@ -622,10 +673,7 @@ const Tools = ({ buildings }) => {
 												paddingRight: 20,
 											}}
 										>
-											<img
-												src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQ9rK6D7hqxf_cdMKKLd2TnI1QnK3HMe_loMsn6xGPsaCZ9CWbkEtcdkfTBda_ikLg67ByI2gniaHHeSSHkMHR2Yh60_PgvMuqJLZXRcmBfEmfr-iVmDmvJWgY"
-												alt=""
-											/>
+											{tool.img && <img src={tool.img} alt="" />}
 										</td>
 										<td
 											style={{
@@ -717,17 +765,19 @@ const Tools = ({ buildings }) => {
 							})}
 						</tbody>
 					</table>
-					<button
-						onClick={() => {
-							setEditingTool(null);
-							setToolForm(toolForm);
-							setFormVisible(true);
-						}}
-						className="responsibilities__btn"
-					>
-						<PlusIconSmall />
-						<span>Přidat</span>
-					</button>
+					{filteredTools.length < 1 && (
+						<p
+							style={{
+								textAlign: "center",
+								fontSize: "24px",
+								fontWeight: 500,
+								padding: "50px 0",
+							}}
+						>
+							Žádná data
+						</p>
+					)}
+
 					<StatusIndicator error={error} loading={loading} />
 				</section>
 				<Footer />

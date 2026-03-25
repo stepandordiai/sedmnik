@@ -9,7 +9,7 @@ router.post("/", protect, async (req, res) => {
 		const tool = req.body;
 
 		if (!tool.name || tool.name.trim() === "") {
-			return res.status(400).json({ message: "Name is required" });
+			return res.status(400).json({ message: "Název je povinný" });
 		}
 
 		const newTool = await Tool.create(tool);
@@ -45,7 +45,7 @@ router.put("/:id", protect, async (req, res) => {
 		const tool = req.body;
 
 		if (!tool.name || tool.name.trim() === "") {
-			return res.status(400).json({ message: "Name is required" });
+			return res.status(400).json({ message: "Název je povinný" });
 		}
 
 		// TODO: learn this
