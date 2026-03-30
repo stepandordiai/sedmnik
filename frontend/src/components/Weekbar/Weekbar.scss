@@ -22,13 +22,3 @@
 .weekbar__day--active {
 	background: var(--accent-semi-tp-clr) !important;
 }
-
-.weekbar__pdf {
-	align-self: flex-end;
-	flex-shrink: 0;
-	padding: 5px;
-	border-radius: 5px;
-	border: 2px solid var(--red-clr);
-	background: var(--red-tp-clr);
-	color: var(--red-clr);
-}

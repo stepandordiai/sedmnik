@@ -1,4 +1,4 @@
-#pdf-content {
+.pdf-container {
 	background: white;
 	color: black;
 }
@@ -18,17 +18,17 @@
 	width: 1200px;
 }
 
-.pdf-header {
-	display: none;
-	justify-content: flex-start;
-	align-items: center;
-	gap: 5px;
-}
-
 .pdf-btn--hidden {
 	display: none !important;
 }
 
 .pdf-header--visible {
 	display: flex;
+}
+
+.weekbar__pdf {
+	padding: 10px;
+	border-radius: 5px;
+	background: red;
+	color: #fff;
 }

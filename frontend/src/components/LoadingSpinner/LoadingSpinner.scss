@@ -15,7 +15,7 @@
 		top: 2px;
 		left: 2px;
 		border-radius: inherit;
-		background: var(--accent-clr);
+		background: var(--spinner-clr, var(--accent-clr));
 		width: calc(100% - 4px);
 		height: calc(100% - 4px);
 	}

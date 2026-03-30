@@ -8,10 +8,12 @@ import classNames from "classnames";
 import timeToMinutes from "../../utils/timeToMinutes";
 import { capitalizeDay, dateToDayName } from "../../utils/helpers";
 import "./Period.scss";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 
 const Period = ({ allUsers, userId }) => {
 	const [error, setError] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [isPdfLoading, setIsPdfLoading] = useState(false);
 	const [dateRange, setDateRange] = useState({
 		startDate: "",
 		endDate: "",
@@ -70,55 +72,72 @@ const Period = ({ allUsers, userId }) => {
 	// TODO: LEARN THIS
 	const exportPDF = async () => {
 		if (!pdfRef.current) return;
-
 		if (data.length < 1) {
 			setError("Žádná data k dispozici");
 			return;
 		}
-		document.body.classList.add("content-page");
-		setInitPdf(true);
 
-		await new Promise((resolve) => setTimeout(resolve, 200));
+		setInitPdf(true);
+		setIsPdfLoading(true);
+
+		// 🔥 clone the content into a hidden fixed-size container
+		const hidden = document.createElement("div");
+		hidden.style.cssText = `
+        position: fixed;
+        top: -9999px;
+        left: -9999px;
+        width: 794px;
+        overflow: visible;
+        background: #ffffff;
+        z-index: -1;
+    `;
+
+		const clone = pdfRef.current.cloneNode(true) as HTMLElement;
+		clone.style.width = "794px";
+		hidden.appendChild(clone);
+		document.body.appendChild(hidden);
+
+		await new Promise((resolve) => setTimeout(resolve, 1000)); // let it paint
 
 		const pdf = new jsPDF("p", "mm", "a4");
-
 		const pageWidth = pdf.internal.pageSize.getWidth();
 		const pageHeight = pdf.internal.pageSize.getHeight();
-
 		const margin = 5;
 		const contentWidth = pageWidth - margin * 2;
 		let yOffset = margin;
+		const SCALE = 3;
 
-		const blocks = pdfRef.current.querySelectorAll(".pdf-avoid-break");
+		const blocks = clone.querySelectorAll(".pdf-avoid-break");
 
 		for (let i = 0; i < blocks.length; i++) {
 			const block = blocks[i] as HTMLElement;
 
 			const canvas = await html2canvas(block, {
-				scale: 1,
+				scale: SCALE,
 				useCORS: true,
 				allowTaint: false,
 				backgroundColor: "#ffffff",
+				windowWidth: 794,
 			});
 
-			const imgData = canvas.toDataURL("image/jpeg");
+			const imgData = canvas.toDataURL("image/png");
 			const imgHeight = (canvas.height * contentWidth) / canvas.width;
 
-			// 🔥 NEW PAGE if block doesn't fit
 			if (yOffset + imgHeight > pageHeight - margin) {
 				pdf.addPage();
 				yOffset = margin;
 			}
 
-			pdf.addImage(imgData, "JPEG", margin, yOffset, contentWidth, imgHeight);
-
-			yOffset += imgHeight + 1; // spacing between blocks
+			pdf.addImage(imgData, "PNG", margin, yOffset, contentWidth, imgHeight);
+			yOffset += imgHeight + 1;
 		}
 
 		pdf.save(`${currentUser.name.replace(" ", "-").toLowerCase()}-export.pdf`);
 
-		document.body.classList.remove("content-page");
+		// 🔥 clean up — remove the hidden clone
+		document.body.removeChild(hidden);
 		setInitPdf(false);
+		setIsPdfLoading(false);
 	};
 
 	const totalMinutes = data.reduce((acc, item) => {
@@ -140,90 +159,52 @@ const Period = ({ allUsers, userId }) => {
 
 	return (
 		<>
-			<button onClick={exportPDF} className="weekbar__pdf">
-				Export PDF
-			</button>
-			<section ref={pdfRef} id="pdf-content" className="section">
-				<div
-					className={classNames("pdf-header pdf-avoid-break", {
-						"pdf-header--visible": initPdf,
-					})}
-					style={{
-						fontWeight: 600,
-						fontSize: "1.5rem",
-					}}
-				>
-					Neresen | <span style={{ color: "var(--accent-clr)" }}>Sedmník</span>
+			<section className="section">
+				<p style={{ fontSize: "1.5rem" }}>Období</p>
+
+				<div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+					<label htmlFor="from">Od </label>
+					<input
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						id="from"
+						type="date"
+						onChange={(e) => handleDateRange(e.target.name, e.target.value)}
+						name="startDate"
+						value={dateRange.startDate}
+						disabled={loading}
+					/>
+					<label htmlFor="to"> Do </label>
+					<input
+						className={classNames("input", {
+							"input--disabled": loading,
+						})}
+						id="to"
+						onChange={(e) => handleDateRange(e.target.name, e.target.value)}
+						name="endDate"
+						type="date"
+						value={dateRange.endDate}
+						disabled={loading}
+					/>
+					<button className="btn" onClick={fetchDataRange}>
+						Získat data
+					</button>
 				</div>
 				<div
-					className="pdf-avoid-break"
 					style={{
 						display: "flex",
 						flexDirection: "column",
 						gap: 5,
-						alignItems: "flex-start",
 					}}
 				>
-					<p style={{ fontSize: "2rem" }}>{currentUser.name} | Období</p>
+					<p>Další nastavení</p>
 					<div
 						style={{
 							display: "flex",
-							justifyContent: "space-between",
-							alignItems: "flex-end",
-							width: "100%",
-						}}
-					>
-						<div>
-							<label htmlFor="from">Od </label>
-							<input
-								className={classNames("input", {
-									"input--disabled": loading,
-								})}
-								id="from"
-								type="date"
-								onChange={(e) => handleDateRange(e.target.name, e.target.value)}
-								name="startDate"
-								value={dateRange.startDate}
-								disabled={loading}
-							/>
-							<label htmlFor="to"> Do </label>
-							<input
-								className={classNames("input", {
-									"input--disabled": loading,
-								})}
-								id="to"
-								onChange={(e) => handleDateRange(e.target.name, e.target.value)}
-								name="endDate"
-								type="date"
-								value={dateRange.endDate}
-								disabled={loading}
-							/>
-						</div>
-						<div style={{ display: "flex", flexDirection: "column" }}>
-							<span>Odpracováno za měsíc</span>
-							<span style={{ textAlign: "center" }} className="input">
-								{totalTime}
-							</span>
-						</div>
-					</div>
-					<button
-						className={classNames("btn", {
-							"pdf-btn--hidden": initPdf,
-						})}
-						onClick={fetchDataRange}
-					>
-						Získat data
-					</button>
-					<div
-						style={{
-							display: "flex",
-							justifyContent: "flex-start",
 							alignItems: "center",
 							gap: 5,
 						}}
-						className={classNames({
-							"pdf-btn--hidden": initPdf,
-						})}
 					>
 						<button
 							style={{ justifyContent: "flex-end", width: "max-content" }}
@@ -232,11 +213,61 @@ const Period = ({ allUsers, userId }) => {
 							})}
 							onClick={() => setResponsibilities((prev) => !prev)}
 						></button>
-						<span style={{ fontWeight: 600 }}>Responsibilities</span>
+						<span style={{ fontWeight: 600 }}>Popis práce</span>
 					</div>
 				</div>
-				{data.length === 0 ? (
-					"Vyberte období pro zobrazení data"
+				<StatusIndicator error={error} loading={loading} />
+			</section>
+			<div
+				style={{
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "center",
+				}}
+			>
+				<p style={{ fontSize: "18px" }}>Náhled PDF dokumentu</p>
+				<button onClick={exportPDF} className="weekbar__pdf">
+					{isPdfLoading ? <LoadingSpinner clr="red" /> : "Export PDF"}
+				</button>
+			</div>
+			<section ref={pdfRef} id="pdf-content" className="section">
+				<div
+					className="pdf-avoid-break"
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+					}}
+				>
+					<div style={{ fontSize: "1.5rem" }}>
+						<p>
+							<span style={{ color: "var(--accent-clr)" }}>Sedmník</span> |
+							Neresen
+						</p>
+						<p>{currentUser.name}</p>
+					</div>
+					<div
+						style={{
+							display: "flex",
+							flexDirection: "column",
+						}}
+					>
+						<span>Odpracováno za měsíc</span>
+						<span style={{ textAlign: "center" }} className="input">
+							{totalTime}
+						</span>
+					</div>
+				</div>
+				{data.length < 1 ? (
+					<p
+						style={{
+							textAlign: "center",
+							fontSize: "24px",
+							fontWeight: 500,
+							padding: "50px 0",
+						}}
+					>
+						Vyberte období pro zobrazení data
+					</p>
 				) : (
 					<div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
 						{data.map((item, i) => {
@@ -358,7 +389,6 @@ const Period = ({ allUsers, userId }) => {
 						})}
 					</div>
 				)}
-				<StatusIndicator error={error} loading={loading} />
 			</section>
 		</>
 	);
