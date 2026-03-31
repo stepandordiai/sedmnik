@@ -34,6 +34,7 @@ const Leads = () => {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [formVisible, setFormVisible] = useState(false);
+	const [filterVisible, setFilterVisible] = useState(false);
 	const [leadForm, setLeadForm] = useState<Lead>(initLead);
 	const [editingLead, setEditingLead] = useState<Lead | null>(null);
 
@@ -211,6 +212,19 @@ const Leads = () => {
 		setTimeout(() => setCopiedId(null), 1500);
 	};
 
+	const uniquePositions = [
+		...new Set(leads.map((lead) => lead.position).filter(Boolean)),
+	];
+
+	// add state for selected position
+	const [positionFilter, setPositionFilter] = useState("");
+	const [appliedFilter, setAppliedFilter] = useState("");
+
+	// filtered leads derived from state
+	const filteredLeads = appliedFilter
+		? leads.filter((lead) => lead.position === appliedFilter)
+		: leads;
+
 	return (
 		<>
 			<form
@@ -327,12 +341,55 @@ const Leads = () => {
 				</button>
 			</div>
 			<div
+				className={classNames("leads-filter", {
+					"leads-filter--visible": filterVisible,
+				})}
+			>
+				<p style={{ fontWeight: 600 }}>Filter</p>
+				<select
+					onChange={(e) => setPositionFilter(e.target.value)}
+					value={positionFilter}
+					name=""
+					id=""
+				>
+					<option value="">Not selected</option>
+					{uniquePositions.map((position, i) => {
+						return (
+							<option key={i} value={position}>
+								{position}
+							</option>
+						);
+					})}
+				</select>
+				<div style={{ display: "flex", gap: 5 }}>
+					<button
+						style={{ background: "#000" }}
+						className="tools-form__btn"
+						onClick={() => {
+							setFilterVisible(false);
+						}}
+					>
+						Zrušit
+					</button>
+					<button
+						onClick={() => {
+							setAppliedFilter(positionFilter);
+							setFilterVisible(false);
+						}}
+						className="tools-form__btn"
+						type="submit"
+					>
+						Přidat
+					</button>
+				</div>
+			</div>
+			<div
 				onClick={() => {
 					setSelectedId(null);
 					setModalOpen(false);
 				}}
 				className={classNames("header__curtain", {
-					"header__curtain--visible": formVisible || modalOpen,
+					"header__curtain--visible": formVisible || modalOpen || filterVisible,
 				})}
 			></div>
 			<main className="main">
@@ -341,17 +398,25 @@ const Leads = () => {
 						<PersonIcon size={20} />
 						<h2>Potenciální pracovníci</h2>
 					</div>
-					<button
-						onClick={() => {
-							setEditingLead(null);
-							setLeadForm(leadForm);
-							setFormVisible(true);
-						}}
-						className="leads__btn"
-					>
-						<PlusIconSmall />
-						<span>Přidat</span>
-					</button>
+					<div style={{ display: "flex", justifyContent: "space-between" }}>
+						<button
+							onClick={() => setFilterVisible(true)}
+							className="leads__btn"
+						>
+							<span>Filter</span>
+						</button>
+						<button
+							onClick={() => {
+								setEditingLead(null);
+								setLeadForm(leadForm);
+								setFormVisible(true);
+							}}
+							className="leads__btn"
+						>
+							<PlusIconSmall />
+							<span>Přidat</span>
+						</button>
+					</div>
 					<table className="leads-table">
 						<thead>
 							<tr>
@@ -369,7 +434,7 @@ const Leads = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{leads.map((lead, i) => {
+							{filteredLeads.map((lead, i) => {
 								return (
 									<tr key={lead._id}>
 										<td>{i + 1}</td>

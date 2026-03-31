@@ -19,7 +19,6 @@ const Period = ({ allUsers, userId }) => {
 		endDate: "",
 	});
 	const [data, setData] = useState([]);
-	const [initPdf, setInitPdf] = useState(false);
 	const [responsibilities, setResponsibilities] = useState(false);
 
 	const pdfRef = useRef<HTMLDivElement>(null);
@@ -77,7 +76,6 @@ const Period = ({ allUsers, userId }) => {
 			return;
 		}
 
-		setInitPdf(true);
 		setIsPdfLoading(true);
 
 		// 🔥 clone the content into a hidden fixed-size container
@@ -136,7 +134,6 @@ const Period = ({ allUsers, userId }) => {
 
 		// 🔥 clean up — remove the hidden clone
 		document.body.removeChild(hidden);
-		setInitPdf(false);
 		setIsPdfLoading(false);
 	};
 
