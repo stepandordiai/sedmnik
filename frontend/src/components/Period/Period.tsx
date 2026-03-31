@@ -9,6 +9,7 @@ import timeToMinutes from "../../utils/timeToMinutes";
 import { capitalizeDay, dateToDayName } from "../../utils/helpers";
 import "./Period.scss";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
+import CalendarIcon from "../../icons/CalendarIcon";
 
 const Period = ({ allUsers, userId }) => {
 	const [error, setError] = useState(null);
@@ -157,8 +158,10 @@ const Period = ({ allUsers, userId }) => {
 	return (
 		<>
 			<section className="section">
-				<p style={{ fontSize: "1.5rem" }}>Období</p>
-
+				<div className="container-title">
+					<CalendarIcon size={20} />
+					<h2>Období</h2>
+				</div>
 				<div style={{ display: "flex", alignItems: "center", gap: 5 }}>
 					<label htmlFor="from">Od </label>
 					<input
@@ -222,7 +225,7 @@ const Period = ({ allUsers, userId }) => {
 					alignItems: "center",
 				}}
 			>
-				<p style={{ fontSize: "18px" }}>Náhled PDF dokumentu</p>
+				<p style={{ fontWeight: 600 }}>Náhled PDF dokumentu</p>
 				<button onClick={exportPDF} className="weekbar__pdf">
 					{isPdfLoading ? <LoadingSpinner clr="red" /> : "Export PDF"}
 				</button>
