@@ -15,6 +15,12 @@ router.post("/", async (req, res) => {
 
 		res.status(201).json(newLead);
 	} catch (error) {
+		// TODO: learn this
+		if (error.code === 11000) {
+			return res
+				.status(409)
+				.json({ message: "Toto telefonní číslo již existuje." });
+		}
 		console.error("Mongoose Error:", error.message);
 		res.status(500).json({ message: error.message });
 	}

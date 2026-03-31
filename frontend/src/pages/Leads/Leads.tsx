@@ -52,7 +52,6 @@ const Leads = () => {
 				leadForm,
 			);
 
-			// TODO: learn this
 			setLeads((prev) => [...prev, res.data]);
 
 			setFormVisible(false);
