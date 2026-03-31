@@ -116,13 +116,25 @@ html {
 	border-radius: 5px;
 }
 
-.btn--delete {
-	background: var(--red-tp-clr);
-	color: var(--red-clr);
-	border: 2px solid var(--red-clr);
+.btn--update {
+	background: var(--orange-clr);
+	color: #000;
+	// border: 2px solid var(--orange-clr);
 	padding: 5px;
 	width: max-content;
 	aspect-ratio: 1/1;
+	border-radius: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.btn--delete {
+	background: var(--red-clr);
+	color: #fff;
+	padding: 5px;
+	width: max-content;
 	border-radius: 5px;
 	display: flex;
 	justify-content: center;

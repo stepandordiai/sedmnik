@@ -8,6 +8,7 @@ import XIcon from "../../icons/XIcon";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import PencilIcon from "../../icons/PencilIcon";
 import "./Leads.scss";
+import FilterIcon from "../../icons/FilterIcon";
 
 interface Lead {
 	_id?: string;
@@ -34,7 +35,6 @@ const Leads = () => {
 	const [modalOpen, setModalOpen] = useState(false);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [formVisible, setFormVisible] = useState(false);
-	const [filterVisible, setFilterVisible] = useState(false);
 	const [leadForm, setLeadForm] = useState<Lead>(initLead);
 	const [editingLead, setEditingLead] = useState<Lead | null>(null);
 
@@ -216,14 +216,20 @@ const Leads = () => {
 		...new Set(leads.map((lead) => lead.position).filter(Boolean)),
 	];
 
-	// add state for selected position
 	const [positionFilter, setPositionFilter] = useState("");
-	const [appliedFilter, setAppliedFilter] = useState("");
+	const [dateFilter, setDateFilter] = useState("");
 
 	// filtered leads derived from state
-	const filteredLeads = appliedFilter
-		? leads.filter((lead) => lead.position === appliedFilter)
-		: leads;
+	// TODO: learn this
+	const filteredLeads = leads
+		.filter((lead) =>
+			positionFilter ? lead.position === positionFilter : true,
+		)
+		.sort((a, b) => {
+			if (dateFilter === "desc") return b.createdAt.localeCompare(a.createdAt);
+			if (dateFilter === "asc") return a.createdAt.localeCompare(b.createdAt);
+			return 0;
+		});
 
 	return (
 		<>
@@ -233,8 +239,11 @@ const Leads = () => {
 					"leads-form--active": formVisible,
 				})}
 			>
+				<p style={{ fontSize: "24px" }}>
+					{editingLead ? "Upravit lead" : "Přidat lead"}
+				</p>
 				<div>
-					<label htmlFor="name">Jmeno</label>
+					<label htmlFor="name">Jméno</label>
 					<input
 						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
 						value={leadForm.name}
@@ -248,7 +257,9 @@ const Leads = () => {
 					/>
 				</div>
 				<div>
-					<label htmlFor="tel">Telefon</label>
+					<label htmlFor="tel">
+						Telefonní číslo<span style={{ color: "#f00" }}>*</span>
+					</label>
 					<input
 						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
 						name="tel"
@@ -286,7 +297,7 @@ const Leads = () => {
 					/>
 				</div>
 				<div>
-					<label htmlFor="details">Poznamky</label>
+					<label htmlFor="details">Poznámky</label>
 					<input
 						onChange={(e) => handleLeadForm(e.target.name, e.target.value)}
 						name="details"
@@ -321,7 +332,7 @@ const Leads = () => {
 					"header-modal--visible": modalOpen,
 				})}
 			>
-				<p style={{ fontWeight: 600 }}>Opravdu chcete tuto položku smazat?</p>
+				<p style={{ fontSize: "24px" }}>Opravdu chcete tuto položku smazat?</p>
 				<button
 					onClick={deleteLead}
 					style={{ background: "var(--red-clr)" }}
@@ -341,93 +352,92 @@ const Leads = () => {
 				</button>
 			</div>
 			<div
-				className={classNames("leads-filter", {
-					"leads-filter--visible": filterVisible,
-				})}
-			>
-				<p style={{ fontWeight: 600 }}>Filter</p>
-				<select
-					onChange={(e) => setPositionFilter(e.target.value)}
-					value={positionFilter}
-					name=""
-					id=""
-				>
-					<option value="">Not selected</option>
-					{uniquePositions.map((position, i) => {
-						return (
-							<option key={i} value={position}>
-								{position}
-							</option>
-						);
-					})}
-				</select>
-				<div style={{ display: "flex", gap: 5 }}>
-					<button
-						style={{ background: "#000" }}
-						className="tools-form__btn"
-						onClick={() => {
-							setFilterVisible(false);
-						}}
-					>
-						Zrušit
-					</button>
-					<button
-						onClick={() => {
-							setAppliedFilter(positionFilter);
-							setFilterVisible(false);
-						}}
-						className="tools-form__btn"
-						type="submit"
-					>
-						Přidat
-					</button>
-				</div>
-			</div>
-			<div
 				onClick={() => {
 					setSelectedId(null);
 					setModalOpen(false);
 				}}
 				className={classNames("header__curtain", {
-					"header__curtain--visible": formVisible || modalOpen || filterVisible,
+					"header__curtain--visible": formVisible || modalOpen,
 				})}
 			></div>
 			<main className="main">
 				<section className="section">
 					<div className="container-title">
+						<FilterIcon size={20} />
+						<h2>Filtr</h2>
+					</div>
+					<div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+						<div>
+							<label htmlFor="select-position">Pozice</label>
+							<select
+								className="input"
+								id="select-position"
+								onChange={(e) => setPositionFilter(e.target.value)}
+								value={positionFilter}
+							>
+								<option value="">Nevybráno</option>
+								{uniquePositions.map((position, i) => {
+									return (
+										<option key={i} value={position}>
+											{position}
+										</option>
+									);
+								})}
+							</select>
+						</div>
+						<div>
+							<label htmlFor="filter-date">Seřadit podle data</label>
+							<select
+								className="input"
+								onChange={(e) => setDateFilter(e.target.value)}
+								value={dateFilter}
+								id="filter-date"
+							>
+								<option value="">Nevybráno</option>
+								<option value="desc">Od nejnovějších</option>{" "}
+								{/* newest first = desc */}
+								<option value="asc">Od nejstarších</option>{" "}
+								{/* oldest first = asc */}
+							</select>
+						</div>
+					</div>
+					<button
+						className="btn--delete"
+						onClick={() => {
+							setDateFilter("");
+							setPositionFilter("");
+						}}
+					>
+						Zrušit filtry
+					</button>
+				</section>
+				<section className="section">
+					<div className="container-title">
 						<PersonIcon size={20} />
 						<h2>Potenciální pracovníci</h2>
 					</div>
-					<div style={{ display: "flex", justifyContent: "space-between" }}>
-						<button
-							onClick={() => setFilterVisible(true)}
-							className="leads__btn"
-						>
-							<span>Filter</span>
-						</button>
-						<button
-							onClick={() => {
-								setEditingLead(null);
-								setLeadForm(leadForm);
-								setFormVisible(true);
-							}}
-							className="leads__btn"
-						>
-							<PlusIconSmall />
-							<span>Přidat</span>
-						</button>
-					</div>
+					<button
+						onClick={() => {
+							setEditingLead(null);
+							setLeadForm(leadForm);
+							setFormVisible(true);
+						}}
+						className="leads__btn"
+					>
+						<PlusIconSmall />
+						<span>Přidat</span>
+					</button>
 					<table className="leads-table">
 						<thead>
 							<tr>
 								<th>#</th>
-								<th>Jmeno</th>
+								<th>Jméno</th>
 								<th>
-									Telefon <span style={{ color: "#f00" }}>*</span>
+									Telefonní číslo<span style={{ color: "#f00" }}>*</span>
 								</th>
 								<th>Adresa</th>
 								<th>Pozice</th>
-								<th className="fixed-data">Poznamky</th>
+								<th className="fixed-data">Poznámky</th>
 								<th>Datum</th>
 								<th></th>
 								<th></th>
@@ -458,7 +468,8 @@ const Leads = () => {
 													setEditingLead(lead);
 													setFormVisible(true);
 												}}
-												className="plan__remove-btn"
+												className="btn--update"
+												title="Upravit lead"
 											>
 												<PencilIcon />
 											</button>
@@ -469,7 +480,8 @@ const Leads = () => {
 													setSelectedId(lead._id);
 													setModalOpen(true);
 												}}
-												className="plan__remove-btn"
+												className="btn--delete"
+												title="Smazat lead"
 											>
 												<XIcon />
 											</button>
