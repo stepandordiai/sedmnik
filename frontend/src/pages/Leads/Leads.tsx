@@ -217,13 +217,18 @@ const Leads = () => {
 
 	const [positionFilter, setPositionFilter] = useState("");
 	const [dateFilter, setDateFilter] = useState("");
+	const [telFilter, setTelFilter] = useState("");
 
 	// filtered leads derived from state
 	// TODO: learn this
 	const filteredLeads = leads
-		.filter((lead) =>
-			positionFilter ? lead.position === positionFilter : true,
-		)
+		.filter((lead) => {
+			const matchesPosition = positionFilter
+				? lead.position === positionFilter && lead.tel.includes(telFilter)
+				: true;
+			const matchesTel = telFilter ? lead.tel.includes(telFilter) : true;
+			return matchesPosition && matchesTel;
+		})
 		.sort((a, b) => {
 			if (dateFilter === "desc") return b.createdAt.localeCompare(a.createdAt);
 			if (dateFilter === "asc") return a.createdAt.localeCompare(b.createdAt);
@@ -367,6 +372,15 @@ const Leads = () => {
 					</div>
 					<div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
 						<div>
+							<label htmlFor="filter-date">Telefonní číslo</label>
+							<input
+								className="input"
+								type="text"
+								value={telFilter}
+								onChange={(e) => setTelFilter(e.target.value)}
+							/>
+						</div>
+						<div>
 							<label htmlFor="select-position">Pozice</label>
 							<select
 								className="input"
@@ -405,6 +419,7 @@ const Leads = () => {
 						onClick={() => {
 							setDateFilter("");
 							setPositionFilter("");
+							setTelFilter("");
 						}}
 					>
 						Zrušit filtry
