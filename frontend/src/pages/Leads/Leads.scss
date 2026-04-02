@@ -18,10 +18,12 @@
 }
 
 .leads__btn {
+	position: sticky;
+	bottom: 20px;
 	background: var(--accent-clr);
 	color: #fff;
-	padding: 5px;
-	border-radius: 5px;
+	padding: 10px;
+	border-radius: 10px;
 	display: flex;
 	justify-content: center;
 	align-items: center;

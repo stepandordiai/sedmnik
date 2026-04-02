@@ -7,8 +7,8 @@ import PersonIcon from "../../icons/PersonIcon";
 import XIcon from "../../icons/XIcon";
 import PlusIconSmall from "../../icons/PlusIconSmall";
 import PencilIcon from "../../icons/PencilIcon";
-import "./Leads.scss";
 import FilterIcon from "../../icons/FilterIcon";
+import "./Leads.scss";
 
 interface Lead {
 	_id?: string;
@@ -113,6 +113,8 @@ const Leads = () => {
 			createLead();
 		}
 	};
+
+	console.log(leads);
 
 	useEffect(() => {
 		const getLeads = async () => {
@@ -430,17 +432,6 @@ const Leads = () => {
 						<PersonIcon size={20} />
 						<h2>Potenciální pracovníci</h2>
 					</div>
-					<button
-						onClick={() => {
-							setEditingLead(null);
-							setLeadForm(leadForm);
-							setFormVisible(true);
-						}}
-						className="leads__btn"
-					>
-						<PlusIconSmall />
-						<span>Přidat</span>
-					</button>
 					<table className="leads-table">
 						<thead>
 							<tr>
@@ -474,7 +465,7 @@ const Leads = () => {
 										<td>{lead.address}</td>
 										<td>{lead.position}</td>
 										<td className="fixed-data">{lead.details}</td>
-										<td>{lead.createdAt.split("T")[0]}</td>
+										<td>{lead.updatedAt.split("T")[0]}</td>
 										<td>
 											<button
 												onClick={() => {
@@ -505,6 +496,17 @@ const Leads = () => {
 							})}
 						</tbody>
 					</table>
+					<button
+						onClick={() => {
+							setEditingLead(null);
+							setLeadForm(leadForm);
+							setFormVisible(true);
+						}}
+						className="leads__btn"
+					>
+						<PlusIconSmall />
+						<span>Přidat</span>
+					</button>
 					<StatusIndicator error={error} loading={loading} />
 				</section>
 				<Footer />
