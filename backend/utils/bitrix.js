@@ -1,5 +1,5 @@
 const BITRIX_WEBHOOK_URL =
-	"https://b24-mzglfo.bitrix24.eu/rest/13/iebvepomtz5i3vai/";
+	"https://b24-mzglfo.bitrix24.eu/rest/13/n1mx77timb7pxjt2/";
 
 export default async function pushLeadToBitrix(lead) {
 	const params = new URLSearchParams({

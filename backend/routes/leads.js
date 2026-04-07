@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
 
 		// Push to Bitrix immediately
 		try {
-			await pushLeadToBitrix(lead);
+			await pushLeadToBitrix(newLead);
 		} catch (bitrixErr) {
 			console.error("Bitrix sync failed:", bitrixErr.message);
 			// Don't fail the whole request if Bitrix is down
