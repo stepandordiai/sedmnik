@@ -1,5 +1,6 @@
 import express from "express";
 import Lead from "./../models/Lead.js";
+import pushLeadToBitrix from "../utils/bitrix.js";
 
 const router = express.Router();
 
@@ -12,6 +13,14 @@ router.post("/", async (req, res) => {
 		}
 
 		const newLead = await Lead.create(lead);
+
+		// Push to Bitrix immediately
+		try {
+			await pushLeadToBitrix(lead);
+		} catch (bitrixErr) {
+			console.error("Bitrix sync failed:", bitrixErr.message);
+			// Don't fail the whole request if Bitrix is down
+		}
 
 		res.status(201).json(newLead);
 	} catch (error) {

@@ -9,6 +9,7 @@ import leadsRoutes from "./routes/leads.js";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 dotenv.config();
+import bitrixRouter from "./routes/bitrix.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -55,6 +56,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/leads", leadsRoutes);
+
+app.use("/api/bitrix", bitrixRouter);
 
 app.listen(PORT, () => {
 	console.log(`Server started at port ${PORT}`);
