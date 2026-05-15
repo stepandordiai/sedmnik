@@ -9,7 +9,6 @@ import PlusIcon from "../../../icons/PlusIcon";
 import logo from "/logo/logo-black.png";
 import ToolsIcon from "../../../icons/ToolsIcon";
 import StoreIcon from "../../../icons/StoreIcon";
-import PersonIcon from "../../../icons/PersonIcon";
 import type { Building } from "../../../interfaces";
 import { extractNameInitials } from "../../../utils/helpers";
 import "./Header.scss";

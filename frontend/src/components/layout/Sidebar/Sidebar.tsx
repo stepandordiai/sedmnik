@@ -10,7 +10,6 @@ import PlusIconSmall from "../../../icons/PlusIconSmall";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 import ToolsIcon from "../../../icons/ToolsIcon";
 import StoreIcon from "../../../icons/StoreIcon";
-import PersonIcon from "../../../icons/PersonIcon";
 import type { Building } from "../../../interfaces";
 import "./Sidebar.scss";
 import { extractNameInitials } from "../../../utils/helpers";
