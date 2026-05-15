@@ -247,7 +247,7 @@ const Sidebar = ({
 						<StoreIcon size={20} />
 						<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
 					</a>
-					<NavLink
+					{/* <NavLink
 						className={({ isActive }) =>
 							classNames("sidebar__link", {
 								"sidebar__link--active": isActive,
@@ -257,7 +257,7 @@ const Sidebar = ({
 					>
 						<PersonIcon size={20} />
 						<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
-					</NavLink>
+					</NavLink> */}
 				</div>
 				<div
 					style={{

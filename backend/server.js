@@ -5,11 +5,11 @@ import workRoutes from "./routes/work.js";
 import usersRoutes from "./routes/users.js";
 import buildingsRoutes from "./routes/buildings.js";
 import toolsRoutes from "./routes/tools.js";
-import leadsRoutes from "./routes/leads.js";
+// import leadsRoutes from "./routes/leads.js";
 import { connectDB } from "./config/db.js";
 import cors from "cors";
 dotenv.config();
-import bitrixRouter from "./routes/bitrix.js";
+// import bitrixRouter from "./routes/bitrix.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -22,42 +22,37 @@ app.use(express.json());
 // TODO: LEARN THIS
 app.use("/uploads", express.static("C:/SynologyDrive/RŮZNÉ/tools"));
 
-const allowedOrigins = [
-	"https://sedmnik.netlify.app",
-	"http://localhost:3000",
-	"http://localhost:5173",
-	"https://www.flovas.cz",
-];
+// const allowedOrigins = [
+// 	"https://sedmnik.netlify.app",
+// 	"http://localhost:3000",
+// 	"http://localhost:5173",
+// 	"https://www.flovas.cz",
+// ];
 
 // CORS for frontend domain
-app.use(
-	cors({
-		origin: function (origin, callback) {
-			if (!origin || allowedOrigins.includes(origin)) {
-				callback(null, true);
-			}
-		},
-		// credentials: true,
-	}),
-);
+// app.use(
+// 	cors({
+// 		origin: function (origin, callback) {
+// 			if (!origin || allowedOrigins.includes(origin)) {
+// 				callback(null, true);
+// 			}
+// 		},
+// 		// credentials: true,
+// 	}),
+// );
+app.use(cors());
 app.use("/api", authRoutes);
-
 app.use("/api/users", usersRoutes);
-
 app.use("/api/work", workRoutes);
-
 app.use("/api/buildings", buildingsRoutes);
-
 app.use("/tools", toolsRoutes);
+// app.use("/leads", leadsRoutes);
+// app.use("/api/bitrix", bitrixRouter);
 
 app.get("/health", (req, res) => {
 	res.status(200).write("ok");
 	res.end();
 });
-
-app.use("/leads", leadsRoutes);
-
-app.use("/api/bitrix", bitrixRouter);
 
 app.listen(PORT, () => {
 	console.log(`Server started at port ${PORT}`);

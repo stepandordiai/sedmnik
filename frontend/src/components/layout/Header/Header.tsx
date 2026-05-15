@@ -237,7 +237,7 @@ const Header = ({
 						<StoreIcon size={20} />
 						<span style={{ fontWeight: 600 }}>Složení "Tatra"</span>
 					</a>
-					<NavLink
+					{/* <NavLink
 						style={{ borderRadius: 10 }}
 						onClick={() => setMenuVisible(false)}
 						className={({ isActive }) =>
@@ -249,7 +249,7 @@ const Header = ({
 					>
 						<PersonIcon size={20} />
 						<span style={{ fontWeight: 600 }}>Potenciální pracovníci</span>
-					</NavLink>
+					</NavLink> */}
 				</div>
 				<div
 					style={{
