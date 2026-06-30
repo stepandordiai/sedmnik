@@ -7,15 +7,23 @@ import { useState } from "react";
 import Plan from "../../components/Plan/Plan";
 import Period from "../../components/Period/Period";
 import classNames from "classnames";
-import "./UserPage.scss";
 import Footer from "../../components/layout/Footer/Footer";
+import "./UserPage.scss";
 
 const UserPage = ({ allUsers }) => {
 	const { user } = useAuth();
 	const { id } = useParams<string>();
 	const today = new Date();
 
-	const [shiftDate, setShiftDate] = useState(today.toISOString().split("T")[0]);
+	// TODO: learn this
+	const toLocalDateString = (date: Date) => {
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, "0");
+		const day = String(date.getDate()).padStart(2, "0");
+		return `${year}-${month}-${day}`;
+	};
+
+	const [shiftDate, setShiftDate] = useState(toLocalDateString(today));
 	const [isWeek, setIsWeek] = useState(false);
 	const [periodActive, setPeriodActive] = useState(false);
 

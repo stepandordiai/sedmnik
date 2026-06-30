@@ -1,6 +1,14 @@
 import classNames from "classnames";
 import "./Weekbar.scss";
 
+// TODO: learn this
+const toLocalDateString = (date: Date) => {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	return `${year}-${month}-${day}`;
+};
+
 const Weekbar = ({ shiftDate, setShiftDate, isWeek, setIsWeek }) => {
 	const weekData = [
 		"Pondělí",
@@ -25,7 +33,7 @@ const Weekbar = ({ shiftDate, setShiftDate, isWeek, setIsWeek }) => {
 
 		schedule.push({
 			day: weekData[i],
-			date: currentDate.toISOString().split("T")[0],
+			date: toLocalDateString(currentDate),
 		});
 	}
 
@@ -58,7 +66,7 @@ const Weekbar = ({ shiftDate, setShiftDate, isWeek, setIsWeek }) => {
 							onClick={() => handleWeekDay(day.date, false)}
 							className={classNames("weekbar__day", {
 								"weekbar__day--active":
-									day.date === new Date().toISOString().split("T")[0],
+									day.date === toLocalDateString(new Date()),
 							})}
 							style={
 								shiftDate === day.date && !isWeek
